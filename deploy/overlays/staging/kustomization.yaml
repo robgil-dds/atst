@@ -3,6 +3,7 @@ bases:
   - ../../azure/
 resources:
   - namespace.yml
+  - reset-cron-job.yml
 patchesStrategicMerge:
   - replica_count.yml
   - ports.yml
