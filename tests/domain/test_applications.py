@@ -5,7 +5,7 @@ from atst.models import CSPRole, ApplicationRoleStatus
 from atst.domain.application_roles import ApplicationRoles
 from atst.domain.applications import Applications
 from atst.domain.environment_roles import EnvironmentRoles
-from atst.domain.exceptions import NotFoundError
+from atst.domain.exceptions import AlreadyExistsError, NotFoundError
 from atst.domain.permission_sets import PermissionSets
 
 from tests.factories import (
@@ -177,3 +177,22 @@ def test_invite_to_nonexistent_environment():
                 {"environment_id": uuid4(), "role": CSPRole.BASIC_ACCESS.value},
             ],
         )
+
+
+def test_create_does_not_duplicate_names_within_portfolio():
+    portfolio = PortfolioFactory.create()
+    name = "An Awesome Application"
+
+    assert Applications.create(portfolio.owner, portfolio, name, "")
+    with pytest.raises(AlreadyExistsError):
+        Applications.create(portfolio.owner, portfolio, name, "")
+
+
+def test_update_does_not_duplicate_names_within_portfolio():
+    portfolio = PortfolioFactory.create()
+    name = "An Awesome Application"
+    application = ApplicationFactory.create(portfolio=portfolio, name=name)
+    dupe_application = ApplicationFactory.create(portfolio=portfolio)
+
+    with pytest.raises(AlreadyExistsError):
+        Applications.update(dupe_application, {"name": name})

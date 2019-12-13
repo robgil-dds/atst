@@ -1,4 +1,4 @@
-from sqlalchemy import and_, Column, ForeignKey, String
+from sqlalchemy import and_, Column, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import relationship, synonym
 
 from atst.models.base import Base
@@ -34,6 +34,11 @@ class Application(
         ),
     )
     members = synonym("roles")
+    __table_args__ = (
+        UniqueConstraint(
+            "name", "portfolio_id", name="name_portfolio_id_unique_constraint"
+        ),
+    )
 
     @property
     def users(self):

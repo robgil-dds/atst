@@ -1,4 +1,5 @@
 import pytest
+import random
 from uuid import uuid4
 
 from atst.domain.exceptions import NotFoundError, UnauthorizedError
@@ -97,7 +98,7 @@ def test_scoped_portfolio_returns_all_applications_for_portfolio_admin(
         Applications.create(
             portfolio.owner,
             portfolio,
-            "My Application",
+            "My Application %s" % (random.randrange(1, 1000)),
             "My application",
             ["dev", "staging", "prod"],
         )
@@ -120,7 +121,7 @@ def test_scoped_portfolio_returns_all_applications_for_portfolio_owner(
         Applications.create(
             portfolio.owner,
             portfolio,
-            "My Application",
+            "My Application %s" % (random.randrange(1, 1000)),
             "My application",
             ["dev", "staging", "prod"],
         )
