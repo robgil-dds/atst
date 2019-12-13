@@ -114,6 +114,8 @@ flash:
       message: '{application_name} has been successfully created. You may continue on to provision environments and assign team members now, or come back and complete these tasks at a later time.'
     updated: 'You have successfully updated the {application_name} application.'
     deleted: 'You have successfully deleted the {application_name} application. To view the retained activity log, visit the portfolio administration page.'
+    name_error:
+      message: 'The application name {name} has already been used in this portfolio. Please enter a unique name.'
   delete_member_success: 'You have successfully deleted {member_name} from the portfolio.'
   deleted_member: Portfolio member deleted
   environment_added: 'The environment "{env_name}" has been added to the application.'

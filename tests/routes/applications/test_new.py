@@ -70,6 +70,24 @@ def test_post_name_and_description_for_update(client, session, user_session):
     assert application.description == "This is only a test"
 
 
+def test_post_name_and_description_enforces_unique_name(client, user_session, session):
+    portfolio = PortfolioFactory.create()
+    name = "Test Application"
+    application = ApplicationFactory.create(portfolio=portfolio, name=name)
+    user_session(portfolio.owner)
+
+    session.begin_nested()
+    response = client.post(
+        url_for(
+            "applications.create_new_application_step_1", portfolio_id=portfolio.id
+        ),
+        data={"name": name, "description": "This is only a test"},
+    )
+    session.rollback()
+
+    assert response.status_code == 400
+
+
 def test_get_environments(client, user_session):
     application = ApplicationFactory.create()
     user_session(application.portfolio.owner)

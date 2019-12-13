@@ -2,6 +2,7 @@ from flask import redirect, render_template, request as http_request, url_for, g
 
 from .blueprint import applications_bp
 from atst.domain.applications import Applications
+from atst.domain.exceptions import AlreadyExistsError
 from atst.domain.portfolios import Portfolios
 from atst.forms.application import NameAndDescriptionForm, EnvironmentsForm
 from atst.domain.authz.decorator import user_can_access_decorator as user_can
@@ -37,6 +38,31 @@ def render_new_application_form(
     return render_template(template, **render_args)
 
 
+def update_application(form, application_id=None, portfolio_id=None):
+    if form.validate():
+        application = None
+        try:
+            if application_id:
+                application = Applications.get(application_id)
+                application = Applications.update(application, form.data)
+                flash("application_updated", application_name=application.name)
+            else:
+                portfolio = Portfolios.get_for_update(portfolio_id)
+                application = Applications.create(
+                    g.current_user, portfolio, **form.data
+                )
+                flash("application_created", application_name=application.name)
+
+            return application
+
+        except AlreadyExistsError:
+            flash("application_name_error", name=form.data["name"])
+            return False
+
+    else:
+        return False
+
+
 @applications_bp.route("/portfolios/<portfolio_id>/applications/new")
 @applications_bp.route("/applications/<application_id>/new/step_1")
 @user_can(Permissions.CREATE_APPLICATION, message="view create new application form")
@@ -64,17 +90,9 @@ def create_or_update_new_application_step_1(portfolio_id=None, application_id=No
     form = get_new_application_form(
         {**http_request.form}, NameAndDescriptionForm, application_id
     )
+    application = update_application(form, application_id, portfolio_id)
 
-    if form.validate():
-        application = None
-        if application_id:
-            application = Applications.get(application_id)
-            application = Applications.update(application, form.data)
-            flash("application_updated", application_name=application.name)
-        else:
-            portfolio = Portfolios.get_for_update(portfolio_id)
-            application = Applications.create(g.current_user, portfolio, **form.data)
-            flash("application_created", application_name=application.name)
+    if application:
         return redirect(
             url_for(
                 "applications.update_new_application_step_2",

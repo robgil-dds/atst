@@ -64,6 +64,11 @@ MESSAGES = {
         "message_template": "You have successfully updated the permissions for {{ user_name }}",
         "category": "success",
     },
+    "application_name_error": {
+        "title_template": "",
+        "message_template": """{{ 'flash.application.name_error.message' | translate({ 'name': name }) }}""",
+        "category": "error",
+    },
     "ccpo_user_added": {
         "title_template": translate("flash.success"),
         "message_template": "You have successfully given {{ user_name }} CCPO permissions.",
