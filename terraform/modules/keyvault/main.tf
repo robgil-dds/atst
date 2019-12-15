@@ -19,7 +19,8 @@ resource "azurerm_key_vault" "keyvault" {
   }
 }
 
-resource "azurerm_key_vault_access_policy" "keyvault" {
+resource "azurerm_key_vault_access_policy" "keyvault_k8s_policy" {
+  count        = length(var.principal_id) > 0 ? 1 : 0
   key_vault_id = azurerm_key_vault.keyvault.id
 
   tenant_id = data.azurerm_client_config.current.tenant_id
@@ -34,3 +35,25 @@ resource "azurerm_key_vault_access_policy" "keyvault" {
   ]
 }
 
+# Admin Access
+resource "azurerm_key_vault_access_policy" "keyvault_admin_policy" {
+  for_each     = var.admin_principals
+  key_vault_id = azurerm_key_vault.keyvault.id
+
+  tenant_id = data.azurerm_client_config.current.tenant_id
+  object_id = each.value
+
+  key_permissions = [
+    "get",
+    "list",
+    "create",
+    "update",
+    "delete",
+  ]
+
+  secret_permissions = [
+    "get",
+    "list",
+    "set",
+  ]
+}
