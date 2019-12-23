@@ -3,103 +3,47 @@
 {% from "components/modal.html" import Modal %}
 {% from "components/alert.html" import Alert %}
 
-<section class="member-list" id="portfolio-members">
-  <div class='responsive-table-wrapper panel accordion-table'>
-  {% if g.matchesPath("portfolio-members") %}
-    {% include "fragments/flash.html" %}
-  {% endif %}
-    <base-form inline-template>
-      <form method='POST' id="member-perms" action='{{ url_for("portfolios.edit_members", portfolio_id=portfolio.id) }}' autocomplete="off" enctype="multipart/form-data">
-      {{ member_perms_form.csrf_token }}
+<h3>Portfolio Managers</h3>
+<div class="panel">
+  <section class="member-list">
+    <div class="responsive-table-wrapper">
+      <table class="atat-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Portfolio Permissions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ ppoc.user_name }}</td>
+            <td>
+              {% for perm, value in ppoc.permission_sets.items() -%}
+                <div>
+                  {{ ("portfolios.admin.members.{}.{}".format(perm, value)) | translate }}
+                </div>
+              {%-endfor %}
+            </td>
+          </tr>
+          {% for member in members -%}
+            <tr>
+              <td>{{ member.user_name }}</td>
+              <td>
+                {% for perm, value in member.permission_sets.items() -%}
+                  <div>
+                    {{ ("portfolios.admin.members.{}.{}".format(perm, value)) | translate }}
+                  </div>
+                {%-endfor %}
+              </td>
+            </tr>
+          {%- endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-      <div class='application-list-item'>
-        <header>
-          <div class='responsive-table-wrapper__header'>
-            <div class='responsive-table-wrapper__title'>
-              <div class='h3'>{{ "portfolios.admin.portfolio_members_title" | translate }}</div>
-              <div class='subheading'>
-                {{ "portfolios.admin.portfolio_members_subheading" | translate }}
-              </div>
-            </div>
-
-            <a class='icon-link'>
-              {{ Icon('info') }}
-              {{ "portfolios.admin.settings_info" | translate }}
-            </a>
-          </div>
-        </header>
-
-        {% if not portfolio.members %}
-          <p>{{ "portfolios.admin.no_members" | translate }}</p>
-        {% else %}
-          <table class="atat-table">
-
-            <thead>
-              <tr>
-                  <td>{{ "portfolios.members.permissions.name" | translate }}</td>
-                  <td>{{ "portfolios.members.permissions.app_mgmt" | translate }}</td>
-                  <td>{{ "portfolios.members.permissions.funding" | translate }}</td>
-                  <td>{{ "portfolios.members.permissions.reporting" | translate }}</td>
-                  <td>{{ "portfolios.members.permissions.portfolio_mgmt" | translate }}</td>
-                  <td></td>
-              </tr>
-            </thead>
-
-            <tbody>
-              {% if user_can(permissions.EDIT_PORTFOLIO_USERS) %}
-                {% include "portfolios/fragments/members_edit.html" %}
-              {% elif user_can(permissions.VIEW_PORTFOLIO_USERS) %}
-                {% include "portfolios/fragments/members_view.html" %}
-              {% endif %}
-            </tbody>
-
-          </table>
-        </div>
-        {% endif %}
-
-        <div class="panel__footer">
-          <div class="action-group save">
-            {% if user_can(permissions.EDIT_PORTFOLIO_USERS) %}
-              {{ SaveButton(text=('common.save' | translate), element="input", form="member-perms") }}
-            {% endif %}
-
-            {% if user_can(permissions.CREATE_PORTFOLIO_USERS) %}
-              <a class="icon-link modal-link" v-on:click="openModal('add-port-mem')">
-                {{ "portfolios.admin.add_new_member" | translate }}
-                {{ Icon("plus") }}
-              </a>
-            {% endif %}
-          </div>
-        </div>
-      </form>
-    </base-form>
-    {% if user_can(permissions.EDIT_PORTFOLIO_USERS) %}
-      {% for subform in member_perms_form.members_permissions %}
-        {% set modal_id = "portfolio_id_{}_user_id_{}".format(portfolio.id, subform.member_id.data) %}
-        {% call Modal(name=modal_id, dismissable=False) %}
-          <h1>{{ "portfolios.admin.alert_header" | translate }}</h1>
-          <hr>
-          {{
-            Alert(
-              title="portfolios.admin.alert_title" | translate,
-              message="portfolios.admin.alert_message" | translate,
-              level="warning"
-            )
-          }}
-          <div class="action-group">
-            <form method="POST" action="{{ url_for('portfolios.remove_member', portfolio_id=portfolio.id, portfolio_role_id=subform.member_id.data)}}">
-              {{ member_perms_form.csrf_token }}
-              <button class="usa-button usa-button-danger">
-                {{ "portfolios.members.archive_button" | translate }}
-              </button>
-            </form>
-            <a v-on:click="closeModal('{{ modal_id }}')" class="action-group__action icon-link icon-link--default">{{ "common.cancel" | translate }}</a>
-          </div>
-        {% endcall %}
-      {% endfor %}
-    {% endif %}
-  </div>
   {% if user_can(permissions.CREATE_PORTFOLIO_USERS) %}
+    <a href="#" class="usa-button usa-button-secondary add-new-button">Add Portfolio Manager</a>
     {% include "portfolios/fragments/add_new_portfolio_member.html" %}
   {% endif %}
-</section>
+</div>

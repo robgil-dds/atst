@@ -317,6 +317,19 @@ portfolios:
     portfolio_members_title: Portfolio members
     settings_info: Learn more about these settings
     portfolio_name: Portfolio name
+    members:
+      perms_portfolio_mgmt:
+        'False': View Portfolio
+        'True': Edit Portfolio
+      perms_app_mgmt:
+        'False': View Applications
+        'True': Edit Applications
+      perms_funding:
+        'False': View Funding
+        'True': Edit Funding
+      perms_reporting:
+        'False': View Reporting
+        'True': Edit Reporting
   applications:
     add_application_text: Add a new application
     add_environment: Create an Environment

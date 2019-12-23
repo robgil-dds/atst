@@ -5,13 +5,6 @@
   }
 
   margin-left: 2 * $gap;
-
-  .line {
-    box-sizing: border-box;
-    height: 2px;
-    width: 100%;
-    border: 1px solid $color-gray-lightest;
-  }
 }
 
 .portfolio-header {
@@ -37,36 +30,6 @@
       font-size: $small-font-size;
       margin: 0 0 (-$gap * 0.5);
       color: $color-gray-medium;
-    }
-  }
-
-  &__budget {
-    font-size: $small-font-size;
-    align-items: center;
-
-    .icon-tooltip {
-      margin-left: -$gap / 2;
-    }
-
-    button {
-      margin: 0;
-      padding: 0;
-    }
-
-    &--dollars {
-      font-size: $h2-font-size;
-      font-weight: bold;
-    }
-
-    &--amount {
-      white-space: nowrap;
-    }
-
-    &--cents {
-      font-size: 2rem;
-      margin-top: 0.75rem;
-      margin-left: -0.7rem;
-      font-weight: bold;
     }
   }
 
@@ -109,22 +72,6 @@
       }
     }
   }
-
-  .column-left {
-    width: 12.5rem;
-    float: left;
-  }
-
-  .column-right {
-    margin-left: -0.4rem;
-  }
-
-  .unfunded {
-    color: $color-red;
-    .icon {
-      @include icon-color($color-red);
-    }
-  }
 }
 
 @mixin subheading {
@@ -137,6 +84,10 @@
 
 .portfolio-content {
   margin: (4 * $gap) $gap 0 $gap;
+
+  .panel {
+    padding-bottom: 2rem;
+  }
 
   a.add-new-button {
     display: inherit;
@@ -154,44 +105,6 @@
       table.atat-table {
         table-layout: fixed;
         width: 100%;
-      }
-    }
-
-    input.usa-button.usa-button-primary {
-      width: 9rem;
-      height: 4rem;
-    }
-
-    select {
-      padding-left: 1.2rem;
-    }
-
-    .members-table-ppoc {
-      select::-ms-expand {
-        display: none;
-        color: $color-gray;
-      }
-
-      select {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        display: block;
-        width: 100%;
-        float: right;
-        margin: 5px 0px;
-        padding: 0px 24px;
-        background-image: none;
-        -ms-word-break: normal;
-        word-break: normal;
-        padding-right: 3rem;
-        padding-left: 1.2rem;
-        color: $color-gray;
-      }
-
-      select:hover {
-        box-shadow: none;
-        color: $color-gray;
       }
     }
 
