@@ -1,24 +1,6 @@
 {% from "components/icon.html" import Icon %}
+{% from "components/member_form_template.html" import MemberFormTemplate %}
 {% import "applications/fragments/member_form_fields.html" as member_fields %}
-
-{% macro MemberFormTemplate(title=None, next_button=None, previous=True) %}
-  <hr class="full-width">
-  {% if title %} <h1>{{ title }}</h1> {% endif %}
-
-  {{ caller() }}
-
-  <div class='action-group'>
-    {{ next_button }}
-    {% if previous %}
-      <input
-          type='button'
-          v-on:click="previous()"
-          class='action-group__action usa-button usa-button-secondary'
-          value='{{ "common.previous" | translate }}'>
-    {% endif %}
-    <a class='action-group__action' v-on:click="closeModal('{{ new_port_mem }}')">{{ "common.cancel" | translate }}</a>
-  </div>
-{% endmacro %}
 
 {% macro MemberStepOne(member_form) %}
   {% set next_button %}
@@ -34,6 +16,7 @@
     {{ member_fields.InfoFields(member_form.user_data) }}
   {% endcall %}
 {% endmacro %}
+
 {% macro MemberStepTwo(member_form, application) %}
   {% set next_button %}
     <input

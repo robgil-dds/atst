@@ -1,0 +1,62 @@
+{% from "components/icon.html" import Icon %}
+
+{% macro MemberFormTemplate(title=None, next_button=None, previous=True, modal=modal) %}
+  <hr class="full-width">
+  {% if title %} <h1>{{ title }}</h1> {% endif %}
+
+  {{ caller() }}
+
+  <div class='action-group'>
+    {{ next_button }}
+    {% if previous %}
+      <input
+          type='button'
+          v-on:click="previous()"
+          class='action-group__action usa-button usa-button-secondary'
+          value='{{ "common.previous" | translate }}'>
+    {% endif %}
+    <a class='action-group__action' v-on:click="closeModal('{{ modal }}')">{{ "common.cancel" | translate }}</a>
+  </div>
+{% endmacro %}
+
+{% macro BasicStep(
+  title=None,
+  form=form,
+  next_button_text=next_button_text,
+  previous=True,
+  modal=modal
+) %}
+  {% set next_button %}
+    <input
+        type='button'
+        v-on:click="next()"
+        v-bind:disabled="!canSave"
+        class='action-group__action usa-button'
+        value='{{ next_button_text }}'>
+  {% endset %}
+
+  {% call MemberFormTemplate(title=title, next_button=next_button, previous=previous, modal=modal) %}
+    {{ form }}
+  {% endcall %}
+{% endmacro %}
+
+{% macro SubmitStep(
+  title=None,
+  form=form,
+  submit_text=submit_text,
+  previous=True,
+  modal=modal
+) %}
+  {% set next_button %}
+    <input
+      type="submit"
+      class='action-group__action usa-button'
+      form="add-app-mem"
+      v-bind:disabled="!canSave"
+      value='{{ submit_text }}'>
+  {% endset %}
+
+  {% call MemberFormTemplate(title=title, next_button=next_button, previous=previous, modal=modal) %}
+    {{ form }}
+  {% endcall %}
+{% endmacro %}
