@@ -1,12 +1,10 @@
-{% from "components/alert.html" import Alert %}
 {% from "components/icon.html" import Icon %}
 {% from "components/label.html" import Label %}
-{% import "applications/fragments/new_member_modal_content.html" as member_steps %}
+{% import "components/member_form_template.html" as member_form %}
 {% import "applications/fragments/member_form_fields.html" as member_fields %}
 {% from "components/modal.html" import Modal %}
 {% from "components/multi_step_modal_form.html" import MultiStepModalForm %}
 {% from "components/save_button.html" import SaveButton %}
-{% from "components/toggle_list.html" import ToggleButton, ToggleSection %}
 
 {% macro MemberManagementTemplate(
   application,
@@ -179,8 +177,18 @@
         form=new_member_form,
         form_action=url_for(action_new, application_id=application.id),
         steps=[
-          member_steps.MemberStepOne(new_member_form),
-          member_steps.MemberStepTwo(new_member_form, application)
+          member_form.BasicStep(
+            title="portfolios.applications.members.form.add_member"|translate,
+            form=member_fields.InfoFields(new_member_form.user_data),
+            next_button_text="portfolios.applications.members.form.next_button"|translate,
+            previous=False,
+            modal=new_member_modal_name,
+          ),
+          member_form.SubmitStep(
+            form=member_fields.PermsFields(form=new_member_form, new=True),
+            submit_text="portfolios.applications.members.form.add_member"|translate,
+            modal=new_member_modal_name,
+          )
         ],
       ) }}
   {% endif %}
