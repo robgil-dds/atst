@@ -1,79 +1,41 @@
+{% from "components/checkbox_input.html" import CheckboxInput %}
 {% from "components/icon.html" import Icon %}
+{% from "components/phone_input.html" import PhoneInput %}
 {% from "components/text_input.html" import TextInput %}
-{% from "components/multi_step_modal_form.html" import MultiStepModalForm %}
 
-{% macro SimpleOptionsInput(field) %}
-  <div class="usa-input">
-    <fieldset data-ally-disabled="true" class="usa-input__choices">
-      <legend>
-        <div class="usa-input__title-inline">
-          {{ field.label | striptags}}
-        </div>
-      </legend>
-      {{ field() }}
-    </fieldset>
-  </div>
-{% endmacro %}
-
-{% set step_one %}
-  <hr class="full-width">
-  <h1>Invite new portfolio member</h1>
-  <div class='form-row'>
-    <div class='form-col form-col--half'>
-      {{ TextInput(member_form.user_data.first_name, validation='requiredField', optional=False) }}
-    </div>
-    <div class='form-col form-col--half'>
-      {{ TextInput(member_form.user_data.last_name, validation='requiredField', optional=False) }}
-    </div>
-  </div>
-  <div class='form-row'>
-    <div class='form-col form-col--half'>
-      {{ TextInput(member_form.user_data.email, validation='email', optional=False) }}
-    </div>
-    <div class='form-col form-col--half'>
-      {{ TextInput(member_form.user_data.phone_number, validation='usPhone') }}
-    </div>
-  </div>
-  <div class='form-row'>
-    <div class='form-col form-col--half'>
-      {{ TextInput(member_form.user_data.dod_id, validation='dodId', optional=False) }}
-    </div>
-    <div class='form-col form-col--half'>
-    </div>
-  </div>
-  <div class='action-group'>
-    <input
-        type='button'
-        v-on:click="next()"
-        v-bind:disabled="!canSave"
-        class='action-group__action usa-button usa-button-primary'
-        value='Next'>
-    <a class='action-group__action' v-on:click="closeModal('{{ new_port_mem }}')">Cancel</a>
-  </div>
-{% endset %}
-{% set step_two %}
-  <hr class="full-width">
-  <h1>Assign member permissions</h1>
+{% macro PermsFields(form, member_role_id=None) %}
+  <h2>Assign member permissions</h2>
   <a class='icon-link'>
     {{ Icon('info') }}
     {{ "portfolios.admin.permissions_info" | translate }}
   </a>
-  {{ SimpleOptionsInput(member_form.permission_sets.perms_app_mgmt) }}
-  {{ SimpleOptionsInput(member_form.permission_sets.perms_funding) }}
-  {{ SimpleOptionsInput(member_form.permission_sets.perms_reporting) }}
-  {{ SimpleOptionsInput(member_form.permission_sets.perms_portfolio_mgmt) }}
-  <div class='action-group'>
-    <input
-      type="submit"
-      class='action-group__action usa-button usa-button-primary'
-      form="add-port-mem"
-      value='Invite member'>
-    <a class='action-group__action' v-on:click="closeModal('{{ new_port_mem }}')">Cancel</a>
+  <div class="application-perms">
+    {% if new %}
+      {% set app_mgmt = form.perms_app_mgmt.name %}
+      {% set funding = form.perms_funding.name %}
+      {% set reporting = form.perms_reporting.name %}
+      {% set portfolio_mgmt = form.perms_portfolio_mgmt.name %}
+    {% else %}
+      {% set app_mgmt = "perms_app_mgmt-{}".format(member_role_id) %}
+      {% set funding = "perms_funding-{}".format(member_role_id) %}
+      {% set reporting = "perms_reporting-{}".format(member_role_id) %}
+      {% set portfolio_mgmt = "perms_portfolio_mgmt-{}".format(member_role_id) %}
+    {% endif %}
+
+    {{ CheckboxInput(form.perms_app_mgmt, classes="input__inline-fields", key=app_mgmt, id=app_mgmt, optional=True) }}
+    {{ CheckboxInput(form.perms_funding, classes="input__inline-fields", key=funding, id=funding, optional=True) }}
+    {{ CheckboxInput(form.perms_reporting, classes="input__inline-fields", key=reporting, id=reporting, optional=True) }}
+    {{ CheckboxInput(form.perms_portfolio_mgmt, classes="input__inline-fields", key=portfolio_mgmt, id=portfolio_mgmt, optional=True) }}
   </div>
-{% endset %}
-{{ MultiStepModalForm(
-    'add-port-mem',
-    member_form,
-    url_for("portfolios.invite_member", portfolio_id=portfolio.id),
-    [step_one, step_two],
-  ) }}
+{% endmacro %}
+
+{% macro InfoFields(member_form) %}
+  <div class="application-member__user-info">
+    {{ TextInput(member_form.first_name, validation='requiredField', optional=False) }}
+    {{ TextInput(member_form.last_name, validation='requiredField', optional=False) }}
+    {{ TextInput(member_form.email, validation='email', optional=False) }}
+    {{ PhoneInput(member_form.phone_number, member_form.phone_ext)}}
+    {{ TextInput(member_form.dod_id, validation='dodId', optional=False) }}
+    <a href="#">How do I find the DoD ID?</a>
+  </div>
+{% endmacro %}

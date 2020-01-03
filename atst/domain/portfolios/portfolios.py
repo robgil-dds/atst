@@ -75,10 +75,10 @@ class Portfolios(object):
         permission_sets = PortfolioRoles._permission_sets_for_names(
             member_data.get("permission_sets", [])
         )
-        role = PortfolioRole(portfolio_id=portfolio.id, permission_sets=permission_sets)
+        role = PortfolioRole(portfolio=portfolio, permission_sets=permission_sets)
 
         invitation = PortfolioInvitations.create(
-            inviter=inviter, role=role, member_data=member_data
+            inviter=inviter, role=role, member_data=member_data["user_data"]
         )
 
         PortfoliosQuery.add_and_commit(role)

@@ -41,6 +41,7 @@
 {% endmacro %}
 
 {% macro SubmitStep(
+  name=name,
   title=None,
   form=form,
   submit_text=submit_text,
@@ -51,7 +52,7 @@
     <input
       type="submit"
       class='action-group__action usa-button'
-      form="add-app-mem"
+      form="{{ name }}"
       v-bind:disabled="!canSave"
       value='{{ submit_text }}'>
   {% endset %}
