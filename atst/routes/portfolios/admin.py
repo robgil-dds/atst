@@ -94,34 +94,6 @@ def admin(portfolio_id):
     return render_admin_page(portfolio)
 
 
-@portfolios_bp.route("/portfolios/<portfolio_id>/admin", methods=["POST"])
-@user_can(Permissions.EDIT_PORTFOLIO_USERS, message="view portfolio admin page")
-def edit_members(portfolio_id):
-    portfolio = Portfolios.get_for_update(portfolio_id)
-    member_perms_form = member_forms.MembersPermissionsForm(http_request.form)
-
-    if member_perms_form.validate():
-        for subform in member_perms_form.members_permissions:
-            member_id = subform.member_id.data
-            member = PortfolioRoles.get_by_id(member_id)
-            if member is not portfolio.owner_role:
-                new_perm_set = subform.data["permission_sets"]
-                PortfolioRoles.update(member, new_perm_set)
-
-        flash("update_portfolio_members", portfolio=portfolio)
-
-        return redirect(
-            url_for(
-                "portfolios.admin",
-                portfolio_id=portfolio_id,
-                fragment="portfolio-members",
-                _anchor="portfolio-members",
-            )
-        )
-    else:
-        return render_admin_page(portfolio)
-
-
 @portfolios_bp.route("/portfolios/<portfolio_id>/update_ppoc", methods=["POST"])
 @user_can(Permissions.EDIT_PORTFOLIO_POC, message="update portfolio ppoc")
 def update_ppoc(portfolio_id):
