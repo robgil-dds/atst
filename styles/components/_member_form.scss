@@ -1,6 +1,5 @@
 .member-form {
   text-align: left;
-  min-width: 75rem;
 
   input[type="checkbox"] + label::before {
     margin-left: 0;
@@ -51,5 +50,12 @@
         width: 18rem;
       }
     }
+  }
+}
+
+#modal--add-app-mem,
+#modal--add-portfolio-manager {
+  .modal__body {
+    min-width: 75rem;
   }
 }
