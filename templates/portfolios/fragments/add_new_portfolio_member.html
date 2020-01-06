@@ -4,11 +4,7 @@
 {% from "components/text_input.html" import TextInput %}
 
 {% macro PermsFields(form, member_role_id=None) %}
-  <h2>Assign member permissions</h2>
-  <a class='icon-link'>
-    {{ Icon('info') }}
-    {{ "portfolios.admin.permissions_info" | translate }}
-  </a>
+  <h2>Set Portfolio Permissions</h2>
   <div class="portfolio-perms">
     {% if new %}
       {% set app_mgmt = form.perms_app_mgmt.name %}

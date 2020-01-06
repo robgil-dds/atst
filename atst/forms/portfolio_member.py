@@ -10,24 +10,24 @@ from atst.utils.localization import translate
 
 class PermissionsForm(BaseForm):
     perms_app_mgmt = BooleanField(
-        translate("forms.new_member.app_mgmt"),
+        translate("forms.new_member.app_mgmt.label"),
         default=False,
-        description="Add, remove and edit applications in this Portfolio.",
+        description=translate("forms.new_member.app_mgmt.description"),
     )
     perms_funding = BooleanField(
-        translate("forms.new_member.funding"),
+        translate("forms.new_member.funding.label"),
         default=False,
-        description="Add and Modify Task Orders to fund this Portfolio.",
+        description=translate("forms.new_member.funding.description"),
     )
     perms_reporting = BooleanField(
-        translate("forms.new_member.reporting"),
+        translate("forms.new_member.reporting.label"),
         default=False,
-        description="View and export reports about this Portfolio's funding.",
+        description=translate("forms.new_member.reporting.description"),
     )
     perms_portfolio_mgmt = BooleanField(
-        translate("forms.new_member.portfolio_mgmt"),
+        translate("forms.new_member.portfolio_mgmt.label"),
         default=False,
-        description="Edit this Portfolio's settings.",
+        description=translate("forms.new_member.portfolio_mgmt.description"),
     )
 
     @property

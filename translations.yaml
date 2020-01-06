@@ -161,15 +161,23 @@ forms:
     phone_number_label: Phone number
     service_branch_label: Service branch or agency
   new_member:
-    app_mgmt: App management
+    app_mgmt:
+      label: Edit Applications
+      description: Add, remove and edit applications in this Portfolio.
     dod_id_label: DoD ID
     email_label: Email address
     first_name_label: First name
-    funding: Funding
+    funding:
+      label: Edit Funding
+      description: Add and Modify Task Orders to fund this Portfolio.
     last_name_label: Last name
     phone_number_label: Phone number
-    portfolio_mgmt: Portfolio management
-    reporting: Reporting
+    portfolio_mgmt:
+      label: Edit Portfolio
+      description: "Edit this Portfolio's settings."
+    reporting:
+      label: Edit Reporting
+      description: "View and export reports about this Portfolio's funding."
   portfolio:
     name:
       label: Portfolio Name

@@ -2,7 +2,7 @@
 {% macro MemberForm(title=None, next_button=None, previous=True, modal=modal) %}
   <div class="member-form">
     <hr class="full-width">
-    {% if title %} <h1>{{ title }}</h1> {% endif %}
+    {% if title %} <h2>{{ title }}</h2> {% endif %}
 
     {{ caller() }}
   </div>
