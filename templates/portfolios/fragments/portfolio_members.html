@@ -19,7 +19,9 @@
         </thead>
         <tbody>
           <tr>
-            <td>{{ ppoc.user_name }}</td>
+            <td>
+              <strong>{{ ppoc.user_name }}{% if ppoc.role_id == current_member_id %} (You){% endif %}</strong>
+            </td>
             <td>
               {% for perm, value in ppoc.permission_sets.items() -%}
                 <div>
@@ -30,7 +32,9 @@
           </tr>
           {% for member in members -%}
             <tr>
-              <td>{{ member.user_name }}</td>
+              <td>
+                <strong>{{ member.user_name }}{% if member.role_id == current_member_id %} (You){% endif %}</strong>
+              </td>
               <td>
                 {% for perm, value in member.permission_sets.items() -%}
                   <div>
