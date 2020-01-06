@@ -1,11 +1,11 @@
-{% from "components/icon.html" import Icon %}
+<!-- Layout macro -->
+{% macro MemberForm(title=None, next_button=None, previous=True, modal=modal) %}
+  <div class="member-form">
+    <hr class="full-width">
+    {% if title %} <h1>{{ title }}</h1> {% endif %}
 
-{% macro MemberFormTemplate(title=None, next_button=None, previous=True, modal=modal) %}
-  <hr class="full-width">
-  {% if title %} <h1>{{ title }}</h1> {% endif %}
-
-  {{ caller() }}
-
+    {{ caller() }}
+  </div>
   <div class='action-group'>
     {{ next_button }}
     {% if previous %}
@@ -19,6 +19,8 @@
   </div>
 {% endmacro %}
 
+
+<!-- Step macros to use with MultiStepModalForm -->
 {% macro BasicStep(
   title=None,
   form=form,
@@ -35,7 +37,7 @@
         value='{{ next_button_text }}'>
   {% endset %}
 
-  {% call MemberFormTemplate(title=title, next_button=next_button, previous=previous, modal=modal) %}
+  {% call MemberForm(title=title, next_button=next_button, previous=previous, modal=modal) %}
     {{ form }}
   {% endcall %}
 {% endmacro %}
@@ -57,7 +59,7 @@
       value='{{ submit_text }}'>
   {% endset %}
 
-  {% call MemberFormTemplate(title=title, next_button=next_button, previous=previous, modal=modal) %}
+  {% call MemberForm(title=title, next_button=next_button, previous=previous, modal=modal) %}
     {{ form }}
   {% endcall %}
 {% endmacro %}
