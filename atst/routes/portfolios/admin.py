@@ -46,6 +46,7 @@ def filter_members_data(members_list):
                 "role_id": member.id,
                 "user_name": member.user_name,
                 "permission_sets": filter_perm_sets_data(member),
+                "status": member.display_status,
                 # add in stuff here for forms
             }
         )

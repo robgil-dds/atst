@@ -21,6 +21,8 @@
           <tr>
             <td>
               <strong>{{ ppoc.user_name }}{% if ppoc.role_id == current_member_id %} (You){% endif %}</strong>
+              <br>
+              {{ Label(type="ppoc", classes='label--below label--purple')}}
             </td>
             <td>
               {% for perm, value in ppoc.permission_sets.items() -%}
@@ -34,6 +36,8 @@
             <tr>
               <td>
                 <strong>{{ member.user_name }}{% if member.role_id == current_member_id %} (You){% endif %}</strong>
+                <br>
+                {{ Label(type=member.status, classes='label--below')}}
               </td>
               <td>
                 {% for perm, value in member.permission_sets.items() -%}

@@ -151,12 +151,12 @@ def test_event_details():
 
 def test_status_when_member_is_active():
     portfolio_role = PortfolioRoleFactory.create(status=PortfolioRoleStatus.ACTIVE)
-    assert portfolio_role.display_status == "Active"
+    assert portfolio_role.display_status == "active"
 
 
 def test_status_when_member_is_disabled():
     portfolio_role = PortfolioRoleFactory.create(status=PortfolioRoleStatus.DISABLED)
-    assert portfolio_role.display_status == "Disabled"
+    assert portfolio_role.display_status == "disabled"
 
 
 def test_status_when_invitation_has_been_rejected_for_expirations():
@@ -168,7 +168,7 @@ def test_status_when_invitation_has_been_rejected_for_expirations():
     PortfolioInvitationFactory.create(
         role=portfolio_role, status=InvitationStatus.REJECTED_EXPIRED
     )
-    assert portfolio_role.display_status == "Invite expired"
+    assert portfolio_role.display_status == "invite_expired"
 
 
 def test_status_when_invitation_has_been_rejected_for_wrong_user():
@@ -180,7 +180,7 @@ def test_status_when_invitation_has_been_rejected_for_wrong_user():
     PortfolioInvitationFactory.create(
         role=portfolio_role, status=InvitationStatus.REJECTED_WRONG_USER
     )
-    assert portfolio_role.display_status == "Error on invite"
+    assert portfolio_role.display_status == "invite_error"
 
 
 def test_status_when_invitation_has_been_revoked():
@@ -192,7 +192,7 @@ def test_status_when_invitation_has_been_revoked():
     PortfolioInvitationFactory.create(
         role=portfolio_role, status=InvitationStatus.REVOKED
     )
-    assert portfolio_role.display_status == "Invite revoked"
+    assert portfolio_role.display_status == "invite_revoked"
 
 
 def test_status_when_invitation_is_expired():
@@ -206,7 +206,7 @@ def test_status_when_invitation_is_expired():
         status=InvitationStatus.PENDING,
         expiration_time=datetime.datetime.now() - datetime.timedelta(seconds=1),
     )
-    assert portfolio_role.display_status == "Invite expired"
+    assert portfolio_role.display_status == "invite_expired"
 
 
 def test_can_not_resend_invitation_if_active():
