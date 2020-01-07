@@ -38,20 +38,35 @@ def filter_perm_sets_data(member):
     return perm_sets_data
 
 
-def filter_members_data(members_list, portfolio):
+def filter_members_data(members_list):
     members_data = []
     for member in members_list:
         permission_sets = filter_perm_sets_data(member)
-        members_data.append(
-            {
-                "role_id": member.id,
-                "user_name": member.user_name,
-                "permission_sets": filter_perm_sets_data(member),
-                "status": member.display_status,
-                "ppoc": PermissionSets.PORTFOLIO_POC in member.permission_sets,
-                "form": member_forms.PermissionsForm(permission_sets),
-            }
-        )
+        ppoc = PermissionSets.PORTFOLIO_POC in member.permission_sets
+        member_data = {
+            "role_id": member.id,
+            "user_name": member.user_name,
+            "permission_sets": filter_perm_sets_data(member),
+            "status": member.display_status,
+            "ppoc": ppoc,
+            "form": member_forms.PermissionsForm(permission_sets),
+        }
+
+        if not ppoc:
+            update_invite_form = (
+                member_forms.NewForm(user_data=member.latest_invitation)
+                if member.latest_invitation and member.latest_invitation.can_resend
+                else member_forms.NewForm()
+            )
+            invite_token = (
+                member.latest_invitation.token
+                if member.latest_invitation and member.latest_invitation.can_resend
+                else None
+            )
+            member_data["update_invite_form"] = update_invite_form
+            member_data["invite_token"] = invite_token
+
+        members_data.append(member_data)
 
     return sorted(members_data, key=lambda member: member["user_name"])
 
@@ -76,7 +91,7 @@ def render_admin_page(portfolio, form=None):
         "portfolios/admin.html",
         form=form,
         portfolio_form=portfolio_form,
-        members=filter_members_data(member_list, portfolio),
+        members=filter_members_data(member_list),
         new_manager_form=member_forms.NewForm(),
         assign_ppoc_form=assign_ppoc_form,
         portfolio=portfolio,

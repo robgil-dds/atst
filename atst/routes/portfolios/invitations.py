@@ -54,13 +54,24 @@ def revoke_invitation(portfolio_id, portfolio_token):
 )
 @user_can(Permissions.EDIT_PORTFOLIO_USERS, message="resend invitation")
 def resend_invitation(portfolio_id, portfolio_token):
-    invite = PortfolioInvitations.resend(g.current_user, portfolio_token)
-    send_portfolio_invitation(
-        invitee_email=invite.email,
-        inviter_name=g.current_user.full_name,
-        token=invite.token,
-    )
-    flash("resend_portfolio_invitation", user_name=invite.user_name)
+    form = member_forms.NewForm(http_request.form)
+
+    if form.validate():
+        invite = PortfolioInvitations.resend(
+            g.current_user, portfolio_token, form.data["user_data"]
+        )
+        send_portfolio_invitation(
+            invitee_email=invite.email,
+            inviter_name=g.current_user.full_name,
+            token=invite.token,
+        )
+        flash("resend_portfolio_invitation", user_name=invite.user_name)
+    else:
+        user_name = "{} {}".format(
+            form["user_data"]["first_name"].data, form["user_data"]["last_name"].data
+        )
+        flash("resend_portfolio_invitation_error", user_name=user_name)
+
     return redirect(
         url_for(
             "portfolios.admin",

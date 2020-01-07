@@ -128,6 +128,11 @@ MESSAGES = {
         "message": "flash.portfolio_invite.resent.message",
         "category": "success",
     },
+    "resend_portfolio_invitation_error": {
+        "title_template": "Portfolio invitation error",
+        "message_template": "There was an error processing the invitation for {{ user_name }}.",
+        "category": "error",
+    },
     "revoked_portfolio_access": {
         "title": "flash.portfolio_member.revoked.title",
         "message": "flash.portfolio_member.revoked.message",
