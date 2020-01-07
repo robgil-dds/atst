@@ -1,0 +1,49 @@
+.toggle-menu {
+  position: absolute;
+  top: $gap;
+  right: $gap * 2;
+
+  .accordion-table__item__toggler {
+    padding: $gap / 3;
+    border: 1px solid $color-gray-lighter;
+    border-radius: 3px;
+    cursor: pointer;
+
+    &:hover,
+    &--active {
+      background-color: $color-aqua-lightest;
+    }
+
+    .icon {
+      margin: $gap / 2;
+    }
+  }
+
+  &__toggle {
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background-color: $color-white;
+    border: 1px solid $color-gray-light;
+    z-index: 1;
+    margin-top: 0;
+
+    a {
+      display: block;
+      padding: $gap;
+      border-bottom: 1px solid $color-gray-lighter;
+      text-decoration: none;
+      color: $color-black;
+      cursor: pointer;
+      white-space: nowrap;
+
+      &:last-child {
+        border-bottom: 0;
+      }
+
+      &:hover {
+        background-color: $color-aqua-lightest;
+      }
+    }
+  }
+}

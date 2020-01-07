@@ -5,6 +5,7 @@
 {% from "components/modal.html" import Modal %}
 {% from "components/multi_step_modal_form.html" import MultiStepModalForm %}
 {% from "components/save_button.html" import SaveButton %}
+{% from "components/toggle_menu.html" import ToggleMenu %}
 
 {% macro MemberManagementTemplate(
   application,
@@ -131,32 +132,21 @@
                     </div>
                   {% endfor %}
                   {% if user_can(permissions.EDIT_APPLICATION_MEMBER) -%}
-                    <toggle-menu inline-template v-cloak>
-                      <div class="app-member-menu">
-                        <span v-if="isVisible" class="accordion-table__item__toggler accordion-table__item__toggler--active">
-                          {{ Icon('ellipsis')}}
-                        </span>
-                        <span v-else class="accordion-table__item__toggler">
-                          {{ Icon('ellipsis')}}
-                        </span>
-
-                        <div v-show="isVisible" class="accordion-table__item-toggle-content app-member-menu__toggle">
-                          <a v-on:click="openModal('{{ perms_modal }}')">
-                            {{ "portfolios.applications.members.menu.edit" | translate }}
-                          </a>
-                          {% if invite_pending or invite_expired -%}
-                            {% set revoke_invite_modal = "revoke_invite_{}".format(member.role_id) %}
-                            {% set resend_invite_modal = "resend_invite-{}".format(member.role_id) %}
-                            <a v-on:click='openModal("{{ resend_invite_modal }}")'>
-                              {{ "portfolios.applications.members.menu.resend" | translate }}
-                            </a>
-                            {% if user_can(permissions.DELETE_APPLICATION_MEMBER) -%}
-                              <a v-on:click='openModal("{{ revoke_invite_modal }}")'>{{ 'invites.revoke' | translate }}</a>
-                            {%- endif %}
-                          {%- endif %}
-                        </div>
-                      </div>
-                    </toggle-menu>
+                    {% call ToggleMenu() %}
+                      <a v-on:click="openModal('{{ perms_modal }}')">
+                        {{ "portfolios.applications.members.menu.edit" | translate }}
+                      </a>
+                      {% if invite_pending or invite_expired -%}
+                        {% set revoke_invite_modal = "revoke_invite_{}".format(member.role_id) %}
+                        {% set resend_invite_modal = "resend_invite-{}".format(member.role_id) %}
+                        <a v-on:click='openModal("{{ resend_invite_modal }}")'>
+                          {{ "portfolios.applications.members.menu.resend" | translate }}
+                        </a>
+                        {% if user_can(permissions.DELETE_APPLICATION_MEMBER) -%}
+                          <a v-on:click='openModal("{{ revoke_invite_modal }}")'>{{ 'invites.revoke' | translate }}</a>
+                        {%- endif %}
+                      {%- endif %}
+                    {% endcall %}
                   {%- endif %}
                 </td>
               </tr>
