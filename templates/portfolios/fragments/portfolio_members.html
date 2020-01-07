@@ -5,6 +5,7 @@
 {% from "components/multi_step_modal_form.html" import MultiStepModalForm %}
 {% from 'components/save_button.html' import SaveButton %}
 {% import "portfolios/fragments/member_form_fields.html" as member_form_fields %}
+{% from "components/toggle_menu.html" import ToggleMenu %}
 
 <h3>Portfolio Managers</h3>
 <div class="panel">
@@ -28,7 +29,7 @@
                 {% endif %}
                 {{ Label(type=member.status, classes='label--below')}}
               </td>
-              <td>
+              <td class="toggle-menu__container">
                 {% for perm, value in member.permission_sets.items() -%}
                   <div>
                     {% if value -%}
@@ -36,6 +37,13 @@
                     {%- endif %}
                   </div>
                 {%-endfor %}
+                {% if user_can(permissions.EDIT_PORTFOLIO_USERS) -%}
+                  {% call ToggleMenu() %}
+                    <a href="#">Edit Permissions</a>
+                    <a href="#">Resend Invite</a>
+                    <a href="#">Revoke Invite</a>
+                  {% endcall %}
+                {%- endif %}
               </td>
             </tr>
           {%- endfor %}

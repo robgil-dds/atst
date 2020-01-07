@@ -3,6 +3,10 @@
   top: $gap;
   right: $gap * 2;
 
+  &__container {
+    position: relative;
+  }
+
   .accordion-table__item__toggler {
     padding: $gap / 3;
     border: 1px solid $color-gray-lighter;
