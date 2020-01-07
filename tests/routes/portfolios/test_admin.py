@@ -222,3 +222,54 @@ def test_remove_portfolio_member_ppoc(client, user_session):
         PortfolioRoles.get(portfolio_id=portfolio.id, user_id=portfolio.owner.id).status
         == PortfolioRoleStatus.ACTIVE
     )
+
+
+def test_portfolios_update_member(client, user_session):
+    portfolio = PortfolioFactory.create()
+    portfolio_role = PortfolioRoleFactory.create(
+        portfolio=portfolio,
+        permission_sets=[PermissionSets.get(PermissionSets.EDIT_PORTFOLIO_ADMIN)],
+    )
+
+    form_data = {
+        "perms_app_mgmt": "y",
+    }
+
+    user_session(portfolio.owner)
+    response = client.post(
+        url_for(
+            "portfolios.update_member",
+            portfolio_id=portfolio.id,
+            portfolio_role_id=portfolio_role.id,
+        ),
+        data=form_data,
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 302
+    assert portfolio_role.has_permission_set(
+        PermissionSets.EDIT_PORTFOLIO_APPLICATION_MANAGEMENT
+    )
+    assert not portfolio_role.has_permission_set(PermissionSets.EDIT_PORTFOLIO_ADMIN)
+
+
+def test_can_not_update_ppoc_permissions(client, user_session):
+    portfolio = PortfolioFactory.create()
+    owner = portfolio.owner
+
+    form_data = {
+        "perms_app_mgmt": "y",
+    }
+
+    user_session(owner)
+    response = client.post(
+        url_for(
+            "portfolios.update_member",
+            portfolio_id=portfolio.id,
+            portfolio_role_id=portfolio.owner_role.id,
+        ),
+        data=form_data,
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 400

@@ -7,6 +7,29 @@
 {% import "portfolios/fragments/member_form_fields.html" as member_form_fields %}
 {% from "components/toggle_menu.html" import ToggleMenu %}
 
+{% if user_can(permissions.EDIT_PORTFOLIO_USERS) -%}
+  {% for member in members -%}
+    {% set modal_name = "edit_member-{}".format(loop.index) %}
+    {% call Modal(modal_name, classes="form-content--app-mem") %}
+      <div class="modal__form--header">
+        <h1>{{ Icon('avatar') }} {{ "portfolios.applications.members.form.edit_access_header" | translate({ "user": member.user_name }) }}</h1>
+      </div>
+      <base-form inline-template>
+        <form id='{{ modal_name }}' method="POST" action="{{ url_for('portfolios.update_member', portfolio_id=portfolio.id, portfolio_role_id=member.role_id) }}">
+          {{ member.form.csrf_token }}
+          {{ member_form.SubmitStep(
+            name=modal_name,
+            form=member_form_fields.PermsFields(member.form, member_role_id=member.role_id),
+            submit_text="Save Changes",
+            previous=False,
+            modal=modal_name,
+          ) }}
+        </form>
+      </base-form>
+    {% endcall %}
+  {%- endfor %}
+{%- endif %}
+
 <h3>Portfolio Managers</h3>
 <div class="panel">
   <section class="member-list">
@@ -20,6 +43,7 @@
         </thead>
         <tbody>
           {% for member in members -%}
+            {% set perms_modal = "edit_member-{}".format(loop.index) %}
             <tr>
               <td>
                 <strong>{{ member.user_name }}{% if member.role_id == current_member_id %} (You){% endif %}</strong>
@@ -39,7 +63,7 @@
                 {%-endfor %}
                 {% if user_can(permissions.EDIT_PORTFOLIO_USERS) -%}
                   {% call ToggleMenu() %}
-                    <a href="#">Edit Permissions</a>
+                    <a v-on:click="openModal('{{ perms_modal }}')">Edit Permissions</a>
                     <a href="#">Resend Invite</a>
                     <a href="#">Revoke Invite</a>
                   {% endcall %}
@@ -68,13 +92,13 @@
           form=member_form_fields.InfoFields(new_manager_form.user_data),
           next_button_text="Next: Permissions",
           previous=False,
-          modal=new_manager_modal_name,
+          modal=new_manager_modal,
         ),
         member_form.SubmitStep(
           name=new_manager_modal,
           form=member_form_fields.PermsFields(new_manager_form),
           submit_text="Add Mananger",
-          modal=new_manager_modal_name,
+          modal=new_manager_modal,
         )
       ],
     ) }}

@@ -19,9 +19,6 @@ from atst.domain.exceptions import UnauthorizedError
 
 def filter_perm_sets_data(member):
     perm_sets_data = {
-        "perms_portfolio_mgmt": bool(
-            member.has_permission_set(PermissionSets.EDIT_PORTFOLIO_ADMIN)
-        ),
         "perms_app_mgmt": bool(
             member.has_permission_set(
                 PermissionSets.EDIT_PORTFOLIO_APPLICATION_MANAGEMENT
@@ -33,6 +30,9 @@ def filter_perm_sets_data(member):
         "perms_reporting": bool(
             member.has_permission_set(PermissionSets.EDIT_PORTFOLIO_REPORTS)
         ),
+        "perms_portfolio_mgmt": bool(
+            member.has_permission_set(PermissionSets.EDIT_PORTFOLIO_ADMIN)
+        ),
     }
 
     return perm_sets_data
@@ -41,6 +41,7 @@ def filter_perm_sets_data(member):
 def filter_members_data(members_list, portfolio):
     members_data = []
     for member in members_list:
+        permission_sets = filter_perm_sets_data(member)
         members_data.append(
             {
                 "role_id": member.id,
@@ -48,7 +49,7 @@ def filter_members_data(members_list, portfolio):
                 "permission_sets": filter_perm_sets_data(member),
                 "status": member.display_status,
                 "ppoc": PermissionSets.PORTFOLIO_POC in member.permission_sets,
-                # add in stuff here for forms
+                "form": member_forms.PermissionsForm(permission_sets),
             }
         )
 
@@ -166,3 +167,30 @@ def remove_member(portfolio_id, portfolio_role_id):
             fragment="portfolio-members",
         )
     )
+
+
+@portfolios_bp.route(
+    "/portfolios/<portfolio_id>/members/<portfolio_role_id>", methods=["POST"]
+)
+@user_can(Permissions.EDIT_PORTFOLIO_USERS, message="update portfolio members")
+def update_member(portfolio_id, portfolio_role_id):
+    form_data = http_request.form
+    form = member_forms.PermissionsForm(formdata=form_data)
+    portfolio_role = PortfolioRoles.get_by_id(portfolio_role_id)
+    portfolio = Portfolios.get(user=g.current_user, portfolio_id=portfolio_id)
+
+    if form.validate() and portfolio.owner_role != portfolio_role:
+        PortfolioRoles.update(portfolio_role, form.data["permission_sets"])
+        flash("update_portfolio_member", member_name=portfolio_role.full_name)
+
+        return redirect(
+            url_for(
+                "portfolios.admin",
+                portfolio_id=portfolio_id,
+                _anchor="portfolio-members",
+                fragment="portfolio-members",
+            )
+        )
+    else:
+        flash("update_portfolio_member_error", member_name=portfolio_role.full_name)
+        return (render_admin_page(portfolio), 400)
