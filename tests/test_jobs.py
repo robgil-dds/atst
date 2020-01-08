@@ -5,16 +5,18 @@ from unittest.mock import Mock
 from threading import Thread
 
 from atst.domain.csp.cloud import MockCloudProvider
+from atst.domain.portfolios import Portfolios
+
 from atst.jobs import (
     RecordEnvironmentFailure,
     RecordEnvironmentRoleFailure,
-    do_create_environment,
-    do_create_atat_admin_user,
     dispatch_create_environment,
     dispatch_create_atat_admin_user,
-    create_environment,
+    dispatch_provision_portfolio,
     dispatch_provision_user,
+    create_environment,
     do_provision_user,
+    do_provision_portfolio,
 )
 from atst.models.utils import claim_for_update
 from atst.domain.exceptions import ClaimFailedException
@@ -22,6 +24,7 @@ from tests.factories import (
     EnvironmentFactory,
     EnvironmentRoleFactory,
     PortfolioFactory,
+    PortfolioStateMachineFactory,
     ApplicationRoleFactory,
 )
 from atst.models import CSPRole, EnvironmentRole, ApplicationRoleStatus
@@ -30,6 +33,11 @@ from atst.models import CSPRole, EnvironmentRole, ApplicationRoleStatus
 @pytest.fixture(autouse=True, scope="function")
 def csp():
     return Mock(wraps=MockCloudProvider({}, with_delay=False, with_failure=False))
+
+@pytest.fixture(scope="function")
+def portfolio():
+    portfolio = PortfolioFactory.create()
+    return portfolio
 
 
 def test_environment_job_failure(celery_app, celery_worker):
@@ -248,6 +256,7 @@ def test_claim_for_update(session):
 
 
 def test_dispatch_provision_user(csp, session, celery_app, celery_worker, monkeypatch):
+
     # Given that I have four environment roles:
     #   (A) one of which has a completed status
     #   (B) one of which has an environment that has not been provisioned
@@ -306,3 +315,22 @@ def test_do_provision_user(csp, session):
     )
     # I expect that the EnvironmentRole now has a csp_user_id
     assert environment_role.csp_user_id
+
+def test_dispatch_provision_portfolio(csp, session, portfolio, celery_app, celery_worker, monkeypatch):
+    sm = PortfolioStateMachineFactory.create(portfolio=portfolio)
+    mock = Mock()
+    monkeypatch.setattr("atst.jobs.provision_portfolio", mock)
+    dispatch_provision_portfolio.run()
+    mock.delay.assert_called_once_with(portfolio_id=portfolio.id)
+
+def test_do_provision_portfolio(csp, session, portfolio):
+    do_provision_portfolio(csp=csp, portfolio_id=portfolio.id)
+    session.refresh(portfolio)
+    assert portfolio.state_machine
+
+def test_provision_portfolio_create_tenant(csp, session, portfolio, celery_app, celery_worker, monkeypatch):
+    sm = PortfolioStateMachineFactory.create(portfolio=portfolio)
+    #mock = Mock()
+    #monkeypatch.setattr("atst.jobs.provision_portfolio", mock)
+    #dispatch_provision_portfolio.run()
+    #mock.delay.assert_called_once_with(portfolio_id=portfolio.id)
