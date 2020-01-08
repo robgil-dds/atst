@@ -1,3 +1,4 @@
+import pytest
 from flask import url_for
 from unittest.mock import MagicMock
 
@@ -24,6 +25,7 @@ def test_update_portfolio_name_and_description(client, user_session):
     assert portfolio.description == "a portfolio for things"
 
 
+@pytest.mark.skip(reason="Out of scope for MVP")
 def updating_ppoc_successfully(client, old_ppoc, new_ppoc, portfolio):
     response = client.post(
         url_for("portfolios.update_ppoc", portfolio_id=portfolio.id, _external=True),
@@ -44,6 +46,7 @@ def updating_ppoc_successfully(client, old_ppoc, new_ppoc, portfolio):
     assert Permissions.EDIT_PORTFOLIO_POC not in old_ppoc.permissions
 
 
+@pytest.mark.skip(reason="Out of scope for MVP")
 def test_update_ppoc_no_user_id_specified(client, user_session):
     portfolio = PortfolioFactory.create()
 
@@ -57,6 +60,7 @@ def test_update_ppoc_no_user_id_specified(client, user_session):
     assert response.status_code == 404
 
 
+@pytest.mark.skip(reason="Out of scope for MVP")
 def test_update_ppoc_to_member_not_on_portfolio(client, user_session):
     portfolio = PortfolioFactory.create()
     original_ppoc = portfolio.owner
@@ -74,6 +78,7 @@ def test_update_ppoc_to_member_not_on_portfolio(client, user_session):
     assert portfolio.owner.id == original_ppoc.id
 
 
+@pytest.mark.skip(reason="Out of scope for MVP")
 def test_update_ppoc_when_ppoc(client, user_session):
     portfolio = PortfolioFactory.create()
     original_ppoc = portfolio.owner_role
@@ -90,7 +95,8 @@ def test_update_ppoc_when_ppoc(client, user_session):
     )
 
 
-def test_update_ppoc_when_cpo(client, user_session):
+@pytest.mark.skip(reason="Out of scope for MVP")
+def test_update_ppoc_when_ccpo(client, user_session):
     ccpo = UserFactory.create_ccpo()
     portfolio = PortfolioFactory.create()
     original_ppoc = portfolio.owner_role
@@ -107,6 +113,7 @@ def test_update_ppoc_when_cpo(client, user_session):
     )
 
 
+@pytest.mark.skip(reason="Out of scope for MVP")
 def test_update_ppoc_when_not_ppoc(client, user_session):
     portfolio = PortfolioFactory.create()
     new_owner = UserFactory.create()
