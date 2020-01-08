@@ -50,6 +50,20 @@
           </form>
         </base-form>
       {% endcall %}
+
+      {% set revoke_invite_modal = "revoke_invite-{}".format(member.role_id) %}
+      {% call Modal(name=revoke_invite_modal) %}
+        <form method="post" action="{{ url_for('portfolios.revoke_invitation', portfolio_id=portfolio.id, portfolio_token=member.invite_token) }}">
+          {{ member.form.csrf_token }}
+          <h1>{{ "invites.revoke" | translate }}</h1>
+          <hr class="full-width">
+          {{ "invites.revoke_modal_text" | translate({"application": portfolio.name}) }}
+          <div class="action-group">
+            <button class="action-group__action usa-button usa-button-primary" type="submit">{{ "invites.revoke" | translate }}</button>
+            <button class='action-group__action usa-button usa-button-secondary' v-on:click='closeModal("{{revoke_invite_modal}}")' type="button">{{ "common.cancel" | translate }}</button>
+          </div>
+        </form>
+      {% endcall %}
     {%- endif %}
   {%- endfor %}
 {%- endif %}
@@ -71,6 +85,8 @@
             {% set invite_expired = member.status == 'invite_expired' %}
             {% set perms_modal = "edit_member-{}".format(loop.index) %}
             {% set resend_invite_modal = "resend_invite-{}".format(member.role_id) %}
+            {% set revoke_invite_modal = "revoke_invite-{}".format(member.role_id) %}
+
             <tr>
               <td>
                 <strong>{{ member.user_name }}{% if member.role_id == current_member_id %} (You){% endif %}</strong>
@@ -93,7 +109,7 @@
                     <a v-on:click="openModal('{{ perms_modal }}')">Edit Permissions</a>
                     {% if invite_pending or invite_expired -%}
                       <a v-on:click="openModal('{{ resend_invite_modal }}')">Resend Invite</a>
-                      <a href="#">Revoke Invite</a>
+                      <a v-on:click="openModal('{{ revoke_invite_modal }}')">Revoke Invite</a>
                     {%- endif %}
                   {% endcall %}
                 {%- endif %}
