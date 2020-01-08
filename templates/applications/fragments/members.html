@@ -39,16 +39,17 @@
         {% call Modal(modal_name, classes="form-content--app-mem") %}
           <div class="modal__form--header">
             <h1>{{ Icon('avatar') }} {{ "portfolios.applications.members.form.edit_access_header" | translate({ "user": member.user_name }) }}</h1>
-            <hr class="full-width">
           </div>
           <base-form inline-template>
             <form id='{{ modal_name }}' method="POST" action="{{ url_for(action_update, application_id=application.id, application_role_id=member.role_id,) }}">
               {{ member.form.csrf_token }}
-              {{ member_fields.PermsFields(form=member.form, member_role_id=member.role_id) }}
-              <div class="action-group">
-                {{ SaveButton(text='Update', element='input', additional_classes='action-group__action') }}
-                <a class='action-group__action usa-button usa-button-secondary' v-on:click="closeModal('{{ modal_name }}')">{{ "common.cancel" | translate }}</a>
-              </div>
+              {{ member_form.SubmitStep(
+                name=modal_name,
+                form=member_fields.PermsFields(form=member.form, member_role_id=member.role_id),
+                submit_text="Update",
+                previous=False,
+                modal=modal_name,
+              ) }}
             </form>
           </base-form>
         {% endcall %}
@@ -58,16 +59,17 @@
           {% call Modal(resend_invite_modal, classes="form-content--app-mem") %}
             <div class="modal__form--header">
               <h1>{{ "portfolios.applications.members.new.verify" | translate }}</h1>
-              <hr class="full-width">
             </div>
             <base-form inline-template :enable-save="true">
               <form id='{{ resend_invite_modal }}' method="POST" action="{{ url_for('applications.resend_invite', application_id=application.id, application_role_id=member.role_id) }}">
                 {{ member.update_invite_form.csrf_token }}
-                {{ member_fields.InfoFields(member.update_invite_form) }}
-                <div class="action-group">
-                {{ SaveButton(text="Resend Invite")}}
-                  <a class='action-group__action' v-on:click="closeModal('{{ resend_invite_modal }}')">{{ "common.cancel" | translate }}</a>
-                </div>
+                {{ member_form.SubmitStep(
+                    name=resend_invite_modal,
+                    form=member_fields.InfoFields(member.update_invite_form),
+                    submit_text="Resend Invite",
+                    previous=False,
+                    modal=resend_invite_modal,
+                ) }}
               </form>
             </base-form>
           {% endcall %}
