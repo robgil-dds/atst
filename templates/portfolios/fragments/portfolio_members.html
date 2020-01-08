@@ -64,6 +64,28 @@
           </div>
         </form>
       {% endcall %}
+    {% else %}
+      {% set remove_manager_modal = "remove_manager-{}".format(member.role_id) %}
+      {% call Modal(name=remove_manager_modal, dismissable=False) %}
+        <h1>{{ "portfolios.admin.alert_header" | translate }}</h1>
+        <hr class="full-width">
+        {{
+          Alert(
+            title="portfolios.admin.alert_title" | translate,
+            message="portfolios.admin.alert_message" | translate,
+            level="warning"
+          )
+        }}
+        <div class="action-group">
+          <form method="POST" action="{{ url_for('portfolios.remove_member', portfolio_id=portfolio.id, portfolio_role_id=member.role_id)}}">
+            {{ member.form.csrf_token }}
+            <button class="usa-button usa-button-danger">
+              {{ "portfolios.members.archive_button" | translate }}
+            </button>
+          </form>
+          <a v-on:click="closeModal('{{ modal_id }}')" class="action-group__action icon-link icon-link--default">{{ "common.cancel" | translate }}</a>
+        </div>
+      {% endcall %}
     {%- endif %}
   {%- endfor %}
 {%- endif %}
@@ -83,9 +105,11 @@
           {% for member in members -%}
             {% set invite_pending = member.status == 'invite_pending' %}
             {% set invite_expired = member.status == 'invite_expired' %}
+            {% set current_user = current_member_id == member.role_id %}
             {% set perms_modal = "edit_member-{}".format(loop.index) %}
             {% set resend_invite_modal = "resend_invite-{}".format(member.role_id) %}
             {% set revoke_invite_modal = "revoke_invite-{}".format(member.role_id) %}
+            {% set remove_manager_modal = "remove_manager-{}".format(member.role_id) %}
 
             <tr>
               <td>
@@ -110,6 +134,12 @@
                     {% if invite_pending or invite_expired -%}
                       <a v-on:click="openModal('{{ resend_invite_modal }}')">Resend Invite</a>
                       <a v-on:click="openModal('{{ revoke_invite_modal }}')">Revoke Invite</a>
+                    {% else %}
+                      <a
+                        {% if not current_user %}v-on:click="openModal('{{ remove_manager_modal }}')"{% endif %}
+                        class="{% if current_user %}disabled{% endif %}">
+                        Remove Manager
+                      </a>
                     {%- endif %}
                   {% endcall %}
                 {%- endif %}

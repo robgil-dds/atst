@@ -48,6 +48,11 @@
       &:hover {
         background-color: $color-aqua-lightest;
       }
+
+      &.disabled {
+        color: $color-gray;
+        pointer-events: none;
+      }
     }
   }
 }
