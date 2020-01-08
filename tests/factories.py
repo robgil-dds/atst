@@ -255,7 +255,7 @@ class EnvironmentRoleFactory(Base):
         model = EnvironmentRole
 
     environment = factory.SubFactory(EnvironmentFactory)
-    role = random.choice([e.value for e in CSPRole])
+    role = random.choice([e for e in CSPRole])
     application_role = factory.SubFactory(ApplicationRoleFactory)
 
 
