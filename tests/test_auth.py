@@ -15,7 +15,7 @@ from atst.domain.authnid.crl import CRLCache
 
 from .factories import UserFactory
 from .mocks import DOD_SDN_INFO, DOD_SDN, FIXTURE_EMAIL_ADDRESS
-from .utils import make_crl_list
+from .utils import make_crl_list, FakeLogger
 
 
 MOCK_USER = {"id": "438567dd-25fa-4d83-a8cc-8aa8366cb24a"}
@@ -36,7 +36,7 @@ def _login(client, verify="SUCCESS", sdn=DOD_SDN, cert="", **url_query_args):
     )
 
 
-def test_successful_login_redirect_non_ccpo(client, monkeypatch):
+def test_successful_login_redirect(client, monkeypatch, mock_logger):
     monkeypatch.setattr(
         "atst.domain.authnid.AuthenticationContext.authenticate", lambda *args: True
     )
@@ -51,29 +51,18 @@ def test_successful_login_redirect_non_ccpo(client, monkeypatch):
     assert "home" in resp.headers["Location"]
     assert session["user_id"]
 
-
-def test_successful_login_redirect_ccpo(client, monkeypatch):
-    monkeypatch.setattr(
-        "atst.domain.authnid.AuthenticationContext.authenticate", lambda *args: True
-    )
-    role = PermissionSets.get(PermissionSets.VIEW_AUDIT_LOG)
-    monkeypatch.setattr(
-        "atst.domain.authnid.AuthenticationContext.get_user",
-        lambda *args: UserFactory.create(),
-    )
-
-    resp = _login(client)
-
-    assert resp.status_code == 302
-    assert "home" in resp.headers["Location"]
-    assert session["user_id"]
+    login_msg = mock_logger.messages[-1]
+    assert "succeeded" in login_msg
 
 
-def test_unsuccessful_login_redirect(client, monkeypatch):
+def test_unsuccessful_login_redirect(client, monkeypatch, mock_logger):
     resp = client.get(url_for("atst.login_redirect"))
 
     assert resp.status_code == 401
     assert "user_id" not in session
+
+    login_msg = mock_logger.messages[0]
+    assert "failed" in login_msg
 
 
 # checks that all of the routes in the app are protected by auth
@@ -221,13 +210,13 @@ def test_creates_new_user_without_email_on_login(
     assert user.email == None
 
 
-def test_logout(app, client, monkeypatch):
+def test_logout(app, client, monkeypatch, mock_logger):
+    user = UserFactory.create()
     monkeypatch.setattr(
         "atst.domain.authnid.AuthenticationContext.authenticate", lambda s: True
     )
     monkeypatch.setattr(
-        "atst.domain.authnid.AuthenticationContext.get_user",
-        lambda s: UserFactory.create(),
+        "atst.domain.authnid.AuthenticationContext.get_user", lambda s: user,
     )
     # create a real session
     resp = _login(client)
@@ -240,6 +229,10 @@ def test_logout(app, client, monkeypatch):
     assert resp_failure.status_code == 302
     destination = urlparse(resp_failure.headers["Location"]).path
     assert destination == url_for("atst.root")
+    # verify that logout is noted in the logs
+    logout_msg = mock_logger.messages[-1]
+    assert user.dod_id in logout_msg
+    assert "logged out" in logout_msg
 
 
 def test_logging_out_creates_a_flash_message(app, client, monkeypatch):
