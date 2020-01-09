@@ -38,7 +38,7 @@ def filter_perm_sets_data(member):
     return perm_sets_data
 
 
-def filter_members_data(members_list):
+def filter_members_data(members_list, portfolio):
     members_data = []
     for member in members_list:
         members_data.append(
@@ -47,6 +47,7 @@ def filter_members_data(members_list):
                 "user_name": member.user_name,
                 "permission_sets": filter_perm_sets_data(member),
                 "status": member.display_status,
+                "ppoc": (True if portfolio.owner_role == member else False),
                 # add in stuff here for forms
             }
         )
@@ -58,9 +59,7 @@ def render_admin_page(portfolio, form=None):
     pagination_opts = Paginator.get_pagination_opts(http_request)
     audit_events = AuditLog.get_portfolio_events(portfolio, pagination_opts)
     portfolio_form = PortfolioForm(obj=portfolio)
-    ppoc = filter_members_data([portfolio.owner_role])[0]
     member_list = portfolio.members
-    member_list.remove(portfolio.owner_role)
     assign_ppoc_form = member_forms.AssignPPOCForm()
 
     for pf_role in portfolio.roles:
@@ -76,8 +75,7 @@ def render_admin_page(portfolio, form=None):
         "portfolios/admin.html",
         form=form,
         portfolio_form=portfolio_form,
-        ppoc=ppoc,
-        members=filter_members_data(member_list),
+        members=filter_members_data(member_list, portfolio),
         new_manager_form=member_forms.NewForm(),
         assign_ppoc_form=assign_ppoc_form,
         portfolio=portfolio,

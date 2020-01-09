@@ -18,25 +18,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>
-              <strong>{{ ppoc.user_name }}{% if ppoc.role_id == current_member_id %} (You){% endif %}</strong>
-              <br>
-              {{ Label(type="ppoc", classes='label--below label--purple')}}
-            </td>
-            <td>
-              {% for perm, value in ppoc.permission_sets.items() -%}
-                <div>
-                  {{ ("portfolios.admin.members.{}.{}".format(perm, value)) | translate }}
-                </div>
-              {%-endfor %}
-            </td>
-          </tr>
           {% for member in members -%}
             <tr>
               <td>
                 <strong>{{ member.user_name }}{% if member.role_id == current_member_id %} (You){% endif %}</strong>
                 <br>
+                {% if member.ppoc %}
+                  {{ Label(type="ppoc", classes='label--below label--purple')}}
+                {% endif %}
                 {{ Label(type=member.status, classes='label--below')}}
               </td>
               <td>
