@@ -73,7 +73,8 @@ RUN apk update && \
       postgresql-client \
       postgresql-dev \
       postgresql-libs \
-      uwsgi-logfile
+      uwsgi-logfile \
+      uwsgi-python3
 
 COPY --from=builder /install/.venv/ ./.venv/
 COPY --from=builder /install/alembic/ ./alembic/
