@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 from uuid import uuid4
 
-from atst.domain.csp.cloud import AzureCloudProvider
+from atst.domain.csp.cloud import AzureCloudProvider, TenantCSPResult
 
 from tests.mock_azure import mock_azure, AUTH_CREDENTIALS
 from tests.factories import EnvironmentFactory, ApplicationFactory
@@ -121,3 +121,22 @@ def test_create_policy_definition_succeeds(mock_azure: AzureCloudProvider):
         policy_definition_name=properties.get("displayName"),
         parameters=mock_policy_definition,
     )
+
+
+def test_create_tenant(mock_azure: AzureCloudProvider):
+    mock_azure.sdk.adal.AuthenticationContext.return_value.context.acquire_token_with_client_credentials.return_value = {
+        "accessToken": "TOKEN"
+    }
+
+    mock_result = Mock()
+    mock_result.json.return_value = {
+        "objectId": "0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
+        "tenantId": "60ff9d34-82bf-4f21-b565-308ef0533435",
+        "userId": "1153801116406515559",
+    }
+    mock_result.status_code = 200
+    mock_azure.sdk.requests.post.return_value = mock_result
+    result = mock_azure.create_tenant(None, suffix=2)
+    print(result)
+    body: TenantCSPResult = result.get("body")
+    assert body.tenant_id == "60ff9d34-82bf-4f21-b565-308ef0533435"

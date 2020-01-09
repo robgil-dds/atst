@@ -53,16 +53,30 @@ def mock_policy():
     return Mock(spec=policy)
 
 
+def mock_adal():
+    import adal
+
+    return Mock(spec=adal)
+
+
+def mock_requests():
+    import requests
+
+    return Mock(spec=requests)
+
+
 class MockAzureSDK(object):
     def __init__(self):
         from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 
         self.subscription = mock_subscription()
         self.authorization = mock_authorization()
+        self.adal = mock_adal()
         self.managementgroups = mock_managementgroups()
         self.graphrbac = mock_graphrbac()
         self.credentials = mock_credentials()
         self.policy = mock_policy()
+        self.requests = mock_requests()
         # may change to a JEDI cloud
         self.cloud = AZURE_PUBLIC_CLOUD
 
