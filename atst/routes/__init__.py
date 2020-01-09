@@ -98,9 +98,6 @@ def login_redirect():
     auth_context.authenticate()
     user = auth_context.get_user()
 
-    if user.provisional:
-        Users.finalize(user)
-
     current_user_setup(user)
     return redirect(redirect_after_login_url())
 
