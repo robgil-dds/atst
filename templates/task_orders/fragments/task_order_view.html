@@ -23,14 +23,9 @@
           <span class="summary-item__header-text">Total Task Order value</span>
           {{ Tooltip(("task_orders.review.tooltip.total_value" | translate), title="", classes="summary-item__header-icon") }}
         </h4>
-        {% set earliest_pop_start_date, latest_pop_end_date = portfolio.funding_duration %}
-        {% if earliest_pop_start_date and latest_pop_end_date  %}
-          <p class="summary-item__value--large">
-            {{ contract_amount | dollars }}
-          </p>
-        {% else %}
-          <p class="summary-item__value--large"> - </p>
-        {% endif %}
+        <p class="summary-item__value--large">
+          {{ contract_amount | dollars }}
+        </p>
       </div>
       <div class='col col--grow summary-item'>
         <h4 class="summary-item__header">
