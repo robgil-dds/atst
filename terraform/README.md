@@ -51,6 +51,19 @@ For Ubuntu 19.10
 snap install powershell --classic
 ```
 
+# Preview Features
+To create all the resources we need for this environment we'll need to enable some _Preview_ features.
+
+This registers the specific feature for _SystemAssigned_ principals
+```
+az feature register --namespace Microsoft.ContainerService --name MSIPreview
+```
+
+To apply the registration, run the following
+```
+az provider register -n Microsoft.ContainerService
+```
+
 # Running Terraform
 First, you'll need to log in to Azure. With the Azure CLI installed, you can run the following.
 
