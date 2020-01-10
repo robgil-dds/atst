@@ -47,7 +47,7 @@ def filter_members_data(members_list, portfolio):
                 "user_name": member.user_name,
                 "permission_sets": filter_perm_sets_data(member),
                 "status": member.display_status,
-                "ppoc": (True if portfolio.owner_role == member else False),
+                "ppoc": PermissionSets.PORTFOLIO_POC in member.permission_sets,
                 # add in stuff here for forms
             }
         )
