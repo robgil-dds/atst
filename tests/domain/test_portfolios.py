@@ -205,7 +205,7 @@ def test_invite():
     inviter = UserFactory.create()
     member_data = UserFactory.dictionary()
 
-    invitation = Portfolios.invite(portfolio, inviter, member_data)
+    invitation = Portfolios.invite(portfolio, inviter, {"user_data": member_data})
 
     assert invitation.role
     assert invitation.role.portfolio == portfolio

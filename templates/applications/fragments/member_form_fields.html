@@ -118,7 +118,7 @@
 {% endmacro %}
 
 {% macro InfoFields(member_form) %}
-  <div class="application-member__user-info">
+  <div class="user-info">
     {{ TextInput(member_form.first_name, validation='requiredField', optional=False) }}
     {{ TextInput(member_form.last_name, validation='requiredField', optional=False) }}
     {{ TextInput(member_form.email, validation='email', optional=False) }}

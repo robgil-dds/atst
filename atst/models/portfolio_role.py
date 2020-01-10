@@ -12,17 +12,6 @@ from atst.utils import first_or_none
 from atst.models.mixins.auditable import record_permission_sets_updates
 
 
-MEMBER_STATUSES = {
-    "active": "Active",
-    "revoked": "Invite revoked",
-    "expired": "Invite expired",
-    "error": "Error on invite",
-    "pending": "Pending",
-    "unknown": "Unknown errors",
-    "disabled": "Disabled",
-}
-
-
 class Status(Enum):
     ACTIVE = "active"
     DISABLED = "disabled"
@@ -90,23 +79,23 @@ class PortfolioRole(
     @property
     def display_status(self):
         if self.status == Status.ACTIVE:
-            return MEMBER_STATUSES["active"]
+            return "active"
         elif self.status == Status.DISABLED:
-            return MEMBER_STATUSES["disabled"]
+            return "disabled"
         elif self.latest_invitation:
             if self.latest_invitation.is_revoked:
-                return MEMBER_STATUSES["revoked"]
+                return "invite_revoked"
             elif self.latest_invitation.is_rejected_wrong_user:
-                return MEMBER_STATUSES["error"]
+                return "invite_error"
             elif (
                 self.latest_invitation.is_rejected_expired
                 or self.latest_invitation.is_expired
             ):
-                return MEMBER_STATUSES["expired"]
+                return "invite_expired"
             else:
-                return MEMBER_STATUSES["pending"]
+                return "invite_pending"
         else:
-            return MEMBER_STATUSES["unknown"]
+            return "unknown"
 
     def has_permission_set(self, perm_set_name):
         return first_or_none(

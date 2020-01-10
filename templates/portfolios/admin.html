@@ -1,5 +1,6 @@
 {% extends "portfolios/base.html" %}
 
+{% from "components/label.html" import Label %}
 {% from "components/pagination.html" import Pagination %}
 {% from 'components/save_button.html' import SaveButton %}
 {% from 'components/sticky_cta.html' import StickyCTA %}
@@ -9,8 +10,8 @@
 
 {{ StickyCTA(text="Settings") }}
 
-  <div v-cloak class="portfolio-admin portfolio-content">
-
+  <div v-cloak class="portfolio-admin">
+    {% include "fragments/flash.html" %}
     <!-- max width of this section is 460px -->
     <section class="form-container__half">
       <h3>Portfolio name and component</h3>

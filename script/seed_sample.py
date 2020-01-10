@@ -159,7 +159,7 @@ def get_users():
 
 def add_members_to_portfolio(portfolio):
     for user_data in PORTFOLIO_USERS:
-        invite = Portfolios.invite(portfolio, portfolio.owner, user_data)
+        invite = Portfolios.invite(portfolio, portfolio.owner, {"user_data": user_data})
         profile = {
             k: user_data[k] for k in user_data if k not in ["dod_id", "permission_sets"]
         }
