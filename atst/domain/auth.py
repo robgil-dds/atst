@@ -1,4 +1,4 @@
-from flask import g, redirect, url_for, session, request
+from flask import g, redirect, url_for, session, request, current_app as app
 
 from atst.domain.users import Users
 
@@ -59,8 +59,10 @@ def get_last_login():
 
 def logout():
     if session.get("user_id"):  # pragma: no branch
+        dod_id = g.current_user.dod_id
         del session["user_id"]
         del session["last_login"]
+        app.logger.info(f"user with EDIPI {dod_id} has logged out")
 
 
 def _unprotected_route(request):

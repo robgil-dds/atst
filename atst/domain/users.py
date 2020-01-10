@@ -117,12 +117,3 @@ class Users(object):
         user.last_session_id = session_id
         db.session.add(user)
         db.session.commit()
-
-    @classmethod
-    def finalize(cls, user):
-        user.provisional = False
-
-        db.session.add(user)
-        db.session.commit()
-
-        return user

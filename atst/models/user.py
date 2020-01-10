@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey, Column, Date, Boolean, Table, TIMESTAMP
+from sqlalchemy import String, ForeignKey, Column, Date, Table, TIMESTAMP
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.event import listen
@@ -66,8 +66,6 @@ class User(
     date_latest_training = Column(Date)
     last_login = Column(TIMESTAMP(timezone=True), nullable=True)
     last_session_id = Column(UUID(as_uuid=True), nullable=True)
-
-    provisional = Column(Boolean)
 
     cloud_id = Column(String)
 
