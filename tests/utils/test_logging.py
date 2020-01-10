@@ -72,9 +72,11 @@ def test_request_context_filter(logger, log_stream_content, request_ctx, monkeyp
     user.dod_id = "5678901234"
 
     monkeypatch.setattr("atst.utils.logging.g", Mock(current_user=user))
+    monkeypatch.setattr("atst.utils.logging.session", {"user_id": user_uuid})
     request_ctx.request.environ["HTTP_X_REQUEST_ID"] = request_uuid
     logger.info("this user is doing something")
     log = json.loads(log_stream_content())
     assert log["user_id"] == str(user_uuid)
     assert log["dod_edipi"] == str(user.dod_id)
     assert log["request_id"] == request_uuid
+    assert log["logged_in"] == True
