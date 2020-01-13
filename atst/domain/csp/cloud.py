@@ -1,8 +1,8 @@
 import re
-from typing import Dict
+from typing import Dict, List, Optional
 from uuid import uuid4
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 from atst.models.user import User
 from atst.models.environment import Environment
@@ -193,6 +193,12 @@ class TenantCSPResult(AliasModel):
 
 
 class BillingProfileAddress(AliasModel):
+    company_name: str
+    address_line_1: str
+    city: str
+    region: str
+    country: str
+    postal_code: str
 
 
 class BillingProfileCLINBudget(AliasModel):
@@ -207,44 +213,60 @@ class BillingProfileCLINBudget(AliasModel):
     """
 
 
-class BillingProfileCSPPayload(
-    BaseCSPPayload, BillingProfileAddress, BillingProfileCLINBudget
-):
-    displayName: str
-    poNumber: str
-    invoiceEmailOptIn: str
+class BillingProfileCSPPayload(BaseCSPPayload):
+    tenant_id: str
+    display_name: str
+    enabled_azure_plans: Optional[List[str]]
+    address: BillingProfileAddress
 
-    """
-    {
-        "displayName": "string",
-        "poNumber": "string",
-        "address": {
-            "firstName": "string",
-            "lastName": "string",
-            "companyName": "string",
-            "addressLine1": "string",
-            "addressLine2": "string",
-            "addressLine3": "string",
-            "city": "string",
-            "region": "string",
-            "country": "string",
-            "postalCode": "string"
-        },
-        "invoiceEmailOptIn": true,
-        Note: These last 2 are also the body for adding/updating new TOs/clins
-        "enabledAzurePlans": [
-            {
-            "skuId": "string"
-            }
-        ],
-        "clinBudget": {
-            "amount": 0,
-            "startDate": "2019-12-18T16:47:40.909Z",
-            "endDate": "2019-12-18T16:47:40.909Z",
-            "externalReferenceId": "string"
+    @validator("enabled_azure_plans", pre=True, always=True)
+    def default_enabled_azure_plans(cls, v):
+        """
+        Normally you'd implement this by setting the field with a value of:
+            dataclasses.field(default_factory=list)
+        but that prevents the object from being correctly pickled, so instead we need
+        to rely on a validator to ensure this has an empty value when not specified
+        """
+        return v or []
+
+
+class BillingProfileCreateCSPResult(AliasModel):
+    location: str
+    retry_after: int
+
+    class Config:
+        fields = {"location": "Location", "retry_after": "Retry-After"}
+
+
+class BillingProfileVerifyCSPPayload(BaseCSPPayload):
+    location: str
+
+
+class BillingInvoiceSection(AliasModel):
+    invoice_section_id: str
+    invoice_section_name: str
+
+    class Config:
+        fields = {"invoice_section_id": "id", "invoice_section_name": "name"}
+
+
+class BillingProfileProperties(AliasModel):
+    address: BillingProfileAddress
+    display_name: str
+    invoice_sections: List[BillingInvoiceSection]
+
+
+class BillingProfileCSPResult(AliasModel):
+    billing_profile_id: str
+    billing_profile_name: str
+    billing_profile_properties: BillingProfileProperties
+
+    class Config:
+        fields = {
+            "billing_profile_id": "id",
+            "billing_profile_name": "name",
+            "billing_profile_properties": "properties",
         }
-    }
-    """
 
 
 class CloudProviderInterface:
@@ -682,8 +704,6 @@ class AzureCloudProvider(CloudProviderInterface):
 
         create_tenant_body = payload.dict(by_alias=True)
 
-        print(create_tenant_body)
-
         create_tenant_headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {sp_token}",
@@ -697,6 +717,53 @@ class AzureCloudProvider(CloudProviderInterface):
 
         if result.status_code == 200:
             return self._ok(TenantCSPResult(**result.json()))
+        else:
+            return self._error(result.json())
+
+    def create_billing_profile(self, payload: BillingProfileCSPPayload):
+        sp_token = self._get_sp_token(payload.creds)
+        if sp_token is None:
+            raise AuthenticationException(
+                "Could not resolve token for billing profile creation"
+            )
+
+        create_billing_account_body = payload.dict(by_alias=True)
+
+        create_billing_account_headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {sp_token}",
+        }
+
+        # TODO: unsure if this is a static value or needs to be constructed/configurable
+        BILLING_ACCOUT_NAME = "7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31"
+        billing_account_create_url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{BILLING_ACCOUT_NAME}/billingProfiles?api-version=2019-10-01-preview"
+
+        result = self.sdk.requests.post(
+            billing_account_create_url,
+            json=create_billing_account_body,
+            headers=create_billing_account_headers,
+        )
+
+        if result.status_code == 202:
+            return self._ok(BillingProfileCreateCSPResult(**result.headers))
+        else:
+            return self._error(result.json())
+
+    def validate_billing_profile_created(self, payload: BillingProfileVerifyCSPPayload):
+        sp_token = self._get_sp_token(payload.creds)
+        if sp_token is None:
+            raise AuthenticationException(
+                "Could not resolve token for billing profile validation"
+            )
+
+        auth_header = {
+            "Authorization": f"Bearer {sp_token}",
+        }
+
+        result = self.sdk.requests.get(payload.location, headers=auth_header)
+
+        if result.status_code == 200:
+            return self._ok(BillingProfileCSPResult(**result.json()))
         else:
             return self._error(result.json())
 
@@ -721,45 +788,6 @@ class AzureCloudProvider(CloudProviderInterface):
         """
 
         return self.ok()
-
-    def create_billing_profile(self, creds, tenant_admin_details, billing_owner_id):
-        # call billing profile creation endpoint, specifying owner
-        # Payload:
-        """
-        {
-            "displayName": "string",
-            "poNumber": "string",
-            "address": {
-                "firstName": "string",
-                "lastName": "string",
-                "companyName": "string",
-                "addressLine1": "string",
-                "addressLine2": "string",
-                "addressLine3": "string",
-                "city": "string",
-                "region": "string",
-                "country": "string",
-                "postalCode": "string"
-            },
-            "invoiceEmailOptIn": true,
-            Note: These last 2 are also the body for adding/updating new TOs/clins
-            "enabledAzurePlans": [
-                {
-                "skuId": "string"
-                }
-            ],
-            "clinBudget": {
-                "amount": 0,
-                "startDate": "2019-12-18T16:47:40.909Z",
-                "endDate": "2019-12-18T16:47:40.909Z",
-                "externalReferenceId": "string"
-            }
-        }
-        """
-
-        # response will be mostly the same as the body, but we only really care about the id
-        response = {"id": "string"}
-        return self._ok({"billing_profile_id": response["id"]})
 
     def report_clin(self, creds, clin_id, clin_amount, clin_start, clin_end, clin_to):
         # should consumer be responsible for reporting each clin or
