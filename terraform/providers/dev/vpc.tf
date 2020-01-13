@@ -4,6 +4,7 @@ module "vpc" {
   region          = var.region
   virtual_network = var.virtual_network
   networks        = var.networks
+  gateway_subnet  = var.gateway_subnet
   route_tables    = var.route_tables
   owner           = var.owner
   name            = var.name

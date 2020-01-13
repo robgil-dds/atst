@@ -72,15 +72,18 @@ $CONTAINER_IMAGE \
 
 # Use curl to wait for application container to become available
 docker pull curlimages/curl:latest
+echo "Waiting for application container to become available"
 docker run --network atat \
   curlimages/curl:latest \
-  curl --connect-timeout 3 \
+  curl \
+  --silent \
+  --connect-timeout 3 \
   --max-time 5 \
   --retry $CONTAINER_TIMEOUT \
   --retry-connrefused \
   --retry-delay 1 \
   --retry-max-time $CONTAINER_TIMEOUT \
-  test-atat:8000
+  test-atat:8000 >/dev/null
 
 # Run Ghost Inspector tests
 docker pull ghostinspector/test-runner-standalone:latest

@@ -23,7 +23,7 @@
         {% for task_order in expired_task_orders %}
           <tr>
             <td colspan="5">
-              <span class="h4 reporting-expended-funding__header">Task Order</span> <a href="{{ url_for("task_orders.review_task_order", task_order_id=task_order.id) }}">
+              <span class="h4 reporting-expended-funding__header">Task Order</span> <a href="{{ url_for("task_orders.view_task_order", task_order_id=task_order.id) }}">
                 {{ task_order.number }} {{ Icon("caret_right", classes="icon--tiny icon--blue" ) }}
               </a>
             </td>

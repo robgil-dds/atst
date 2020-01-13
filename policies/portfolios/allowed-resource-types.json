@@ -1,0 +1,40 @@
+{
+  "definitionPoint": "portfolio",
+  "policyDefinition": {
+    "properties": {
+      "displayName": "Allowed resource types",
+      "policyType": "Custom",
+      "mode": "Indexed",
+      "description": "This policy enables you to specify the resource types that your organization can deploy.",
+      "parameters": {
+        "listOfResourceTypesAllowed": {
+          "type": "Array",
+          "metadata": {
+            "description": "The list of resource types that can be deployed.",
+            "displayName": "Allowed resource types",
+            "strongType": "resourceTypes"
+          }
+        }
+      },
+      "policyRule": {
+        "if": {
+          "not": {
+            "field": "type",
+            "in": "[parameters('listOfResourceTypesAllowed')]"
+          }
+        },
+        "then": {
+          "effect": "deny"
+        }
+      }
+    },
+    "type": "Microsoft.Authorization/policyDefinitions"
+  },
+  "parameters": {
+    "listOfResourceTypesAllowed": {
+      "value": [
+        "Microsoft.Cache"
+      ]
+    }
+  }
+}

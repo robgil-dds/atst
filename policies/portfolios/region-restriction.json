@@ -1,0 +1,51 @@
+{
+  "definitionPoint": "portfolio",
+  "policyDefinition": {
+    "properties": {
+      "displayName": "Custom - Region Restriction",
+      "policyType": "Custom",
+      "mode": "Indexed",
+      "parameters": {
+        "listOfAllowedLocations": {
+          "type": "Array",
+          "metadata": {
+            "displayName": "Allowed locations",
+            "description": "The list of locations that can be specified when deploying resources.",
+            "strongType": "location"
+          }
+        }
+      },
+      "policyRule": {
+        "if": {
+          "allOf": [
+            {
+              "field": "location",
+              "notIn": "[parameters('listOfAllowedLocations')]"
+            },
+            {
+              "field": "location",
+              "notEquals": "global"
+            },
+            {
+              "field": "type",
+              "notEquals": "Microsoft.AzureActiveDirectory/b2cDirectories"
+            }
+          ]
+        },
+        "then": {
+          "effect": "Deny"
+        }
+      }
+    },
+    "type": "Microsoft.Authorization/policyDefinitions"
+  },
+  "parameters": {
+    "listOfAllowedLocations": {
+      "value": [
+        "eastus",
+        "southcentralus",
+        "westus"
+      ]
+    }
+  }
+}

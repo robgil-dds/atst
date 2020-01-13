@@ -34,7 +34,7 @@ def test_create_portfolio_success(client, user_session):
         data={
             "name": "My project name",
             "description": "My project description",
-            "defense_component": "army",
+            "defense_component": ["army"],
         },
     )
 
@@ -84,35 +84,3 @@ def test_portfolio_reports_with_mock_portfolio(client, user_session):
     response = client.get(url_for("portfolios.reports", portfolio_id=portfolio.id))
     assert response.status_code == 200
     assert portfolio.name in response.data.decode()
-
-
-def test_delete_portfolio_success(client, user_session):
-    portfolio = PortfolioFactory.create()
-    owner = portfolio.owner
-    user_session(owner)
-
-    assert len(Portfolios.for_user(user=owner)) == 1
-
-    response = client.post(
-        url_for("portfolios.delete_portfolio", portfolio_id=portfolio.id)
-    )
-
-    assert response.status_code == 302
-    assert url_for("atst.home") in response.location
-    assert len(Portfolios.for_user(user=owner)) == 0
-
-
-def test_delete_portfolio_failure(no_debug_client, user_session):
-    portfolio = PortfolioFactory.create()
-    application = ApplicationFactory.create(portfolio=portfolio)
-    owner = portfolio.owner
-    user_session(owner)
-
-    assert len(Portfolios.for_user(user=owner)) == 1
-
-    response = no_debug_client.post(
-        url_for("portfolios.delete_portfolio", portfolio_id=portfolio.id)
-    )
-
-    assert response.status_code == 500
-    assert len(Portfolios.for_user(user=owner)) == 1

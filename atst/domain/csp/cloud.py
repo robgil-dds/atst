@@ -6,6 +6,7 @@ from atst.models.user import User
 from atst.models.application import Application
 from atst.models.environment import Environment
 from atst.models.environment_role import EnvironmentRole
+from .policy import AzurePolicyManager
 
 
 class GeneralCSPException(Exception):
@@ -401,6 +402,7 @@ REMOTE_ROOT_ROLE_DEF_ID = "/providers/Microsoft.Authorization/roleDefinitions/00
 class AzureSDKProvider(object):
     def __init__(self):
         from azure.mgmt import subscription, authorization, managementgroups
+        from azure.mgmt.resource import policy
         import azure.graphrbac as graphrbac
         import azure.common.credentials as credentials
         from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
@@ -410,6 +412,7 @@ class AzureSDKProvider(object):
         self.managementgroups = managementgroups
         self.graphrbac = graphrbac
         self.credentials = credentials
+        self.policy = policy
         # may change to a JEDI cloud
         self.cloud = AZURE_PUBLIC_CLOUD
 
@@ -426,6 +429,8 @@ class AzureCloudProvider(CloudProviderInterface):
             self.sdk = AzureSDKProvider()
         else:
             self.sdk = azure_sdk_provider
+
+        self.policy_manager = AzurePolicyManager(config["AZURE_POLICY_LOCATION"])
 
     def create_environment(
         self, auth_credentials: Dict, user: User, environment: Environment
@@ -560,6 +565,51 @@ class AzureCloudProvider(CloudProviderInterface):
             # troublesome error, subscription should exist at this point
             # but we just don't have a valid ID
             pass
+
+    AZURE_MANAGEMENT_API = "https://management.azure.com"
+
+    def _create_policy_definition(
+        self, credentials, subscription_id, management_group_id, properties,
+    ):
+        """
+        Requires credentials that have AZURE_MANAGEMENT_API
+        specified as the resource. The Service Principal
+        specified in the credentials must have the "Resource
+        Policy Contributor" role assigned with a scope at least
+        as high as the management group specified by
+        management_group_id.
+
+        Arguments:
+            credentials -- ServicePrincipalCredentials
+            subscription_id -- str, ID of the subscription (just the UUID, not the path)
+            management_group_id -- str, ID of the management group (just the UUID, not the path)
+            properties -- dictionary, the "properties" section of a valid Azure policy definition document
+
+        Returns:
+            azure.mgmt.resource.policy.[api version].models.PolicyDefinition: the PolicyDefinition object provided to Azure
+
+        Raises:
+            TBD
+        """
+        # TODO: which subscription would this be?
+        client = self.sdk.policy.PolicyClient(credentials, subscription_id)
+
+        definition = client.policy_definitions.models.PolicyDefinition(
+            policy_type=properties.get("policyType"),
+            mode=properties.get("mode"),
+            display_name=properties.get("displayName"),
+            description=properties.get("description"),
+            policy_rule=properties.get("policyRule"),
+            parameters=properties.get("parameters"),
+        )
+
+        name = properties.get("displayName")
+
+        return client.policy_definitions.create_or_update_at_management_group(
+            policy_definition_name=name,
+            parameters=definition,
+            management_group_id=management_group_id,
+        )
 
     def _get_management_service_principal(self):
         # we really should be using graph.microsoft.com, but i'm getting

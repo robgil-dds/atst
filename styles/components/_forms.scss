@@ -1,7 +1,8 @@
 // Form Grid
 .form-row {
   margin: ($gap * 4) 0;
-  &--separated {
+
+  &--bordered {
     border-bottom: $color-gray-lighter 1px solid;
   }
 
@@ -201,4 +202,8 @@
   & > fieldset.usa-input__choices label {
     display: inline;
   }
+}
+
+.form-container__half {
+  max-width: 46rem;
 }

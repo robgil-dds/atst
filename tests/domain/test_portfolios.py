@@ -1,4 +1,5 @@
 import pytest
+import random
 from uuid import uuid4
 
 from atst.domain.exceptions import NotFoundError, UnauthorizedError
@@ -97,7 +98,7 @@ def test_scoped_portfolio_returns_all_applications_for_portfolio_admin(
         Applications.create(
             portfolio.owner,
             portfolio,
-            "My Application",
+            "My Application %s" % (random.randrange(1, 1000)),
             "My application",
             ["dev", "staging", "prod"],
         )
@@ -120,7 +121,7 @@ def test_scoped_portfolio_returns_all_applications_for_portfolio_owner(
         Applications.create(
             portfolio.owner,
             portfolio,
-            "My Application",
+            "My Application %s" % (random.randrange(1, 1000)),
             "My application",
             ["dev", "staging", "prod"],
         )
@@ -204,7 +205,7 @@ def test_invite():
     inviter = UserFactory.create()
     member_data = UserFactory.dictionary()
 
-    invitation = Portfolios.invite(portfolio, inviter, member_data)
+    invitation = Portfolios.invite(portfolio, inviter, {"user_data": member_data})
 
     assert invitation.role
     assert invitation.role.portfolio == portfolio

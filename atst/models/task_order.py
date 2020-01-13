@@ -9,7 +9,7 @@ from atst.models.base import Base
 import atst.models.types as types
 import atst.models.mixins as mixins
 from atst.models.attachment import Attachment
-from atst.utils.clock import Clock
+from pendulum import today
 
 
 class Status(Enum):
@@ -84,24 +84,8 @@ class TaskOrder(Base, mixins.TimestampsMixin):
         return self.status == Status.ACTIVE
 
     @property
-    def is_upcoming(self):
-        return self.status == Status.UPCOMING
-
-    @property
     def is_expired(self):
         return self.status == Status.EXPIRED
-
-    @property
-    def is_unsigned(self):
-        return self.status == Status.UNSIGNED
-
-    @property
-    def has_begun(self):
-        return self.start_date is not None and Clock.today() >= self.start_date
-
-    @property
-    def has_ended(self):
-        return self.start_date is not None and Clock.today() >= self.end_date
 
     @property
     def clins_are_completed(self):
@@ -117,17 +101,17 @@ class TaskOrder(Base, mixins.TimestampsMixin):
 
     @property
     def status(self):
-        today = Clock.today()
+        todays_date = today(tz="UTC").date()
 
         if not self.is_completed and not self.is_signed:
             return Status.DRAFT
         elif self.is_completed and not self.is_signed:
             return Status.UNSIGNED
-        elif today < self.start_date:
+        elif todays_date < self.start_date:
             return Status.UPCOMING
-        elif today >= self.end_date:
+        elif todays_date > self.end_date:
             return Status.EXPIRED
-        elif self.start_date <= today < self.end_date:
+        elif self.start_date <= todays_date <= self.end_date:
             return Status.ACTIVE
 
     @property
@@ -141,39 +125,25 @@ class TaskOrder(Base, mixins.TimestampsMixin):
     @property
     def days_to_expiration(self):
         if self.end_date:
-            return (self.end_date - Clock.today()).days
+            return (self.end_date - today(tz="UTC").date()).days
 
     @property
     def total_obligated_funds(self):
-        total = 0
-        for clin in self.clins:
-            if clin.obligated_amount is not None:
-                total += clin.obligated_amount
-        return total
+        return sum(
+            (clin.obligated_amount for clin in self.clins if clin.obligated_amount)
+        )
 
     @property
     def total_contract_amount(self):
-        total = 0
-        for clin in self.clins:
-            if clin.total_amount is not None:
-                total += clin.total_amount
-        return total
-
-    @property
-    # TODO delete when we delete task_order_review flow
-    def budget(self):
-        return 100000
-
-    @property
-    def balance(self):
-        # TODO: fix task order -- reimplement using CLINs
-        # Faked for display purposes
-        return 50
+        return sum((clin.total_amount for clin in self.clins if clin.total_amount))
 
     @property
     def invoiced_funds(self):
         # TODO: implement this using reporting data from the CSP
-        return self.total_obligated_funds * Decimal(0.75)
+        if self.is_active:
+            return self.total_obligated_funds * Decimal(0.75)
+        else:
+            return 0
 
     @property
     def display_status(self):

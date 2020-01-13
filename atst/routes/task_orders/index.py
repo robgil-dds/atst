@@ -8,16 +8,16 @@ from atst.forms.task_order import SignatureForm
 from atst.models import Permissions
 
 
-@task_orders_bp.route("/task_orders/<task_order_id>/review")
-@user_can(Permissions.VIEW_TASK_ORDER_DETAILS, message="review task order details")
-def review_task_order(task_order_id):
+@task_orders_bp.route("/task_orders/<task_order_id>")
+@user_can(Permissions.VIEW_TASK_ORDER_DETAILS, message="view task order details")
+def view_task_order(task_order_id):
     task_order = TaskOrders.get(task_order_id)
     if task_order.is_draft:
         return redirect(url_for("task_orders.edit", task_order_id=task_order.id))
     else:
         signature_form = SignatureForm()
         return render_template(
-            "task_orders/review.html",
+            "task_orders/view.html",
             task_order=task_order,
             signature_form=signature_form,
         )

@@ -1,6 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
+import random
 
 from flask import url_for, Response
 
@@ -264,26 +265,28 @@ def test_applications_post_application_step_1(post_url_assert_status):
     rando = user_with()
     portfolio = PortfolioFactory.create(owner=owner)
     application = ApplicationFactory.create(portfolio=portfolio)
-    step_1_form_data = {
-        "name": "Test Application",
-        "description": "This is only a test",
-    }
+
+    def _form_data():
+        return {
+            "name": "Test Application %s" % (random.randrange(1, 1000)),
+            "description": "This is only a test",
+        }
 
     url = url_for(
         "applications.create_new_application_step_1", portfolio_id=portfolio.id
     )
-    post_url_assert_status(ccpo, url, 302, data=step_1_form_data)
-    post_url_assert_status(owner, url, 302, data=step_1_form_data)
-    post_url_assert_status(rando, url, 404, data=step_1_form_data)
+    post_url_assert_status(ccpo, url, 302, data=_form_data())
+    post_url_assert_status(owner, url, 302, data=_form_data())
+    post_url_assert_status(rando, url, 404, data=_form_data())
 
     url = url_for(
         "applications.update_new_application_step_1",
         portfolio_id=portfolio.id,
         application_id=application.id,
     )
-    post_url_assert_status(ccpo, url, 302, data=step_1_form_data)
-    post_url_assert_status(owner, url, 302, data=step_1_form_data)
-    post_url_assert_status(rando, url, 404, data=step_1_form_data)
+    post_url_assert_status(ccpo, url, 302, data=_form_data())
+    post_url_assert_status(owner, url, 302, data=_form_data())
+    post_url_assert_status(rando, url, 404, data=_form_data())
 
 
 # applications.view_new_application_step_2
@@ -338,40 +341,6 @@ def test_portfolios_invite_member_access(post_url_assert_status):
     post_url_assert_status(ccpo, url, 302)
     post_url_assert_status(owner, url, 302)
     post_url_assert_status(rando, url, 404)
-
-
-# applications.delete
-def test_applications_delete_access(post_url_assert_status, monkeypatch):
-    ccpo = UserFactory.create_ccpo()
-    owner = user_with()
-    app_admin = user_with()
-    rando = user_with()
-
-    portfolio = PortfolioFactory.create(
-        owner=owner, applications=[{"name": "mos eisley"}]
-    )
-    application = portfolio.applications[0]
-
-    ApplicationRoleFactory.create(
-        user=app_admin,
-        application=application,
-        permission_sets=PermissionSets.get_many(
-            [
-                PermissionSets.VIEW_APPLICATION,
-                PermissionSets.EDIT_APPLICATION_ENVIRONMENTS,
-                PermissionSets.EDIT_APPLICATION_TEAM,
-                PermissionSets.DELETE_APPLICATION_ENVIRONMENTS,
-            ]
-        ),
-    )
-
-    monkeypatch.setattr("atst.domain.applications.Applications.delete", lambda *a: True)
-
-    url = url_for("applications.delete", application_id=application.id)
-    post_url_assert_status(app_admin, url, 404)
-    post_url_assert_status(rando, url, 404)
-    post_url_assert_status(owner, url, 302)
-    post_url_assert_status(ccpo, url, 302)
 
 
 # applications.settings
@@ -535,10 +504,16 @@ def test_applications_update_access(post_url_assert_status):
     )
     app = portfolio.applications[0]
 
+    def _form_data():
+        return {
+            "name": "Test Application %s" % (random.randrange(1, 1000)),
+            "description": "This is only a test",
+        }
+
     url = url_for("applications.update", application_id=app.id)
-    post_url_assert_status(dev, url, 200)
-    post_url_assert_status(ccpo, url, 200)
-    post_url_assert_status(rando, url, 404)
+    post_url_assert_status(dev, url, 302, data=_form_data())
+    post_url_assert_status(ccpo, url, 302, data=_form_data())
+    post_url_assert_status(rando, url, 404, data=_form_data())
 
 
 # applications.update_environments
@@ -696,34 +671,3 @@ def test_task_orders_new_post_routes(post_url_assert_status):
         post_url_assert_status(owner, url, 302, data=data)
         post_url_assert_status(ccpo, url, 302, data=data)
         post_url_assert_status(rando, url, 404, data=data)
-
-
-def test_portfolio_delete_access(post_url_assert_status):
-    rando = UserFactory.create()
-    owner = UserFactory.create()
-    ccpo = UserFactory.create_ccpo()
-
-    post_url_assert_status(
-        ccpo,
-        url_for(
-            "portfolios.delete_portfolio", portfolio_id=PortfolioFactory.create().id
-        ),
-        302,
-    )
-
-    post_url_assert_status(
-        owner,
-        url_for(
-            "portfolios.delete_portfolio",
-            portfolio_id=PortfolioFactory.create(owner=owner).id,
-        ),
-        302,
-    )
-
-    post_url_assert_status(
-        rando,
-        url_for(
-            "portfolios.delete_portfolio", portfolio_id=PortfolioFactory.create().id
-        ),
-        404,
-    )

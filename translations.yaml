@@ -22,13 +22,13 @@ home:
   add_portfolio_button_text: Add New Portfolio
   new_portfolio: New Portfolio
   get_started: Get Started
-  head: About Cloud Services
+  head: JEDI Cloud Services
   your_project: Your Project
   your_project_descrip: Your portfolio is where all task orders pertaining to a specific project or set of related projects live. In JEDI, every task order in your portfolio has four components.
-  funding_descrip: is information about all approved task orders associated to your portfolio.
-  applications_descrip: ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-  reports_descrip: enim ad minim veniam, quis nostrud exercitation ullamco
-  admin_descrip: aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+  funding_descrip: The Task Orders section allows you to enter, manage, and edit awarded TOs associated to a specific Portfolio.
+  applications_descrip: The Applications section allows you to easily create and define new Applications within a Portfolio, as well as manage user permissions and Environments.
+  reports_descrip: The Reports section allows you to view and monitor funding usage within a specific Portfolio.
+  admin_descrip: Within the Settings section, you can manage your Portfolio name and description, as well as add, edit, and delete Portfolio managers.
 ccpo:
   users_title: CCPO Users
   add_user: Add new CCPO user
@@ -114,24 +114,88 @@ flash:
       message: '{application_name} has been successfully created. You may continue on to provision environments and assign team members now, or come back and complete these tasks at a later time.'
     updated: 'You have successfully updated the {application_name} application.'
     deleted: 'You have successfully deleted the {application_name} application. To view the retained activity log, visit the portfolio administration page.'
+    name_error:
+      message: 'The application name {name} has already been used in this portfolio. Please enter a unique name.'
+    env_name_error:
+      message: 'The environment name {name} has already been used in this application. Please enter a unique name.'
+  application_invite:
+    error:
+      title: Application invitation error
+      message: There was an error processing the invitation for {user_name} from {application_name}
+    resent:
+      title: Application invitation resent
+      message: You have successfully resent the invite for {user_name} from {application_name}
+    revoked:
+      title: Application invitation revoked
+      message: You have successfully revoked the invite for {user_name} from {application_name}
+  application_member:
+    removed:
+      title: Team member removed from application
+      message: You have successfully deleted {user_name} from {application_name}
+    update_error:
+      title: "{user_name} could not be updated"
+      message: An unexpected problem occurred with your request, please try again. If the problem persists, contact an administrator.
+    updated:
+      title: Team member updated
+      message: You have successfully updated the permissions for {user_name}
+  ccpo_user:
+    added:
+      message: You have successfully given {user_name} CCPO permissions.
+    removed:
+      message: You have successfully removed {user_name}'s CCPO permissions.
   delete_member_success: 'You have successfully deleted {member_name} from the portfolio.'
   deleted_member: Portfolio member deleted
-  environment_added: 'The environment "{env_name}" has been added to the application.'
+  environment_added: 'The environment "{environment_name}" has been added to the application.'
+  environment:
+    updated:
+      title: Application environments updated
+      message: Application environments have been updated
+    deleted:
+      title: "{environment_name} deleted"
+      message: The environment "{environment_name}" has been deleted
+  form:
+    errors:
+      title: There were some errors
+      message: Please see below.
   login_required_message: After you log in, you will be redirected to your destination page.
   login_required_title: Log in required
+  logged_out:
+    title: Logged out
+    message: You've been logged out.
   new_portfolio_member: 'You have successfully invited {user_name} to the portfolio.'
   new_ppoc_message: 'You have successfully added {ppoc_name} as the primary point of contact. You are no longer the PPoC.'
   new_ppoc_title: Primary point of contact updated
+  portfolio_member:
+    revoked:
+      title: Removed portfolio access
+      message: Portfolio access successfully removed from {member_name}.
+  portfolio_invite:
+    resent:
+      title: Invitation resent
+      message: Successfully sent a new invitation to {user_name}.
+  session_expired:
+    title: Session Expired
+    message: Your session expired due to inactivity. Please log in again to continue.
   success: Success!
   task_order_number_error:
     message: 'The TO number has already been entered for a JEDI task order #{to_number}. Please double-check the TO number you are entering. If you believe this is in error, please contact support@cloud.mil.'
+  task_order:
+    insufficient_funds:
+      title: Insufficient Funds
+    submitted:
+      title: Your Task Order has been uploaded successfully.
+      message: Your task order form for {task_order.portfolio_name} has been submitted.
   new_application_member:
     title: "{user_name}'s invitation has been sent"
     message: "{user_name}'s access to this Application is pending until they sign in for the first time."
   updated_application_team_settings: 'You have updated the {application_name} team settings.'
-  logged_out: Logged out
+  user:
+    complete_profile:
+      title: You must complete your profile
+      message: Before continuing, you must complete your profile.
+    updated:
+      title: User information updated.
 footer:
-  jedi_help_link_text: Need help?  Click here!
   login: 'Last login:'
 forms:
   application:
@@ -158,15 +222,23 @@ forms:
     phone_number_label: Phone number
     service_branch_label: Service branch or agency
   new_member:
-    app_mgmt: App management
+    app_mgmt:
+      label: Edit Applications
+      description: Add, remove and edit applications in this Portfolio.
     dod_id_label: DoD ID
     email_label: Email address
     first_name_label: First name
-    funding: Funding
+    funding:
+      label: Edit Funding
+      description: Add and Modify Task Orders to fund this Portfolio.
     last_name_label: Last name
     phone_number_label: Phone number
-    portfolio_mgmt: Portfolio management
-    reporting: Reporting
+    portfolio_mgmt:
+      label: Edit Portfolio
+      description: "Edit this Portfolio's settings."
+    reporting:
+      label: Edit Reporting
+      description: "View and export reports about this Portfolio's funding."
   portfolio:
     name:
       label: Portfolio Name
@@ -197,7 +269,7 @@ forms:
             </ul>
           </p>
         </div>
-    defense_component: 
+    defense_component:
       label: "Select DoD component(s) funding your Portfolio:"
       choices:
         air_force: Air Force
@@ -209,7 +281,7 @@ forms:
       help_text: |
         <p>
           Select the DOD component(s) that will fund all Applications within this Portfolio.
-          In JEDI, multiple DoD organizations can fund the same Portfolio.<br/> 
+          In JEDI, multiple DoD organizations can fund the same Portfolio.<br/>
           Select all that apply.<br/>
         </p>
   attachment:
@@ -307,12 +379,26 @@ portfolios:
     alert_header: Are you sure you want to delete this member?
     alert_message: 'The member will be removed from the portfolio, but their log history will be retained.'
     alert_title: Warning! You  are about to delete a member from the portfolio.
+    defense_component_label: Department of Defense Component
     no_members: There are currently no members in this portfolio.
     permissions_info: Learn more about these permissions
     portfolio_members_subheading: These members have different levels of access to the portfolio.
     portfolio_members_title: Portfolio members
     settings_info: Learn more about these settings
     portfolio_name: Portfolio name
+    members:
+      perms_portfolio_mgmt:
+        'False': View Portfolio
+        'True': Edit Portfolio
+      perms_app_mgmt:
+        'False': View Applications
+        'True': Edit Applications
+      perms_funding:
+        'False': View Funding
+        'True': Edit Funding
+      perms_reporting:
+        'False': View Reporting
+        'True': Edit Reporting
   applications:
     add_application_text: Add a new application
     add_environment: Create an Environment
@@ -488,6 +574,15 @@ task_orders:
       pop: PoP
       total_amount: CLIN Value
       obligated: Amount Obligated
+      JEDICLINType:
+        JEDI_CLIN_1: 'Unclassified IaaS and PaaS (IDIQ CLIN 0001)'
+        JEDI_CLIN_2: 'Classified IaaS and PaaS (IDIQ CLIN 0002)'
+        JEDI_CLIN_3: 'Unclassified Cloud Support Package (IDIQ CLIN 0003)'
+        JEDI_CLIN_4: 'Classified Cloud Support Package (IDIQ CLIN 0004)'
+    tooltip:
+      obligated_funds: Funds committed to fund your portfolio. This may represent 100% of your total Task Order value, or a portion of it.
+      total_value: All obligated and projected funds for the Task Order’s Base and Option CLINs.
+      expended_funds: All funds spend from the Task Order so far.
   form:
     add_clin: Add another CLIN
     add_to_header: Add your task order
@@ -521,10 +616,12 @@ task_orders:
       next_button: 'Next: Review Task Order'
     step_5:
       title: Confirm Signature
-      description: Finally, plase confirm that your uploaded document representing the information you've entered contains the required signature from your Contracting Officer. You will be informed as soon as CCPO completes their review.
+      description: Prior to submitting the Task Order, you must acknowledge, by marking the appropriate box below, that the uploaded Task Order is signed by an appropriate, duly warranted Contracting Officer who has the authority to execute the uploaded Task Order on your Agency’s behalf and has authorized you to upload the Task Order in accordance with Agency policy and procedures. You must further acknowledge, by marking the appropriate box below, that all information entered herein matches that of the submitted Task Order.
       alert_message: All task orders require a Contracting Officer signature.
       next_button: 'Confirm & Submit'
-    sticky_header_text: 'Add Task Order (step {step} of 5)'
+    sticky_header_text: 'Add a Task Order'
+    sticky_header_review_text: Review Changes
+    sticky_header_context: 'Step {step} of 5'
   empty_state:
     header: Add approved task orders
     message: Upload your approved Task Order here. You are required to confirm you have the appropriate signature. You will have the ability to add additional approved Task Orders with more funding to this Portfolio in the future.
@@ -537,7 +634,11 @@ task_orders:
       subtitle: Who will be involved in the work funded by this task order?
       team_title: Your team
   sign:
-    digital_signature_description: I acknowledge that the uploaded task order contains the required KO signature.
+    digital_signature_description: I confirm the uploaded Task Order is signed by the appropriate, duly warranted Agency Contracting Officer who authorized me to upload the Task Order.
+    confirmation_description: I confirm that the information entered here in matches that of the submitted Task Order.
+    acknowledge:
+      title: Acknowledge Statement
+      text: I acknowledge, by executing the confirmation above and submitting this verification, that I am subject to potential penalties that may include fines, imprisonment, or both, under the U.S. law and regulations for any false statement or misrepresentation in association with this Task Order submission or on any accompanying documentation.
   status_empty_state: 'This Portfolio has no {status} Task Orders.'
   status_list_title: '{status} Task Orders'
 JEDICLINType:

@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atst-worker-envvars
+data:
+  CELERY_DEFAULT_QUEUE: celery-staging
+  SERVER_NAME: staging.atat.code.mil
+  FLASK_ENV: staging
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atst-envvars
+data:
+  ASSETS_URL: https://atat-cdn-staging.azureedge.net/
+  CDN_ORIGIN: https://staging.atat.code.mil
+  CELERY_DEFAULT_QUEUE: celery-staging
+  FLASK_ENV: staging
+  STATIC_URL: https://atat-cdn-staging.azureedge.net/static/
+  PGHOST: cloudzero-dev-sql.postgres.database.azure.com
+  REDIS_HOST: cloudzero-dev-redis.redis.cache.windows.net:6380

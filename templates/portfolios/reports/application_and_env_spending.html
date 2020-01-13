@@ -49,7 +49,7 @@
                   <span v-html='formatDollars(application.last_month || 0)'></span>
                 </td>
                 <td class="table-cell--align-right">
-                  <span v-html='formatDollars(application.total)'></span>
+                  <span v-html='formatDollars(application.total || 0)'></span>
                 </td>
               </tr>
               <tr 
@@ -67,7 +67,7 @@
                   <span v-html='formatDollars(environment.last_month || 0)'></span>
                 </td>
                 <td class="table-cell--align-right">
-                  <span v-html='formatDollars(environment.total)'></span>
+                  <span v-html='formatDollars(environment.total || 0)'></span>
                 </td>
               </tr>
             </template>

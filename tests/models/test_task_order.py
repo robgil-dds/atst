@@ -87,17 +87,28 @@ class TestTaskOrderStatus:
     @patch("atst.models.TaskOrder.is_completed", new_callable=PropertyMock)
     @patch("atst.models.TaskOrder.is_signed", new_callable=PropertyMock)
     def test_active_status(self, is_signed, is_completed, start_date, end_date):
-        # Given that I have a signed TO and today is within its start_date and end_date
-        today = pendulum.today().date()
-        to = TaskOrderFactory.create()
+        today = pendulum.today(tz="UTC").date()
 
-        start_date.return_value = today.subtract(days=1)
-        end_date.return_value = today.add(days=1)
         is_signed.return_value = True
         is_completed.return_value = True
 
+        # Given that I have a signed TO and today is within its start_date and end_date
+        to_1 = TaskOrderFactory.create()
+        start_date.return_value = today.subtract(days=1)
+        end_date.return_value = today.add(days=1)
+
         # Its status should be active
-        assert to.status == Status.ACTIVE
+        assert to_1.status == Status.ACTIVE
+
+        # A period of performance's start and end dates are inclusive, so a TO
+        # should be active on its start and end dates
+        to_2 = TaskOrderFactory.create()
+        start_date.return_value = today
+        end_date.return_value = today
+        is_signed.return_value = True
+        is_completed.return_value = True
+
+        assert to_2.status == Status.ACTIVE
 
     @patch("atst.models.TaskOrder.end_date", new_callable=PropertyMock)
     @patch("atst.models.TaskOrder.start_date", new_callable=PropertyMock)

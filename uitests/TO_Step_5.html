@@ -16,7 +16,7 @@
 <meta name="ghost-inspector-screenshotTarget" content="" />
 <meta name="ghost-inspector-screenshotExclusions" content="div.global-navigation, time" />
 <meta name="ghost-inspector-screenshotCompareEnabled" content="true" />
-<meta name="ghost-inspector-screenshotCompareThreshold" content="0.05" />
+<meta name="ghost-inspector-screenshotCompareThreshold" content="0.02" />
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
@@ -55,13 +55,13 @@ Imported from: AT-AT CI - New Portfolio
 Imported from: AT-AT CI - login-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=.about-cloud > h1</td>
+<td>css=.home__content > h1</td>
 <td></td>
 </tr>
 <tr>
 <td>assertText</td>
-<td>css=.about-cloud > h1</td>
-<td>About Cloud Services</td>
+<td>css=.home__content > h1</td>
+<td>JEDI Cloud Services</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
@@ -78,7 +78,7 @@ Imported from: AT-AT CI - New Portfolio-->
 <td>css=a[href="/portfolios/new"]</td>
 <td></td>
 </tr>
-<tr>
+<tr original-target="a[href="/portfolios/new"],xpath=//a[contains(text(), "Add New Portfolio")]">
 <td>click</td>
 <td>css=a[href="/portfolios/new"]</td>
 <td></td>
@@ -95,13 +95,33 @@ Imported from: AT-AT CI - TO Step 1
 Imported from: AT-AT CI - New Portfolio-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=main.usa-section > h1</td>
+<td>css=.portfolio-header__name > h1</td>
 <td></td>
 </tr>
 <tr>
 <td>assertText</td>
-<td>css=main.usa-section > h1</td>
-<td>*New Portfolio Form*</td>
+<td>css=.portfolio-header__name > h1</td>
+<td>*New Portfolio*</td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<!--Imported from: AT-AT CI - TO Step 4
+Imported from: AT-AT CI - TO Step 3
+Imported from: AT-AT CI - TO Step 2
+Imported from: AT-AT CI - TO Step 1
+Imported from: AT-AT CI - New Portfolio-->
+<tr>
+<td>waitForElementPresent</td>
+<td>css=.sticky-cta-text > h3</td>
+<td></td>
+</tr>
+<tr>
+<td>assertText</td>
+<td>css=.sticky-cta-text > h3</td>
+<td>*Create New Portfolio*</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
@@ -135,232 +155,12 @@ Imported from: AT-AT CI - TO Step 1
 Imported from: AT-AT CI - New Portfolio-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=#defense_component</td>
+<td>css=fieldset.usa-input__choices > ul > li:nth-of-type(5) > label</td>
 <td></td>
 </tr>
-<tr>
-<td>type</td>
-<td>css=#defense_component</td>
-<td>Defense Logistics Agency</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#description</td>
-<td></td>
-</tr>
-<tr>
-<td>type</td>
-<td>css=#description</td>
-<td>Maintenance and monitoring of the energy grid</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#app_migration > li:nth-of-type(3) > label</td>
-<td></td>
-</tr>
-<tr>
+<tr original-target="fieldset.usa-input__choices > ul > li:nth-of-type(5) > label,xpath=//label[contains(text(), "Other")]">
 <td>click</td>
-<td>css=#app_migration > li:nth-of-type(3) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#native_apps > li:nth-of-type(1) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#native_apps > li:nth-of-type(1) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(1) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(1) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(2) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(2) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(3) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(3) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(4) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(4) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(5) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(5) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input:nth-of-type(7) > fieldset.usa-input__choices > ul > li:nth-of-type(2) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input:nth-of-type(7) > fieldset.usa-input__choices > ul > li:nth-of-type(2) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(7) > fieldset.usa-input__choices > ul > li:nth-of-type(3) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(7) > fieldset.usa-input__choices > ul > li:nth-of-type(3) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#team_experience > li:nth-of-type(5) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#team_experience > li:nth-of-type(5) > label</td>
+<td>css=fieldset.usa-input__choices > ul > li:nth-of-type(5) > label</td>
 <td></td>
 </tr>
 <tr>
@@ -376,71 +176,31 @@ Imported from: AT-AT CI - New Portfolio-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=input[type="submit"]</td>
+<td></td>
+</tr>
+<tr>
+<td>click</td>
+<td>css=input[type="submit"]</td>
+<td></td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<!--Imported from: AT-AT CI - TO Step 4
+Imported from: AT-AT CI - TO Step 3
+Imported from: AT-AT CI - TO Step 2
+Imported from: AT-AT CI - TO Step 1
+Imported from: AT-AT CI - New Portfolio-->
+<tr>
+<td>waitForElementPresent</td>
+<td>css=.empty-state > h3</td>
 <td></td>
 </tr>
 <tr>
 <td>assertText</td>
-<td>css=input[type="submit"]</td>
-<td>Save</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=input[type="submit"]</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=input[type="submit"]</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.portfolio-header__name > h1</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=.portfolio-header__name > h1</td>
-<td>*Tatooine Energy Maintenance Systems*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.empty-state h3</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=.empty-state h3</td>
+<td>css=.empty-state > h3</td>
 <td>*You don't have any Applications yet*</td>
 </tr>
 <tr>
@@ -511,13 +271,13 @@ Imported from: AT-AT CI - TO Step 2
 Imported from: AT-AT CI - TO Step 1-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=.sticky-cta-text > h3</td>
+<td>css=.sticky-cta-context</td>
 <td></td>
 </tr>
 <tr>
 <td>assertText</td>
-<td>css=.sticky-cta-text > h3</td>
-<td>*Add Task Order (step 1 of 5)*</td>
+<td>css=.sticky-cta-context</td>
+<td>*Step 1 of 5*</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
@@ -619,13 +379,13 @@ Imported from: AT-AT CI - TO Step 3
 Imported from: AT-AT CI - TO Step 2-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=.sticky-cta-text > h3</td>
+<td>css=.sticky-cta-context</td>
 <td></td>
 </tr>
 <tr>
 <td>assertText</td>
-<td>css=.sticky-cta-text > h3</td>
-<td>*Add Task Order (step 2 of 5)*</td>
+<td>css=.sticky-cta-context</td>
+<td>*Step 2 of 5*</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
@@ -689,13 +449,13 @@ Imported from: AT-AT CI - TO Step 3-->
 Imported from: AT-AT CI - TO Step 3-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=.sticky-cta-text > h3</td>
+<td>css=.sticky-cta-context</td>
 <td></td>
 </tr>
 <tr>
 <td>assertText</td>
-<td>css=.sticky-cta-text > h3</td>
-<td>*Add Task Order (step 3 of 5)*</td>
+<td>css=.sticky-cta-context</td>
+<td>*Step 3 of 5*</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
@@ -993,13 +753,13 @@ Imported from: AT-AT CI - TO Step 3-->
 <!--Imported from: AT-AT CI - TO Step 4-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=.sticky-cta-text > h3</td>
+<td>css=.sticky-cta-context</td>
 <td></td>
 </tr>
 <tr>
 <td>assertText</td>
-<td>css=.sticky-cta-text > h3</td>
-<td>*Add Task Order (step 4 of 5)*</td>
+<td>css=.sticky-cta-context</td>
+<td>*Step 4 of 5*</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
@@ -1087,13 +847,13 @@ Imported from: AT-AT CI - TO Step 3-->
 </tr>
 <tr>
 <td>waitForElementPresent</td>
-<td>css=.h2</td>
+<td>css=span.sticky-cta-context</td>
 <td></td>
 </tr>
 <tr>
 <td>assertText</td>
-<td>css=.h2</td>
-<td>*Confirm Signature*</td>
+<td>css=span.sticky-cta-context</td>
+<td>*Step 5 of 5*</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
@@ -1102,12 +862,97 @@ Imported from: AT-AT CI - TO Step 3-->
 </tr>
 <tr>
 <td>waitForElementPresent</td>
-<td>css=fieldset.usa-input__choices > legend > label</td>
+<td>css=.task-order__confirmation > div:nth-of-type(1) > .usa-input > fieldset.usa-input__choices > legend > label</td>
+<td></td>
+</tr>
+<tr original-target=".task-order__confirmation > div:nth-of-type(1) > .usa-input > fieldset.usa-input__choices > legend > label,xpath=//label[contains(text(), "I confirm the uploaded Task Order is signed by the appropriate")]">
+<td>click</td>
+<td>css=.task-order__confirmation > div:nth-of-type(1) > .usa-input > fieldset.usa-input__choices > legend > label</td>
 <td></td>
 </tr>
 <tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>waitForElementPresent</td>
+<td>css=input[type="submit"][disabled="disabled"]</td>
+<td></td>
+</tr>
+<tr>
+<td>assertElementPresent</td>
+<td>css=input[type="submit"][disabled="disabled"]</td>
+<td></td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>waitForElementPresent</td>
+<td>css=.task-order__confirmation > div:nth-of-type(1) > .usa-input > fieldset.usa-input__choices > legend > label</td>
+<td></td>
+</tr>
+<tr original-target=".task-order__confirmation > div:nth-of-type(1) > .usa-input > fieldset.usa-input__choices > legend > label,xpath=//label[contains(text(), "I confirm the uploaded Task Order is signed by the appropriate")]">
 <td>click</td>
-<td>css=fieldset.usa-input__choices > legend > label</td>
+<td>css=.task-order__confirmation > div:nth-of-type(1) > .usa-input > fieldset.usa-input__choices > legend > label</td>
+<td></td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>waitForElementPresent</td>
+<td>css=.task-order__confirmation > div:nth-of-type(2) > .usa-input > fieldset.usa-input__choices > legend > label</td>
+<td></td>
+</tr>
+<tr original-target=".task-order__confirmation > div:nth-of-type(2) > .usa-input > fieldset.usa-input__choices > legend > label,xpath=//label[contains(text(), "I confirm that the information entered here in matches that of the submitted Task Order.")]">
+<td>click</td>
+<td>css=.task-order__confirmation > div:nth-of-type(2) > .usa-input > fieldset.usa-input__choices > legend > label</td>
+<td></td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>waitForElementPresent</td>
+<td>css=input[type="submit"][disabled="disabled"]</td>
+<td></td>
+</tr>
+<tr>
+<td>assertElementPresent</td>
+<td>css=input[type="submit"][disabled="disabled"]</td>
+<td></td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>waitForElementPresent</td>
+<td>css=.task-order__confirmation > div:nth-of-type(1) > .usa-input > fieldset.usa-input__choices > legend > label</td>
+<td></td>
+</tr>
+<tr original-target=".task-order__confirmation > div:nth-of-type(1) > .usa-input > fieldset.usa-input__choices > legend > label,xpath=//label[contains(text(), "I confirm the uploaded Task Order is signed by the appropriate")]">
+<td>click</td>
+<td>css=.task-order__confirmation > div:nth-of-type(1) > .usa-input > fieldset.usa-input__choices > legend > label</td>
+<td></td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>assertElementNotPresent</td>
+<td>css=input[type="submit"][disabled="disabled"]</td>
 <td></td>
 </tr>
 <tr>

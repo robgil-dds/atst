@@ -94,4 +94,19 @@
   &--primary {
     @include icon-color($color-primary);
   }
+
+  &--home-pg-badge {
+    @include icon-size(27);
+    @include icon-color($color-white);
+
+    background-color: $color-primary;
+    height: $home-pg-icon-width;
+    width: $home-pg-icon-width;
+    border-radius: 100%;
+    display: inline-flex;
+
+    svg {
+      margin: auto;
+    }
+  }
 }

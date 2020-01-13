@@ -21,6 +21,10 @@ def random_service_branch():
     return random_choice(data.SERVICE_BRANCHES)
 
 
+def random_defense_component():
+    return [random_choice(data.SERVICE_BRANCHES)]
+
+
 def random_dod_id():
     return "".join(random.choices(string.digits, k=10))
 
@@ -104,7 +108,7 @@ class PortfolioFactory(Base):
         model = Portfolio
 
     name = factory.Faker("domain_word")
-    defense_component = factory.LazyFunction(random_service_branch)
+    defense_component = factory.LazyFunction(random_defense_component)
     description = factory.Faker("sentence")
 
     @classmethod

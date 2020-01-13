@@ -90,3 +90,28 @@ def test_create_atat_admin_user_succeeds(mock_azure: AzureCloudProvider):
     result = mock_azure.create_atat_admin_user(AUTH_CREDENTIALS, environment_id)
 
     assert result.get("csp_user_id") == csp_user_id
+
+
+def test_create_policy_definition_succeeds(mock_azure: AzureCloudProvider):
+    subscription_id = str(uuid4())
+    management_group_id = str(uuid4())
+    properties = {
+        "policyType": "test",
+        "displayName": "test policy",
+    }
+
+    result = mock_azure._create_policy_definition(
+        AUTH_CREDENTIALS, subscription_id, management_group_id, properties
+    )
+    azure_sdk_method = (
+        mock_azure.sdk.policy.PolicyClient.return_value.policy_definitions.create_or_update_at_management_group
+    )
+    mock_policy_definition = (
+        mock_azure.sdk.policy.PolicyClient.return_value.policy_definitions.models.PolicyDefinition()
+    )
+    assert azure_sdk_method.called
+    azure_sdk_method.assert_called_with(
+        management_group_id=management_group_id,
+        policy_definition_name=properties.get("displayName"),
+        parameters=mock_policy_definition,
+    )

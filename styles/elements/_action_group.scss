@@ -12,6 +12,7 @@
   .usa-button,
   a {
     margin: 0 0 0 $gap;
+    cursor: pointer;
 
     @include media($medium-screen) {
       margin: 0 0 0 ($gap * 2);
@@ -46,7 +47,7 @@
   background: white;
   right: 0;
   padding-right: $gap * 4;
-  border-top: 1px solid $color-gray-light;
+  border-top: 1px solid $color-gray-lighter;
   width: 100%;
   z-index: 1;
 }

@@ -151,3 +151,6 @@ class SignatureForm(BaseForm):
         translate("task_orders.sign.digital_signature_description"),
         validators=[Required()],
     )
+    confirm = BooleanField(
+        translate("task_orders.sign.confirmation_description"), validators=[Required()],
+    )

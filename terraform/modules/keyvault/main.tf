@@ -1,7 +1,7 @@
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "keyvault" {
-  name     = "${var.name}-${var.environment}-rg"
+  name     = "${var.name}-${var.environment}-keyvault"
   location = var.region
 }
 
@@ -23,7 +23,7 @@ resource "azurerm_key_vault_access_policy" "keyvault" {
   key_vault_id = azurerm_key_vault.keyvault.id
 
   tenant_id = "b5ab0e1e-09f8-4258-afb7-fb17654bc5b3"
-  object_id = "2ca63d41-d058-4e06-aef6-eb517a53b631"
+  object_id = "ca8cfc48-9995-4973-a8cc-6c7f755e84de"
 
   key_permissions = [
     "get",

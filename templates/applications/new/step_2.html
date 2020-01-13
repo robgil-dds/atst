@@ -19,7 +19,7 @@
   <p>
     {{ 'portfolios.applications.new.step_2_description' | translate }}
   </p>
-  <hr class="panel__break"> 
+  <hr>
   <application-environments inline-template v-bind:initial-data='{{ form.data|tojson }}'>
     <form method="POST" action="{{ url_for('applications.update_new_application_step_2', portfolio_id=portfolio.id, application_id=application.id) }}" v-on:submit="handleSubmit">
       <div class="subheading">{{ 'portfolios.applications.environments_heading' | translate }}</div>
@@ -58,9 +58,9 @@
                 {{ Icon("plus") }}
               </button>
             </div>
-        </div>    
+        </div>
       </div>
-    </div>    
+    </div>
       <span class="action-group-footer">
         {% block next_button %}
           {{ SaveButton(text=('portfolios.applications.new.step_2_button_text' | translate)) }}

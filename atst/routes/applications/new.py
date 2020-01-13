@@ -1,8 +1,7 @@
-from flask import redirect, render_template, request as http_request, url_for, g
+from flask import redirect, render_template, request as http_request, url_for
 
 from .blueprint import applications_bp
 from atst.domain.applications import Applications
-from atst.domain.portfolios import Portfolios
 from atst.forms.application import NameAndDescriptionForm, EnvironmentsForm
 from atst.domain.authz.decorator import user_can_access_decorator as user_can
 from atst.models.permissions import Permissions
@@ -12,6 +11,7 @@ from atst.routes.applications.settings import (
     get_new_member_form,
     handle_create_member,
     handle_update_member,
+    handle_update_application,
 )
 
 
@@ -64,17 +64,9 @@ def create_or_update_new_application_step_1(portfolio_id=None, application_id=No
     form = get_new_application_form(
         {**http_request.form}, NameAndDescriptionForm, application_id
     )
+    application = handle_update_application(form, application_id, portfolio_id)
 
-    if form.validate():
-        application = None
-        if application_id:
-            application = Applications.get(application_id)
-            application = Applications.update(application, form.data)
-            flash("application_updated", application_name=application.name)
-        else:
-            portfolio = Portfolios.get_for_update(portfolio_id)
-            application = Applications.create(g.current_user, portfolio, **form.data)
-            flash("application_created", application_name=application.name)
+    if application:
         return redirect(
             url_for(
                 "applications.update_new_application_step_2",

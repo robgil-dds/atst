@@ -118,27 +118,6 @@
     }
   }
 
-  .reporting-summary-item {
-    border-right: 1px solid $color-gray-light;
-    margin-right: $gap * 3;
-    padding-right: $gap * 3;
-    &:last-child {
-      border-right: none;
-      margin-right: 0;
-      padding-right: 0;
-    }
-    &__header {
-      margin: 0;
-      &-icon {
-        margin: 0;
-        padding: 0;
-      }
-    }
-    &__value {
-      font-size: $lead-font-size;
-    }
-  }
-
   .reporting-expended-funding {
     &__header {
       margin: 0;

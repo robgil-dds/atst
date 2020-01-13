@@ -3,34 +3,34 @@
 
 
 <section class="row">
-  <div class='col col--grow reporting-summary-item'>
-    <h5 class="reporting-summary-item__header">
-      <span class="reporting-summary-item__header-text">Total Portfolio Value</span>
-      {{Tooltip(("common.lorem" | translate), title="", classes="reporting-summary-item__header-icon")}}
+  <div class='col col--grow summary-item'>
+    <h5 class="summary-item__header">
+      <span class="summary-item__header-text">Total Portfolio Value</span>
+      {{Tooltip(("common.lorem" | translate), title="", classes="summary-item__header-icon")}}
     </h5>
-    <p class="reporting-summary-item__value">{{ total_portfolio_value | dollars }}</p>
+    <p class="summary-item__value">{{ total_portfolio_value | dollars }}</p>
   </div>
-  <div class='col col--grow reporting-summary-item'>
-    <h5 class="reporting-summary-item__header">
-      <span class="reporting-summary-item__header-text">Funding Duration</span>
-      {{Tooltip(("common.lorem" | translate), title="", classes="reporting-summary-item__header-icon")}}
+  <div class='col col--grow summary-item'>
+    <h5 class="summary-item__header">
+      <span class="summary-item__header-text">Funding Duration</span>
+      {{Tooltip(("common.lorem" | translate), title="", classes="summary-item__header-icon")}}
     </h5>
     {% set earliest_pop_start_date, latest_pop_end_date = portfolio.funding_duration %}
     {% if earliest_pop_start_date and latest_pop_end_date  %}
-      <p class="reporting-summary-item__value" >
+      <p class="summary-item__value" >
         {{ earliest_pop_start_date | formattedDate(formatter="%B %d, %Y") }}
-        - 
+        -
         {{ latest_pop_end_date | formattedDate(formatter="%B %d, %Y") }}
       </p>
     {% else %}
-      <p class="reporting-summary-item__value"> - </p>
+      <p class="summary-item__value"> - </p>
     {% endif %}
   </div>
-  <div class='col col--grow reporting-summary-item'>
-    <h5 class="reporting-summary-item__header">
-      <span class="reporting-summary-item__header-text">Days Remaining</span>
-      {{Tooltip(("common.lorem" | translate), title="", classes="reporting-summary-item__header-icon")}}
+  <div class='col col--grow summary-item'>
+    <h5 class="summary-item__header">
+      <span class="summary-item__header-text">Days Remaining</span>
+      {{Tooltip(("common.lorem" | translate), title="", classes="summary-item__header-icon")}}
     </h5>
-    <p class="reporting-summary-item__value">{{ portfolio.days_to_funding_expiration }} days</p>
+    <p class="summary-item__value">{{ portfolio.days_to_funding_expiration }} days</p>
   </div>
 </section>

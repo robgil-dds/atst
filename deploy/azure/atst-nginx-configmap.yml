@@ -45,7 +45,7 @@ data:
         include /etc/nginx/snippets/ssl.conf;
 
         location /login-redirect {
-            return 301 https://auth-azure.atat.code.mil$request_uri;
+            return 301 https://${AUTH_DOMAIN}$request_uri;
         }
         location /login-dev {
             try_files $uri @appbasicauth;
@@ -82,7 +82,7 @@ data:
         include /etc/nginx/snippets/ssl.conf;
 
         location / {
-            return 301 https://azure.atat.code.mil$request_uri;
+            return 301 https://${MAIN_DOMAIN}$request_uri;
         }
         location /login-redirect {
             try_files $uri @app;

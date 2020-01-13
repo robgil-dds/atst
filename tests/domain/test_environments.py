@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from atst.domain.environments import Environments
 from atst.domain.environment_roles import EnvironmentRoles
-from atst.domain.exceptions import NotFoundError, DisabledError
+from atst.domain.exceptions import AlreadyExistsError, DisabledError, NotFoundError
 from atst.models.environment_role import CSPRole, EnvironmentRole
 
 from tests.factories import (
@@ -98,6 +98,27 @@ def test_update_environment():
     assert environment.name is not "name 2"
     Environments.update(environment, name="name 2")
     assert environment.name == "name 2"
+
+
+def test_create_does_not_duplicate_names_within_application():
+    application = ApplicationFactory.create()
+    name = "Your Environment"
+    user = application.portfolio.owner
+
+    assert Environments.create(user, application, name)
+    with pytest.raises(AlreadyExistsError):
+        Environments.create(user, application, name)
+
+
+def test_update_does_not_duplicate_names_within_application():
+    application = ApplicationFactory.create()
+    name = "Your Environment"
+    environment = EnvironmentFactory.create(application=application, name=name)
+    dupe_env = EnvironmentFactory.create(application=application)
+    user = application.portfolio.owner
+
+    with pytest.raises(AlreadyExistsError):
+        Environments.update(dupe_env, name)
 
 
 class EnvQueryTest:

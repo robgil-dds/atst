@@ -1,5 +1,10 @@
 import re
 
+from sqlalchemy.exc import IntegrityError
+
+from atst.database import db
+from atst.domain.exceptions import AlreadyExistsError
+
 
 def first_or_none(predicate, lst):
     return next((x for x in lst if predicate(x)), None)
@@ -23,3 +28,11 @@ def camel_to_snake(camel_cased):
 def pick(keys, dct):
     _keys = set(keys)
     return {k: v for (k, v) in dct.items() if k in _keys}
+
+
+def commit_or_raise_already_exists_error(message):
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        raise AlreadyExistsError(message)

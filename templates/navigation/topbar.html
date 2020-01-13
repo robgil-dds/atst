@@ -8,12 +8,15 @@
         {{ "navigation.topbar.jedi_cloud_link_text" | translate }}
       </span>
     </a>
-
     <div class="topbar__context">
       {% if g.current_user %}
         <a href="{{ url_for('users.user') }}" class="topbar__link">
-          <span class="topbar__link-label">{{ g.current_user.first_name + " " + g.current_user.last_name }}</span>
           {{ Icon('avatar', classes='topbar__link-icon') }}
+          <span class="topbar__link-label">{{ g.current_user.first_name + " " + g.current_user.last_name }}</span>
+        </a>
+        <a href="{{ url_for('atst.helpdocs') }}" class="topbar__link">
+          {{ Icon('question', classes='topbar__link-icon') }}
+          <span class="topbar__link-label">Support</span>
         </a>
 
         <a href="{{ url_for('atst.logout') }}" class="topbar__link" title='{{ "navigation.topbar.logout_link_title" | translate }}'>

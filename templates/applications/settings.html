@@ -13,6 +13,9 @@
 
 {% block application_content %}
 
+  {% if show_flash -%}
+    {% include "fragments/flash.html" %}
+  {%- endif %}
   <h3>{{ 'portfolios.applications.settings.name_description' | translate }}</h3>
 
   {% if user_can(permissions.EDIT_APPLICATION) %}
@@ -59,59 +62,8 @@
     environments_obj,
     new_env_form) }}
 
-  {% if user_can(permissions.DELETE_APPLICATION) %}
-    {% set env_count = application.environments | length %}
-    {% if env_count == 1 %}
-      {% set pluralized_env = "environment" %}
-    {% else %}
-      {% set pluralized_env = "environments" %}
-    {% endif %}
-
-    <h3>
-      {{ "portfolios.applications.delete.subheading" | translate }}
-    </h3>
-    <div class="form-row">
-      <div class="form-col form-col--two-thirds">
-        {{ "portfolios.applications.delete.text" | translate({"application_name": application.name}) | safe }}
-      </div>
-      <div class="form-col form-col--third">
-        <div class="usa-input">
-          <input
-            id="delete-application"
-            type="button"
-            v-on:click="openModal('delete-application')"
-            class='usa-button--outline button-danger-outline'
-            value="{{ 'portfolios.applications.delete.button' | translate }}"
-            >
-        </div>
-      </div>
-    </div>
-
-    {% call Modal(name="delete-application") %}
-      <h1>{{ "portfolios.applications.delete.header" | translate }}</h1>
-      <hr>
-      {{
-        Alert(
-          title=("components.modal.destructive_title" | translate),
-          message=("portfolios.applications.delete.alert.message" | translate),
-          level="warning"
-        )
-      }}
-
-      {{
-        DeleteConfirmation(
-          modal_id="delete_application",
-          delete_text=('portfolios.applications.delete.button' | translate),
-          delete_action= url_for('applications.delete', application_id=application.id),
-          form=application_form
-        )
-      }}
-    {% endcall %}
-  {% endif %}
-
-  <hr>
-
   {% if user_can(permissions.VIEW_APPLICATION_ACTIVITY_LOG) and config.get("USE_AUDIT_LOG", False) %}
+    <hr>
     {% include "fragments/audit_events_log.html" %}
     {{ Pagination(audit_events, url=url_for('applications.settings', application_id=application.id)) }}
   {% endif %}

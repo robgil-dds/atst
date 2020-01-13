@@ -8,11 +8,16 @@
 {% set next_button_text = "task_orders.form.step_3.next_button" | translate %}
 {% set previous_button_link = url_for("task_orders.form_step_two_add_number", task_order_id=task_order_id) %}
 {% set step = "3" %}
+{% set sticky_cta_text = 'task_orders.form.sticky_header_text' | translate %}
 
 
 {% block to_builder_form_field %}
   <div>
-    {{ TOFormStepHeader('task_orders.form.clin_title' | translate, 'task_orders.form.clin_description' | translate, task_order.number) }}
+    {{ TOFormStepHeader(
+      title='task_orders.form.clin_title' | translate,
+      description='task_orders.form.clin_description' | translate,
+      to_number=task_order.number,
+    ) }}
 
     {% for clin in form.clins %}
       {{ CLINFields(contract_start, contract_end, clin, index=loop.index - 1) }}

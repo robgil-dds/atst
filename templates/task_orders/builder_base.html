@@ -8,8 +8,26 @@
     <form id="to_form" action='{{ action }}' method="POST" autocomplete="off" enctype="multipart/form-data">
       {{ form.csrf_token }}
 
-      {% call StickyCTA(text=('task_orders.form.sticky_header_text' | translate({"step": step}) )) %}
-        <span class="action-group">
+      {{ StickyCTA(
+        text=sticky_cta_text,
+        context=('task_orders.form.sticky_header_context' | translate({"step": step}) )) }}
+
+      {% call Modal(name='cancel', dismissable=True) %}
+        <div class="task-order__modal-cancel">
+          <h1>Do you want to save this draft?</h1>
+          <div class="action-group">
+            <button formaction="{{ cancel_discard_url }}" class="usa-button usa-button-primary" type="submit">No, delete it</button>
+            <button formaction="{{ cancel_save_url }}" class="usa-button usa-button-primary" type="submit">Yes, save for later</button>
+          </div>
+        </div>
+      {% endcall %}
+
+      {% include "fragments/flash.html" %}
+
+      <div class="task-order">
+        {% block to_builder_form_field %}{% endblock %}
+      </div>
+       <span class="action-group-footer">
           {% block next_button %}
             <input
               type="submit"
@@ -32,23 +50,6 @@
             {{ "common.cancel" | translate }}
           </a>
         </span>
-      {% endcall %}
-
-      {% call Modal(name='cancel', dismissable=True) %}
-        <div class="task-order__modal-cancel">
-          <h1>Do you want to save this draft?</h1>
-          <div class="action-group">
-            <button formaction="{{ cancel_discard_url }}" class="usa-button usa-button-primary" type="submit">No, delete it</button>
-            <button formaction="{{ cancel_save_url }}" class="usa-button usa-button-primary" type="submit">Yes, save for later</button>
-          </div>
-        </div>
-      {% endcall %}
-
-      {% include "fragments/flash.html" %}
-
-      <div class="task-order">
-        {% block to_builder_form_field %}{% endblock %}
-      </div>
 
     </form>
   </to-form>

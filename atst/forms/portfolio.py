@@ -23,20 +23,10 @@ class PortfolioForm(BaseForm):
             )
         ],
     )
-
-
-class PortfolioCreationForm(BaseForm):
-    name = StringField(
-        translate("forms.portfolio.name.label"),
-        validators=[
-            Length(
-                min=4,
-                max=100,
-                message=translate("forms.portfolio.name.length_validation_message"),
-            )
-        ],
-    )
     description = TextAreaField(translate("forms.portfolio.description.label"),)
+
+
+class PortfolioCreationForm(PortfolioForm):
     defense_component = SelectMultipleField(
         choices=SERVICE_BRANCHES,
         widget=ListWidget(prefix_label=False),

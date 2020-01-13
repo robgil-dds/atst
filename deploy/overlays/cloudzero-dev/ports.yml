@@ -1,0 +1,28 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: atst-main
+spec:
+  loadBalancerIP: ""
+  ports:
+  - port: 80
+    targetPort: 9342
+    name: http
+  - port: 443
+    targetPort: 9442
+    name: https
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: atst-auth
+spec:
+  loadBalancerIP: ""
+  ports:
+  - port: 80
+    targetPort: 9343
+    name: http
+  - port: 443
+    targetPort: 9443
+    name: https

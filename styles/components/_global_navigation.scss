@@ -4,18 +4,4 @@
   height: auto;
   box-shadow: $box-shadow;
   margin-bottom: -$footer-height * 2.5;
-
-  .sidenav__link {
-    padding-right: $gap * 2;
-
-    @include media($large-screen) {
-      padding-right: $gap * 2;
-    }
-  }
-
-  &__context--portfolio {
-    .sidenav__link {
-      padding-right: $gap;
-    }
-  }
 }

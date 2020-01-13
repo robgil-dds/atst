@@ -21,9 +21,7 @@
     {% include 'navigation/topbar.html' %}
 
     <div class='global-layout'>
-      {% if portfolios %}
-        {% include 'navigation/global_sidenav.html' %}
-      {% endif %}
+      {% include 'navigation/global_sidenav.html' %}
 
       <div class='global-panel-container'>
         {% block sidenav %}{% endblock %}

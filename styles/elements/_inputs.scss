@@ -165,6 +165,15 @@
         margin-top: 0;
         margin-bottom: 0;
       }
+
+      label {
+        margin-left: 3rem;
+
+        &:before {
+          position: absolute;
+          left: -3rem;
+        }
+      }
     }
 
     select {

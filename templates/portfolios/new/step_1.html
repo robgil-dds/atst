@@ -16,36 +16,36 @@
   </div>
   {{ StickyCTA(text="Create New Portfolio") }}
   <base-form inline-template>
-    <form id="portfolio-create" action="{{ url_for('portfolios.create_portfolio') }}" method="POST">
-      {{ form.csrf_token }}
-      <div class="form-row form-row--separated">
-        <div class="form-col">
-        {{ TextInput(form.name, optional=False) }}
-        {{"forms.portfolio.name.help_text" | translate | safe }}
+    <div class="row">
+      <form id="portfolio-create" class="col" action="{{ url_for('portfolios.create_portfolio') }}" method="POST">
+        {{ form.csrf_token }}
+        <div class="form-row form-row--bordered">
+          <div class="form-col">
+            {{ TextInput(form.name, optional=False, classes="form-col") }}
+            {{"forms.portfolio.name.help_text" | translate | safe }}
+          </div>
         </div>
-      </div>
-      <div class="form-row form-row--separated">
-        <div class="form-col">
-        {{ TextInput(form.description, paragraph=True) }}
-        {{"forms.portfolio.description.help_text" | translate | safe }}
+        <div class="form-row form-row--bordered">
+          <div class="form-col">
+            {{ TextInput(form.description, paragraph=True) }}
+            {{"forms.portfolio.description.help_text" | translate | safe }}
+          </div>
         </div>
-      </div>
-      <div class="form-row">
-        <div class="form-col">
-        {{ MultiCheckboxInput(form.defense_component, optional=False) }}
-        {{ "forms.portfolio.defense_component.help_text" | translate | safe }}
+        <div class="form-row">
+          <div class="form-col">
+            {{ MultiCheckboxInput(form.defense_component, optional=False) }}
+            {{ "forms.portfolio.defense_component.help_text" | translate | safe }}
+          </div>
         </div>
-      </div>
-      <div class='action-group'>
-        {{
-          SaveButton(
-            text=('common.save' | translate),
-            form="portfolio-create",
-            element="input",
-          )
-        }}
-      </div>
-    </form>
+        <div class='action-group-footer'>
+        {% block next_button %}
+          {{ SaveButton(text=('common.save' | translate), form="portfolio-create", element="input") }}
+        {% endblock %}
+        <a href="{{ url_for('atst.home') }}">
+          Cancel
+        </a>
+      </form>
+    </div>
   </base-form>
 </main>
 {% endblock %}

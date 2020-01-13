@@ -1,48 +1,24 @@
 .home {
+  margin: $gap * 3;
   .sticky-cta {
     margin: -1.6rem -1.6rem 0 -1.6rem;
   }
-}
 
-.about-cloud {
-  margin: 4rem auto;
-  max-width: 900px;
-}
+  &__content {
+    margin: 4rem;
+    max-width: 900px;
 
-.your-project {
-  margin-top: 3rem;
-  padding: 3rem;
-  background-color: $color-gray-lightest;
+    &--descriptions {
+      .col {
+        margin-left: $home-pg-icon-width;
+        padding: ($gap * 2) ($gap * 4);
+        position: relative;
 
-  h2 {
-    margin-top: 0;
-  }
-
-  .links {
-    justify-content: flex-start;
-
-    .icon-link {
-      padding: $gap ($gap * 4);
-
-      &:first-child {
-        padding-left: 0;
-      }
-
-      &:last-child {
-        padding-right: 0;
-      }
-
-      &:hover {
-        background-color: transparent;
-        color: $color-gray-dark;
-
-        .svg * {
-          fill: $color-gray-dark;
+        .icon--home-pg-badge {
+          position: absolute;
+          left: -$home-pg-icon-width;
+          top: $gap * 3;
         }
-      }
-
-      &.active:hover {
-        color: $color-blue;
       }
     }
   }
@@ -111,9 +87,4 @@
       }
     }
   }
-}
-
-#jedi-heirarchy {
-  max-width: 65rem;
-  margin-top: $gap * 8;
 }

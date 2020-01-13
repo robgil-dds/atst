@@ -30,7 +30,7 @@
         icon='funding',
         text='navigation.portfolio_navigation.breadcrumbs.funding' | translate,
         url=url_for("task_orders.portfolio_funding", portfolio_id=portfolio.id),
-        active=request.url_rule.endpoint in ["task_orders.portfolio_funding", "task_orders.review_task_order", "task_orders.form_step_one_add_pdf", "task_orders.submit_form_step_one_add_pdf", "task_orders.form_step_two_add_number", "task_orders.submit_form_step_two_add_number", "task_orders.form_step_three_add_clins", "task_orders.submit_form_step_three_add_clins", "task_orders.form_step_four_review", "task_orders.form_step_five_confirm_signature"],
+        active=request.url_rule.endpoint in ["task_orders.portfolio_funding", "task_orders.view_task_order", "task_orders.form_step_one_add_pdf", "task_orders.submit_form_step_one_add_pdf", "task_orders.form_step_two_add_number", "task_orders.submit_form_step_two_add_number", "task_orders.form_step_three_add_clins", "task_orders.submit_form_step_three_add_clins", "task_orders.form_step_four_review", "task_orders.form_step_five_confirm_signature"],
       ) }}
     {% endif %}
     {{ Link(

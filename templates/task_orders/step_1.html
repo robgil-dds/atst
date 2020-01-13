@@ -1,7 +1,6 @@
 {% extends "task_orders/builder_base.html" %}
 
 {% from 'components/icon.html' import Icon %}
-{% from "components/sticky_cta.html" import StickyCTA %}
 {% from "task_orders/form_header.html" import TOFormStepHeader %}
 {% from 'components/upload_input.html' import UploadInput %}
 
@@ -13,8 +12,12 @@
 
 {% set next_button_text = "Next: Add TO Number" %}
 {% set step = "1" %}
+{% set sticky_cta_text = 'task_orders.form.sticky_header_text' | translate %}
 
 {% block to_builder_form_field %}
-  {{ TOFormStepHeader('task_orders.form.supporting_docs_header' | translate, 'task_orders.form.supporting_docs_text' | translate) }}
+  {{ TOFormStepHeader(
+    title='task_orders.form.supporting_docs_header' | translate,
+    description='task_orders.form.supporting_docs_text' | translate,
+  ) }}
   {{ UploadInput(form.pdf, portfolio.id) }}
 {% endblock %}

@@ -33,3 +33,22 @@ variable "vnet_subnet_id" {
   description = "Subnet to use for the default k8s pool"
   type        = string
 }
+
+variable "enable_auto_scaling" {
+  default     = false
+  type        = string
+  description = "Enable or disable autoscaling (Default: false)"
+}
+
+variable "max_count" {
+  default     = 1
+  type        = string
+  description = "Maximum number of nodes to use in autoscaling. This requires `enable_auto_scaling` to be set to true"
+
+}
+
+variable "min_count" {
+  default     = 1
+  type        = string
+  description = "Minimum number of nodes to use in autoscaling. This requires `enable_auto_scaling` to be set to true"
+}

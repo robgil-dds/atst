@@ -20,10 +20,7 @@
   }
 
   &__header {
-    .h2,
-    p {
-      margin-bottom: $gap * 0.5;
-    }
+    margin-bottom: $gap * 6;
   }
 
   .col {
@@ -37,22 +34,6 @@
 
   .h4 {
     margin-top: $gap * 2;
-  }
-
-  .task-order__review {
-    .h2 {
-      margin-bottom: $gap * 4;
-    }
-
-    .task-order__number {
-      text-align: right;
-    }
-
-    .totals-box {
-      flex-grow: unset;
-      display: table;
-      min-width: 350px;
-    }
   }
 
   .card {
@@ -155,6 +136,10 @@
       }
     }
   }
+
+  &__confirmation {
+    margin-left: $gap * 8;
+  }
 }
 
 .task-order__modal-cancel {
@@ -168,5 +153,18 @@
   &__title.h4 {
     margin-top: 0;
     padding-bottom: $gap * 2.5;
+  }
+}
+
+table.clin-summary {
+  tbody,
+  thead {
+    tr {
+      &:last-child {
+        td {
+          border-bottom: none;
+        }
+      }
+    }
   }
 }

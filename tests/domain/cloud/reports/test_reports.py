@@ -1,4 +1,5 @@
 from atst.domain.csp.reports import MockReportingProvider
+from tests.factories import PortfolioFactory
 
 
 def test_get_environment_monthly_totals():
@@ -20,6 +21,11 @@ def test_get_environment_monthly_totals():
 
 
 def test_get_application_monthly_totals():
+    portfolio = PortfolioFactory.create(
+        applications=[
+            {"name": "Test Application", "environments": [{"name": "Z"}, {"name": "A"}]}
+        ],
+    )
     application = {
         "name": "Test Application",
         "environments": [
@@ -42,7 +48,9 @@ def test_get_application_monthly_totals():
         ],
     }
 
-    totals = MockReportingProvider._get_application_monthly_totals(application)
+    totals = MockReportingProvider._get_application_monthly_totals(
+        portfolio, application
+    )
     assert totals["name"] == "Test Application"
     assert totals["this_month"] == 300
     assert totals["last_month"] == 700

@@ -34,16 +34,24 @@ class MockReportingProvider:
             }
         ]
         """
-        if portfolio.name in cls.FIXTURE_SPEND_DATA:
-            applications = cls.FIXTURE_SPEND_DATA[portfolio.name]["applications"]
-            return sorted(
-                [
-                    cls._get_application_monthly_totals(application)
-                    for application in applications
-                ],
-                key=lambda app: app["name"],
-            )
-        return []
+
+        fixture_apps = cls.FIXTURE_SPEND_DATA.get(portfolio.name, {}).get(
+            "applications", []
+        )
+
+        for application in portfolio.applications:
+            if application.name not in [app["name"] for app in fixture_apps]:
+                fixture_apps.append({"name": application.name, "environments": []})
+
+        return sorted(
+            [
+                cls._get_application_monthly_totals(portfolio, fixture_app)
+                for fixture_app in fixture_apps
+                if fixture_app["name"]
+                in [application.name for application in portfolio.applications]
+            ],
+            key=lambda app: app["name"],
+        )
 
     @classmethod
     def _get_environment_monthly_totals(cls, environment):
@@ -64,7 +72,7 @@ class MockReportingProvider:
         }
 
     @classmethod
-    def _get_application_monthly_totals(cls, application):
+    def _get_application_monthly_totals(cls, portfolio, fixture_app):
         """
         returns a dictionary that represents spending totals for an application 
         and its environments e.g. 
@@ -83,19 +91,28 @@ class MockReportingProvider:
                 ]
             }
         """
-        environments = sorted(
-            [
-                cls._get_environment_monthly_totals(env)
-                for env in application["environments"]
-            ],
-            key=lambda env: env["name"],
-        )
+        application_envs = [
+            env
+            for env in portfolio.all_environments
+            if env.application.name == fixture_app["name"]
+        ]
+
+        environments = [
+            cls._get_environment_monthly_totals(env)
+            for env in fixture_app["environments"]
+            if env["name"] in [e.name for e in application_envs]
+        ]
+
+        for env in application_envs:
+            if env.name not in [env["name"] for env in environments]:
+                environments.append({"name": env.name})
+
         return {
-            "name": application["name"],
-            "this_month": sum(env["this_month"] for env in environments),
-            "last_month": sum(env["last_month"] for env in environments),
-            "total": sum(env["total"] for env in environments),
-            "environments": environments,
+            "name": fixture_app["name"],
+            "this_month": sum(env.get("this_month", 0) for env in environments),
+            "last_month": sum(env.get("last_month", 0) for env in environments),
+            "total": sum(env.get("total", 0) for env in environments),
+            "environments": sorted(environments, key=lambda env: env["name"]),
         }
 
     @classmethod

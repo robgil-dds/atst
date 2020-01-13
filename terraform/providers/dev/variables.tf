@@ -7,6 +7,11 @@ variable "region" {
 
 }
 
+variable "backup_region" {
+  default = "westus2"
+}
+
+
 variable "owner" {
   default = "dev"
 }
@@ -31,18 +36,25 @@ variable "networks" {
   }
 }
 
+variable "gateway_subnet" {
+  type    = string
+  default = "10.1.20.0/24"
+}
+
+
 variable "route_tables" {
   description = "Route tables and their default routes"
   type        = map
   default = {
     public  = "Internet"
-    private = "VnetLocal"
+    private = "Internet"
+    #private = "VnetLocal"
   }
 }
 
 variable "dns_servers" {
   type    = list
-  default = ["10.1.2.4", "10.1.2.5"]
+  default = []
 }
 
 variable "k8s_node_size" {

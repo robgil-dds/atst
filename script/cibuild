@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # script/cibuild: Run CI related checks and tests
 

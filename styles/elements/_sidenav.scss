@@ -1,10 +1,4 @@
-@mixin sidenav__header {
-  padding: $gap ($gap * 2);
-  font-weight: bold;
-}
-
 .sidenav-container {
-  box-shadow: $box-shadow;
   overflow: hidden;
   position: relative;
   top: $topbar-height + $usa-banner-height;
@@ -14,192 +8,122 @@
     @extend .sidenav-container;
     width: $sidenav-collapsed-width;
   }
+}
 
-  &__fixed {
-    position: fixed;
-  }
-
-  .sidenav {
-    width: $sidenav-expanded-width;
-
-    @include media($large-screen) {
-      margin: 0px;
-    }
-
-    &__title {
-      @include sidenav__header;
-
-      font-size: $h3-font-size;
-      text-transform: uppercase;
-      width: 50%;
-      color: $color-gray-dark;
-      opacity: 0.54;
-    }
-
-    &__toggle {
-      @include sidenav__header;
-
-      font-size: $small-font-size;
-      line-height: 2.8rem;
-      float: right;
-      color: $color-blue-darker;
-
-      .toggle-arrows {
-        vertical-align: middle;
-      }
-    }
-
-    ul {
-      &.sidenav__list--padded {
-        margin-top: 4 * $gap;
-        margin-bottom: $footer-height;
-        padding-bottom: $gap;
-        position: fixed;
-        overflow-y: scroll;
-        top: $topbar-height + $usa-banner-height + 4rem;
-        bottom: 0;
-        left: 0;
-        width: $sidenav-expanded-width;
-        background-color: $color-white;
-      }
-
-      list-style: none;
-      padding: 0;
-
-      li {
-        margin: 0;
-        display: block;
-      }
-    }
-
-    &__divider--small {
-      display: block;
-      width: 4 * $gap;
-      border: 1px solid #d6d7d9;
-      margin-left: 2 * $gap;
-      margin-bottom: $gap;
-    }
-
-    &__text {
-      margin: 2 * $gap;
-      color: $color-gray;
-      font-style: italic;
-    }
-
-    &__link {
-      display: block;
-      padding: $gap ($gap * 2);
-      color: $color-black;
-      text-decoration: underline;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-
-      &-icon {
-        margin-left: -($gap * 0.5);
-      }
-
-      &--disabled {
-        color: $color-shadow;
-        pointer-events: none;
-      }
-
-      &--add {
-        color: $color-blue;
-        font-size: $small-font-size;
-
-        .icon {
-          @include icon-color($color-blue);
-          @include icon-size(14);
-        }
-      }
-
-      &--active {
-        @include h4;
-
-        color: $color-primary;
-        background-color: $color-aqua-lightest;
-        box-shadow: inset ($gap / 2) 0 0 0 $color-primary;
-
-        .sidenav__link-icon {
-          @include icon-style-active;
-        }
-
-        position: relative;
-
-        &_indicator .icon {
-          @include icon-color($color-primary);
-
-          position: absolute;
-          right: 0;
-        }
-
-        + ul {
-          background-color: $color-primary;
-
-          .sidenav__link {
-            color: $color-white;
-            background-color: $color-primary;
-
-            &:hover {
-              background-color: $color-blue-darker;
-            }
-
-            &--active {
-              @include h5;
-
-              color: $color-white;
-              background-color: $color-primary;
-              box-shadow: none;
-            }
-
-            .icon {
-              @include icon-color($color-white);
-            }
-          }
-        }
-      }
-
-      + ul {
-        li {
-          .sidenav__link {
-            @include h5;
-
-            padding: $gap * 0.75;
-            padding-left: 4.5rem;
-            border: 0;
-            font-weight: normal;
-
-            .sidenav__link-icon {
-              @include icon-size(12);
-
-              flex-shrink: 0;
-              margin-right: 1.5rem;
-              margin-left: -3rem;
-            }
-
-            .sidenav__link-label {
-              padding-left: 0;
-            }
-          }
-        }
-      }
-
-      &:hover {
-        color: $color-primary;
-        background-color: $color-aqua-lightest;
-
-        .sidenav__link-icon {
-          @include icon-style-active;
-        }
-      }
-    }
-  }
+.sidenav {
+  width: $sidenav-expanded-width;
+  position: fixed;
 
   &--minimized {
     @extend .sidenav;
 
     width: $sidenav-collapsed-width;
     margin: 0px;
+  }
+
+  @include media($large-screen) {
+    margin: 0px;
+  }
+
+  &__header {
+    padding: $gap ($gap * 2);
+    font-weight: bold;
+    border-bottom: 1px solid $color-gray-lighter;
+
+    &--minimized {
+      @extend .sidenav__header;
+
+      padding: $gap;
+      width: $sidenav-collapsed-width;
+    }
+  }
+
+  &__title {
+    font-size: $h6-font-size;
+    text-transform: uppercase;
+    width: 50%;
+    color: $color-gray-dark;
+    opacity: 0.54;
+    white-space: nowrap;
+    padding: $gap;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__toggle {
+    font-size: $small-font-size;
+    color: $color-blue;
+    text-decoration: none;
+    padding: $gap;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__toggle-arrows {
+    vertical-align: middle;
+    @include icon-size(20);
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  &__list {
+    margin-top: 3 * $gap;
+    margin-bottom: $footer-height;
+    padding-bottom: ($gap * 2);
+    position: fixed;
+    overflow-y: scroll;
+    top: $topbar-height + $usa-banner-height + 4rem;
+    bottom: 0;
+    left: 0;
+    width: $sidenav-expanded-width;
+    background-color: $color-white;
+    list-style: none;
+    padding: 0;
+
+    &--no-header {
+      top: $topbar-height + $usa-banner-height;
+    }
+  }
+
+  &__text {
+    margin: 2 * $gap;
+    color: $color-gray;
+    font-style: italic;
+  }
+
+  &__item {
+    margin: 0;
+    display: block;
+    color: $color-black-light !important;
+  }
+
+  &__link {
+    display: block;
+    padding: $gap ($gap * 2);
+    white-space: nowrap;
+    overflow: hidden;
+    color: $color-black-light !important;
+    text-decoration: none;
+    text-overflow: ellipsis;
+
+    &--active {
+      @include h4;
+
+      background-color: $color-aqua-lightest !important;
+      color: $color-primary-darker !important;
+      box-shadow: inset ($gap / 2) 0 0 0 $color-primary-darker;
+      position: relative;
+    }
+
+    &:hover {
+      color: $color-primary !important;
+      background-color: $color-aqua-lightest;
+    }
   }
 }

@@ -7,6 +7,7 @@ AZURE_CONFIG = {
     "AZURE_CLIENT_ID": "MOCK",
     "AZURE_SECRET_KEY": "MOCK",
     "AZURE_TENANT_ID": "MOCK",
+    "AZURE_POLICY_LOCATION": "policies",
 }
 
 AUTH_CREDENTIALS = {
@@ -46,6 +47,12 @@ def mock_credentials():
     return Mock(spec=credentials)
 
 
+def mock_policy():
+    from azure.mgmt.resource import policy
+
+    return Mock(spec=policy)
+
+
 class MockAzureSDK(object):
     def __init__(self):
         from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
@@ -55,6 +62,7 @@ class MockAzureSDK(object):
         self.managementgroups = mock_managementgroups()
         self.graphrbac = mock_graphrbac()
         self.credentials = mock_credentials()
+        self.policy = mock_policy()
         # may change to a JEDI cloud
         self.cloud = AZURE_PUBLIC_CLOUD
 

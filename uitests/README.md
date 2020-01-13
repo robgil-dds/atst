@@ -58,6 +58,5 @@ NGROK_TOKEN=<token> GI_API_KEY=<api key> GI_SUITE=<suite> CONTAINER_IMAGE=atat:b
 
 - If you get errors regarding ports being in use, make sure you don't have instances of the Flask app, Postgres, or Redis running locally using those ports.
 - If the curl command used to wait for the application container times out and fails, you can increase the timeout by setting a CONTAINER_TIMEOUT environment variable. It defaults to 200 in the script.
-- The curl command will print errors until it successfully connects to the application container. These are normal and expected. When it finally connects, it will print the ATAT home page HTML to STDOUT.
 - You may see errors like "No such container". The script attempts to clean up any previous incarnations of the containers before it starts, and it may print errors when it doesn't find them. This is fine.
 - The script is, for the most part, a series of docker commands, so try running the commands individually and debugging that way.

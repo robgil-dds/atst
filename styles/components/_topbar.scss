@@ -12,88 +12,44 @@
     flex-direction: row;
     align-items: stretch;
     justify-content: space-between;
+  }
 
-    .topbar__link {
-      color: $color-white;
-      display: inline-flex;
-      align-items: center;
-      height: $topbar-height;
-      padding: 0 ($gap * 2);
+  &__link {
+    color: $color-white !important;
+    display: inline-flex;
+    align-items: center;
+    height: $topbar-height;
+    padding: 0 ($gap * 2);
+    text-decoration: none;
+
+    &-label {
+      @include h5;
+      text-decoration: underline;
+      padding-left: $gap;
       text-decoration: none;
-
-      &-label {
-        @include h5;
-        text-decoration: underline;
-        padding-left: $gap;
-        text-decoration: none;
-      }
-
-      &-icon {
-        margin-left: $gap;
-
-        @include icon-color($color-white);
-      }
-
-      &--home {
-        padding-left: $gap / 2;
-      }
-
-      &--shield {
-        width: $icon-bar-width;
-        justify-content: center;
-        padding: 0;
-
-        .topbar__link-icon {
-          margin: 0;
-        }
-      }
-
-      &:hover {
-        background-color: $color-primary-darker;
-        color: $color-white;
-      }
     }
 
-    .topbar__context {
-      display: flex;
-      flex-grow: 1;
-      flex-direction: row;
-      align-items: stretch;
-      justify-content: flex-end;
+    &-icon {
+      margin-left: $gap;
 
-      .topbar__portfolio-menu {
-        margin-right: auto;
-        position: relative;
-      }
+      @include icon-color($color-white);
+    }
+
+    &--home {
+      padding-left: $gap / 2;
+    }
+
+    &:hover {
+      background-color: $color-primary-darker;
+      color: $color-white;
     }
   }
 
-  &.topbar--public {
-    background-color: $color-primary;
-
-    .topbar__navigation {
-      justify-content: flex-end;
-      -ms-flex-pack: justify;
-    }
-
-    .topbar__link {
-      color: $color-white;
-
-      &-icon {
-        @include icon-style-inverted;
-      }
-
-      &--home {
-        padding-left: $gap;
-      }
-
-      &:first-child {
-        margin-right: auto;
-      }
-
-      &:hover {
-        background-color: $color-primary-darker;
-      }
-    }
+  &__context {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-end;
   }
 }

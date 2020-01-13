@@ -19,6 +19,7 @@ from werkzeug.exceptions import NotFound
 from atst.domain.users import Users
 from atst.domain.authnid import AuthenticationContext
 from atst.domain.auth import logout as _logout
+from atst.domain.exceptions import UnauthenticatedError
 from atst.utils.flash import formatted_flash as flash
 
 
@@ -64,11 +65,15 @@ def catch_all(path):
         raise NotFound()
 
 
+def _client_s_dn():
+    return request.environ.get("HTTP_X_SSL_CLIENT_S_DN")
+
+
 def _make_authentication_context():
     return AuthenticationContext(
         crl_cache=app.crl_cache,
         auth_status=request.environ.get("HTTP_X_SSL_CLIENT_VERIFY"),
-        sdn=request.environ.get("HTTP_X_SSL_CLIENT_S_DN"),
+        sdn=_client_s_dn(),
         cert=request.environ.get("HTTP_X_SSL_CLIENT_CERT"),
     )
 
@@ -89,19 +94,24 @@ def current_user_setup(user):
     session["user_id"] = user.id
     session["last_login"] = user.last_login
     app.session_limiter.on_login(user)
+    app.logger.info(f"authentication succeeded for user with EDIPI {user.dod_id}")
     Users.update_last_login(user)
 
 
 @bp.route("/login-redirect")
 def login_redirect():
-    auth_context = _make_authentication_context()
-    auth_context.authenticate()
-    user = auth_context.get_user()
+    try:
+        auth_context = _make_authentication_context()
+        auth_context.authenticate()
 
-    if user.provisional:
-        Users.finalize(user)
+        user = auth_context.get_user()
+        current_user_setup(user)
+    except UnauthenticatedError as err:
+        app.logger.info(
+            f"authentication failed for subject distinguished name {_client_s_dn()}"
+        )
+        raise err
 
-    current_user_setup(user)
     return redirect(redirect_after_login_url())
 
 

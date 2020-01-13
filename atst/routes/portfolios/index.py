@@ -56,13 +56,3 @@ def reports(portfolio_id):
         monthly_spending=Reports.monthly_spending(portfolio),
         retrieved=datetime.now(),  # mocked datetime of reporting data retrival
     )
-
-
-@portfolios_bp.route("/portfolios/<portfolio_id>/destroy", methods=["POST"])
-@user_can(Permissions.ARCHIVE_PORTFOLIO, message="archive portfolio")
-def delete_portfolio(portfolio_id):
-    Portfolios.delete(portfolio=g.portfolio)
-
-    flash("portfolio_deleted", portfolio_name=g.portfolio.name)
-
-    return redirect(url_for("atst.home"))

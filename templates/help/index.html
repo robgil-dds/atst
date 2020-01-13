@@ -6,31 +6,26 @@
 
 {% block content %}
   <div class='global-layout'>
-    <div class='global-navigation sidenav'>
-      <ul>
-
-        {{ SidenavItem("JEDI Cloud Help",
-          href = url_for("atst.helpdocs"),
-          active = not doc,
-          icon='help'
-        )}}
-
-        {% for doc_item in docs %}
-          {% set active = doc and doc == doc_item %}
-
-          {{ SidenavItem(doc_item | title,
-            href = url_for("atst.helpdocs", doc=doc_item),
-            active = active,
-            subnav = subnav or None
-          )}}
-        {% endfor %}
-
-      </ul>
+    <div class='global-navigation'>
+      <div class="sidenav-container">
+        <div class="sidenav">
+          <ul class="sidenav__list sidenav__list--no-header">
+            {{ SidenavItem("JEDI Cloud Help",
+              href = url_for("atst.helpdocs"),
+              active = not doc,
+            )}}
+            {% for doc_item in docs %}
+              {% set active = doc and doc == doc_item %}
+              {{ SidenavItem(doc_item | title,
+                href = url_for("atst.helpdocs", doc=doc_item),
+                active = active,
+              )}}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
     </div>
-
-
     <div class='global-panel-container'>
-
       <div class='panel'>
         <div class='panel__heading panel__heading--divider'>
           <h1>
@@ -42,16 +37,12 @@
             {% endif %}
           </h1>
         </div>
-
         <div class='panel__content'>
-
           {% block doc_content %}
             <p>Welcome to the JEDI Cloud help documentation.</p>
           {% endblock %}
-
         </div>
       </div>
     </div>
-
   </div>
 {% endblock %}

@@ -1,35 +1,9 @@
-{% from "components/icon.html" import Icon %}
-
-{% macro SidenavItem(label, href, active=False, icon=None, subnav=None) -%}
-  <li>
-  <a class="sidenav__link {% if active %}sidenav__link--active{% endif %}" href="{{href}}" title="{{label}}">
-    {% if icon %}
-      {{ Icon(icon, classes="sidenav__link-icon") }}
-    {% endif %}
-
-    <span class="sidenav__link-label">
-      {{label}}
-    </span>
-    {% if active %}
-      <span class="sidenav__link-active_indicator">
-        {{ Icon("caret_right") }}
+{% macro SidenavItem(label, href, active=False) -%}
+  <li class="sidenav__item">
+    <a class="sidenav__link {% if active %}sidenav__link--active{% endif %}" href="{{href}}" title="{{label}}">
+      <span class="sidenav__link-label">
+        {{label}}
       </span>
-      {% endif %}
-  </a>
-
-  {% if subnav and active %}
-      <ul>
-      {% for item in subnav %}
-      <li>
-          <a class="sidenav__link {% if item["active"] %}sidenav__link--active{% endif %}" href="{{item["href"]}}" title="{{item["label"]}}">
-          {% if "icon" in item %}
-              {{ Icon(item["icon"], classes="sidenav__link-icon") }}
-          {% endif %}
-          <span class="sidenav__link-label">{{item["label"]}}</span>
-          </a>
-      </li>
-      {% endfor %}
-      </ul>
-  {% endif %}
+    </a>
   </li>
 {%- endmacro %}

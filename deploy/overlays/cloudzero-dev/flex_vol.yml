@@ -1,0 +1,62 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: atst
+spec:
+  template:
+    spec:
+      volumes:
+        - name: nginx-secret
+          flexVolume:
+            options:
+              keyvaultname: "atat-vault-test"
+              keyvaultobjectnames: "dhparam4096;cert;cert"
+        - name: flask-secret
+          flexVolume:
+            options:
+              keyvaultname: "atat-vault-test"
+              keyvaultobjectnames: "AZURE-STORAGE-KEY;MAIL-PASSWORD;PGPASSWORD;REDIS-PASSWORD;SECRET-KEY"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: atst-worker
+spec:
+  template:
+    spec:
+      volumes:
+        - name: flask-secret
+          flexVolume:
+            options:
+              keyvaultname: "atat-vault-test"
+              keyvaultobjectnames: "AZURE-STORAGE-KEY;MAIL-PASSWORD;PGPASSWORD;REDIS-PASSWORD;SECRET-KEY"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: atst-beat
+spec:
+  template:
+    spec:
+      volumes:
+        - name: flask-secret
+          flexVolume:
+            options:
+              keyvaultname: "atat-vault-test"
+              keyvaultobjectnames: "AZURE-STORAGE-KEY;MAIL-PASSWORD;PGPASSWORD;REDIS-PASSWORD;SECRET-KEY"
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: crls
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: flask-secret
+              flexVolume:
+                options:
+                  keyvaultname: "atat-vault-test"
+                  keyvaultobjectnames: "AZURE-STORAGE-KEY;MAIL-PASSWORD;PGPASSWORD;REDIS-PASSWORD;SECRET-KEY"

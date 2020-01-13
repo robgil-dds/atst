@@ -1,8 +1,7 @@
 {% extends "base.html" %}
 
-{% from "components/sticky_cta.html" import StickyCTA %}
 {% from "components/icon.html" import Icon %}
-{% from "components/semi_collapsible_text.html" import SemiCollapsibleText %}
+{% from "components/sticky_cta.html" import StickyCTA %}
 
 {% block content %}
 
@@ -13,88 +12,56 @@
      {% set sticky_header = "home.get_started" | translate  %}
   {% endif %}
 
-  {% call StickyCTA(sticky_header) %}
-      <a href="{{ url_for("portfolios.new_portfolio_step_1") }}" class="usa-button-primary">
-        {{ "home.add_portfolio_button_text" | translate }}
-      </a>
-  {% endcall %}
-
-  <div class="about-cloud">
+  <div class="home__content">
     {% include "fragments/flash.html" %}
 
     <h1>{{ "home.head" | translate }}</h1>
+    <h3>Set up a Portfolio</h3>
+    <h4>New Portfolios will be visible in the left side bar of this page. </h4>
+    <p>All TOs associated to a specific Application or set of related Applications will be entered at the Portfolio level. Funding is applied and managed at the Portfolio level as well.</p>
+    <hr>
 
-    {{ SemiCollapsibleText(first_half=("home.about_cloud.part1"|translate), second_half=("home.about_cloud.part2"|translate)) }}
-
-    <div class="your-project">
-      <h2 class="h3">{{ "home.your_project" | translate }}</h2>
-      <p>{{ "home.your_project_descrip" | translate }}</p>
-
-      <hr>
-
-      {% macro Link(icon, text, section, default=False) %}
-      {% if default %}
-        <div v-bind:class='{"icon-link": true, active: selectedSection === "{{ section }}" || selectedSection === null}' v-on:click="toggleSection('{{ section }}')">
-      {% else %}
-        <div v-bind:class='{"icon-link": true, active: selectedSection === "{{ section }}"}' v-on:click="toggleSection('{{ section }}')">
-      {% endif %}
-          <div class="col">
-            <div class='icon-link--icon'>{{ Icon(icon) }}</div>
-            <div class='icon-link--name'>{{ text }}</div>
-          </div>
+    <div class="home__content--descriptions">
+      <div class="row">
+        <div class="col col--half col--pad">
+          {{ Icon('funding', classes="icon--home-pg-badge") }}
+          <h4>{{ "navigation.portfolio_navigation.breadcrumbs.funding" | translate }}</h4>
+          <p>
+            {{ "home.funding_descrip" | translate }}
+          </p>
         </div>
-      {% endmacro %}
-
-      <toggler inline-template v-bind:initial-selected-section="'funding'">
-        <div>
-          <div class="portfolio-header">
-            <div class="links row">
-              {{ Link(
-              icon='funding',
-              section='funding',
-              text='navigation.portfolio_navigation.breadcrumbs.funding' | translate,
-              default=True
-              ) }}
-              {{ Link(
-              icon='applications',
-              section='applications',
-              text='navigation.portfolio_navigation.breadcrumbs.applications' | translate,
-              ) }}
-              {{ Link(
-              icon='chart-pie',
-              section='reports',
-              text='navigation.portfolio_navigation.breadcrumbs.reports' | translate,
-              ) }}
-              {{ Link(
-              icon='cog',
-              section='admin',
-              text='navigation.portfolio_navigation.breadcrumbs.admin' | translate,
-              ) }}
-            </div>
-          </div>
-          {% macro Description(section, default=False) %}
-          {% if default %}
-            <p v-show="selectedSection === '{{ section }}' || selectedSection === null">
-          {% else %}
-            <p v-show="selectedSection === '{{ section }}'">
-          {% endif %}
-              <strong>
-                {{ "navigation.portfolio_navigation.breadcrumbs.%s" | format(section) | translate }}
-              </strong>
-              {{ "home.%s_descrip" | format(section) | translate }}
-            </p>
-          {% endmacro %}
-          <div class="project-section-descriptions">
-            {{ Description('funding', default=True) }}
-            {{ Description('applications') }}
-            {{ Description('reports') }}
-            {{ Description('admin') }}
-          </div>
+        <div class="col col--half col--pad">
+          {{ Icon('chart-pie', classes="icon--home-pg-badge") }}
+          <h4>{{ "navigation.portfolio_navigation.breadcrumbs.reports" | translate }}</h4>
+          <p>
+            {{ "home.reports_descrip" | translate }}
+          </p>
         </div>
-      </toggler>
-
+      </div>
+      <div class="row">
+        <div class="col col--half col--pad">
+          {{ Icon('applications', classes="icon--home-pg-badge") }}
+          <h4>{{ "navigation.portfolio_navigation.breadcrumbs.applications" | translate }}</h4>
+          <p>
+            {{ "home.applications_descrip" | translate }}
+          </p>
+        </div>
+        <div class="col col--half col--pad">
+          {{ Icon('cog', classes="icon--home-pg-badge") }}
+          <h4>{{ "navigation.portfolio_navigation.breadcrumbs.admin" | translate }}</h4>
+          <p>
+            {{ "home.admin_descrip" | translate }}
+          </p>
+        </div>
+      </div>
     </div>
-    <img id='jedi-heirarchy' src="{{ url_for("static", filename="img/JEDIhierarchyDiagram.png")}}" alt="JEDI heirarchy diagram">
+    <div class="empty-state">
+      <div class="empty-state__footer">
+        <a href="{{ url_for("portfolios.new_portfolio_step_1") }}" class="usa-button usa-button-primary">
+          {{ "home.add_portfolio_button_text" | translate }}
+        </a>
+      </div>
+    </div>
   </div>
 </main>
 

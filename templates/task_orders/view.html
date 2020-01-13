@@ -1,0 +1,17 @@
+{% from "components/sticky_cta.html" import StickyCTA %}
+{% from "task_orders/fragments/task_order_view.html" import TaskOrderView %}
+
+{% extends 'portfolios/base.html' %}
+
+{% block portfolio_content %}
+
+  {% call StickyCTA(text="Task Order #{}".format(task_order.number)) %}
+    {% if user_can(permissions.EDIT_TASK_ORDER_DETAILS) and not task_order.is_expired %}
+      <a class="sticky-cta--link" href="{{ url_for('task_orders.edit', task_order_id=task_order.id) }}">Correct an Error</a>
+    {% endif %}
+  {% endcall %}
+
+  <div class="task-order">
+    {{ TaskOrderView(task_order, portfolio) }}
+  </div>
+{% endblock %}

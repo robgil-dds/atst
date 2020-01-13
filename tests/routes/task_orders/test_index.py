@@ -35,22 +35,22 @@ def task_order():
     return task_order
 
 
-def test_review_task_order_not_draft(client, user_session, task_order):
+def test_view_task_order_not_draft(client, user_session, task_order):
     TaskOrders.sign(task_order=task_order, signer_dod_id=random_dod_id())
     user_session(task_order.portfolio.owner)
     response = client.get(
-        url_for("task_orders.review_task_order", task_order_id=task_order.id)
+        url_for("task_orders.view_task_order", task_order_id=task_order.id)
     )
     assert response.status_code == 200
 
 
-def test_review_task_order_draft(client, user_session, task_order):
+def test_view_task_order_draft(client, user_session, task_order):
     TaskOrders.update(
         task_order_id=task_order.id, number="1234567890", clins=[], pdf=None
     )
     user_session(task_order.portfolio.owner)
     response = client.get(
-        url_for("task_orders.review_task_order", task_order_id=task_order.id)
+        url_for("task_orders.view_task_order", task_order_id=task_order.id)
     )
     assert response.status_code == 302
     assert url_for("task_orders.edit", task_order_id=task_order.id) in response.location

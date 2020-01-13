@@ -41,3 +41,8 @@ variable "route_tables" {
   type        = map
   description = "A map with the route tables to create"
 }
+
+variable "gateway_subnet" {
+  type        = string
+  description = "The Subnet CIDR that we'll use for the virtual_network_gateway 'GatewaySubnet'"
+}

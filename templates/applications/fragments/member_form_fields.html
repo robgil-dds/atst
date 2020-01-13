@@ -100,7 +100,7 @@
     {{ CheckboxInput(form.perms_env_mgmt, classes="input__inline-fields", key=env_mgmt, id=env_mgmt, optional=True) }}
     {{ CheckboxInput(form.perms_del_env, classes="input__inline-fields", key=del_env, id=del_env, optional=True) }}
   </div>
-  <hr>
+  <hr class="full-width">
   <div class="environment_roles environment-roles-new">
     <h2>{{ "portfolios.applications.members.form.env_access.title" | translate }}</h2>
     <p class='usa-input__help subtitle'>
@@ -118,7 +118,7 @@
 {% endmacro %}
 
 {% macro InfoFields(member_form) %}
-  <div class="application-member__user-info">
+  <div class="user-info">
     {{ TextInput(member_form.first_name, validation='requiredField', optional=False) }}
     {{ TextInput(member_form.last_name, validation='requiredField', optional=False) }}
     {{ TextInput(member_form.email, validation='email', optional=False) }}

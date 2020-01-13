@@ -1,0 +1,85 @@
+{% from "components/icon.html" import Icon %}
+{% from "components/semi_collapsible_text.html" import SemiCollapsibleText %}
+{% from "components/tooltip.html" import Tooltip %}
+
+{% macro TaskOrderView(task_order, portfolio, builder_mode=False) %}
+  {% set obligated_funds = task_order.total_obligated_funds %}
+  {% set contract_amount = task_order.total_contract_amount %}
+  {% set expended_funds = task_order.invoiced_funds %}
+
+  <div>
+    <section class="row">
+      <div class='col col--grow summary-item'>
+        <h4 class="summary-item__header">
+          <span class="summary-item__header-text">Total obligated funds</span>
+          {{ Tooltip(("task_orders.review.tooltip.obligated_funds" | translate), title="", classes="summary-item__header-icon") }}
+        </h4>
+        <p class="summary-item__value--large">
+          {{ obligated_funds | dollars }}
+        </p>
+      </div>
+      <div class='col col--grow summary-item'>
+        <h4 class="summary-item__header">
+          <span class="summary-item__header-text">Total Task Order value</span>
+          {{ Tooltip(("task_orders.review.tooltip.total_value" | translate), title="", classes="summary-item__header-icon") }}
+        </h4>
+        <p class="summary-item__value--large">
+          {{ contract_amount | dollars }}
+        </p>
+      </div>
+      <div class='col col--grow summary-item'>
+        <h4 class="summary-item__header">
+          <span class="summary-item__header-text">Total expended funds</span>
+          {{ Tooltip(("task_orders.review.tooltip.expended_funds" | translate), title="", classes="summary-item__header-icon") }}
+        </h4>
+        <p class="summary-item__value--large">
+          {{ expended_funds | dollars }}
+        </p>
+      </div>
+    </section>
+    <hr>
+    <section>
+      <h4>Documents</h4>
+      <div class="panel panel__content">
+        {% if builder_mode %}
+          {{ Icon('ok', classes="icon--green icon--medium") }}
+        {% endif %}
+        <a href="{{ pdf_download_url }}">
+          {{ task_order.pdf.filename }}
+          {{ Icon('link', classes="icon--primary icon--medium") }}
+        </a>
+      </div>
+    </section>
+    <hr>
+    <section>
+      <h4>CLIN summary</h4>
+      <table class="fixed-table-wrapper atat-table clin-summary">
+        <thead>
+          <tr>
+            <th>{{ "task_orders.review.clins.number" | translate }}</th>
+            <th>{{ "task_orders.review.clins.type" | translate }}</th>
+            <th>{{ "task_orders.review.clins.idiq_clin_description" | translate }}</th>
+            <th>{{ "task_orders.review.clins.pop" | translate }}</th>
+            <th class="task-order__amount">{{ "task_orders.review.clins.total_amount" | translate }}</th>
+            <th class="task-order__amount">{{ "task_orders.review.clins.obligated" | translate }}</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for clin in task_order.sorted_clins %}
+          <tr>
+            <td>{{ clin.number }}</td>
+            <td>{{ clin.type }}</td>
+            <td>{{ "task_orders.review.clins.{}".format(clin.jedi_clin_type) | translate}}</td>
+            <td>
+             {{ clin.start_date | formattedDate }} -  {{ clin.end_date | formattedDate }}
+            </td>
+            <td class="task-order__amount">{{ clin.total_amount | dollars }}</td>
+            <td class="task-order__amount">{{ clin.obligated_amount | dollars }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  </div>
+{% endmacro %}

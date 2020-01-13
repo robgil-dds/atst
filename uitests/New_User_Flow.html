@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="https://azure.atat.code.mil" />
+<link rel="selenium.base" href="" />
 <title>New User Flow</title>
 <meta name="ghost-inspector-details" content="" />
 <meta name="ghost-inspector-browser" content="chrome" />
@@ -16,7 +16,7 @@
 <meta name="ghost-inspector-screenshotTarget" content="" />
 <meta name="ghost-inspector-screenshotExclusions" content="div.global-navigation, time" />
 <meta name="ghost-inspector-screenshotCompareEnabled" content="true" />
-<meta name="ghost-inspector-screenshotCompareThreshold" content="0.05" />
+<meta name="ghost-inspector-screenshotCompareThreshold" content="0.02" />
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
@@ -33,7 +33,7 @@
 </tr>
 <tr>
 <td>open</td>
-<td>/dev-new-user?first_name=Sim&last_name=Aloo&dod_id=1234567896</td>
+<td>/dev-new-user?first_name=Sim&last_name=Aloo&dod_id=1234567654</td>
 <td></td>
 </tr>
 <tr>
@@ -43,12 +43,12 @@
 </tr>
 <tr>
 <td>waitForElementPresent</td>
-<td>css=a[href="/user"] > .topbar__link-label</td>
+<td>css=div.h2</td>
 <td></td>
 </tr>
 <tr>
 <td>assertText</td>
-<td>css=a[href="/user"] > .topbar__link-label</td>
+<td>css=div.h2</td>
 <td>*Sim Aloo*</td>
 </tr>
 <tr>
@@ -79,7 +79,7 @@
 <tr>
 <td>assertText</td>
 <td>css=.h3</td>
-<td>*DoD ID: 1234567896*</td>
+<td>*DoD ID: 1234567654*</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
@@ -124,22 +124,7 @@
 <tr>
 <td>type</td>
 <td>css=#service_branch</td>
-<td>Air Force, Department of the</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#service_branch > option:nth-of-type(2)</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#service_branch > option:nth-of-type(2)</td>
-<td></td>
+<td>army</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
@@ -253,21 +238,6 @@
 </tr>
 <tr>
 <td>waitForElementPresent</td>
-<td>css=.sticky-cta-text > h3</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=.sticky-cta-text > h3</td>
-<td>*Get Started*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>waitForElementPresent</td>
 <td>css=h3.usa-alert-heading</td>
 <td></td>
 </tr>
@@ -283,13 +253,13 @@
 </tr>
 <tr>
 <td>waitForElementPresent</td>
-<td>css=.about-cloud > h1</td>
+<td>css=.home__content > h1</td>
 <td></td>
 </tr>
 <tr>
 <td>assertText</td>
-<td>css=.about-cloud > h1</td>
-<td>*About Cloud Services*</td>
+<td>css=.home__content > h1</td>
+<td>*JEDI Cloud Services*</td>
 </tr>
 </tbody>
 </table>

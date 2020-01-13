@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
+from sqlalchemy.types import ARRAY
 from itertools import chain
 
 from atst.models.base import Base
@@ -20,7 +21,7 @@ class Portfolio(
     name = Column(String, nullable=False)
     description = Column(String)
     defense_component = Column(
-        String, nullable=False
+        ARRAY(String), nullable=False
     )  # Department of Defense Component
 
     applications = relationship(

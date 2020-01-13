@@ -3,8 +3,7 @@
   background-color: $color-white;
   border-top: 1px solid $color-gray-lightest;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-direction: row-reverse;
   align-items: center;
   padding: $gap * 1.5;
   position: fixed;
@@ -15,19 +14,7 @@
   color: $color-gray-dark;
   font-size: 1.5rem;
 
-  &__info {
-    flex-grow: 1;
+  &__login {
     padding-left: 0.8rem;
-
-    &__link {
-      margin: (-$gap * 2) (-$gap);
-      font-weight: normal;
-
-      .icon--footer {
-        @include icon-size(16);
-
-        margin: 0rem 0.8rem 0rem 0rem;
-      }
-    }
   }
 }

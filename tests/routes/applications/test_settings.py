@@ -52,8 +52,6 @@ def test_updating_application_environments_success(client, user_session):
         _external=True,
         fragment="application-environments",
         _anchor="application-environments",
-        active_toggler=environment.id,
-        active_toggler_section="edit",
     )
     assert environment.name == "new name a"
 
@@ -76,6 +74,24 @@ def test_update_environment_failure(client, user_session):
 
     assert response.status_code == 400
     assert environment.name == "original name"
+
+
+def test_enforces_unique_env_name(client, user_session, session):
+    application = ApplicationFactory.create()
+    user = application.portfolio.owner
+    name = "New Environment"
+    environment = EnvironmentFactory.create(application=application, name=name)
+    form_data = {"name": name}
+    user_session(user)
+
+    session.begin_nested()
+    response = client.post(
+        url_for("applications.new_environment", application_id=application.id),
+        data=form_data,
+    )
+    session.rollback()
+
+    assert response.status_code == 400
 
 
 def test_application_settings(client, user_session):
@@ -258,6 +274,23 @@ def test_user_without_permission_cannot_update_application(client, user_session)
     assert application.description == "Cool stuff happening here!"
 
 
+def test_update_application_enforces_unique_name(client, user_session, session):
+    portfolio = PortfolioFactory.create()
+    name = "Test Application"
+    application = ApplicationFactory.create(portfolio=portfolio, name=name)
+    dupe_application = ApplicationFactory.create(portfolio=portfolio)
+    user_session(portfolio.owner)
+
+    session.begin_nested()
+    response = client.post(
+        url_for("applications.update", application_id=dupe_application.id),
+        data={"name": name, "description": dupe_application.description},
+    )
+    session.rollback()
+
+    assert response.status_code == 400
+
+
 def test_user_can_only_access_apps_in_their_portfolio(client, user_session):
     portfolio = PortfolioFactory.create()
     other_portfolio = PortfolioFactory.create(
@@ -286,41 +319,6 @@ def test_user_can_only_access_apps_in_their_portfolio(client, user_session):
     )
     assert response.status_code == 404
     assert time_updated == other_application.time_updated
-
-
-def test_delete_application(client, user_session):
-    user = UserFactory.create()
-    port = PortfolioFactory.create(
-        owner=user,
-        applications=[
-            {
-                "name": "mos eisley",
-                "environments": [
-                    {"name": "bar"},
-                    {"name": "booth"},
-                    {"name": "band stage"},
-                ],
-            }
-        ],
-    )
-    application = port.applications[0]
-    user_session(user)
-
-    response = client.post(
-        url_for("applications.delete", application_id=application.id)
-    )
-    # appropriate response and redirect
-    assert response.status_code == 302
-    assert response.location == url_for(
-        "applications.portfolio_applications", portfolio_id=port.id, _external=True
-    )
-    # appropriate flash message
-    message = get_flashed_messages()[0]
-    assert "deleted" in message["message"]
-    assert application.name in message["message"]
-    # app and envs are soft deleted
-    assert len(port.applications) == 0
-    assert len(application.environments) == 0
 
 
 def test_new_environment(client, user_session):

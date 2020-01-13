@@ -54,7 +54,6 @@ variable "storage_mb" {
   default     = "5120"
 }
 
-
 variable "storage_backup_retention_days" {
   type        = string
   description = "Storage backup retention (days)"
@@ -76,7 +75,7 @@ variable "storage_auto_grow" {
 variable "administrator_login" {
   type        = string
   description = "Administrator login"
-  default     = "sqladmindude" # FIXME - Remove with wrapper using KeyVault
+  default     = "atat_master" # FIXME - Remove with wrapper using KeyVault
 }
 
 variable "administrator_login_password" {
@@ -85,11 +84,10 @@ variable "administrator_login_password" {
   default     = "eI0l7yswwtuhHpwzoVjwRKdAcuGNsg" # FIXME - Remove with wrapper using KeyVault
 }
 
-
 variable "postgres_version" {
   type        = string
   description = "Postgres version to use"
-  default     = "11"
+  default     = "10"
 }
 
 variable "ssl_enforcement" {

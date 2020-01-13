@@ -16,7 +16,7 @@
 <meta name="ghost-inspector-screenshotTarget" content="" />
 <meta name="ghost-inspector-screenshotExclusions" content="div.global-navigation, time" />
 <meta name="ghost-inspector-screenshotCompareEnabled" content="true" />
-<meta name="ghost-inspector-screenshotCompareThreshold" content="0.05" />
+<meta name="ghost-inspector-screenshotCompareThreshold" content="0.02" />
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
@@ -31,12 +31,8 @@
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO
 Imported from: AT-AT CI - New Portfolio
 Imported from: AT-AT CI - login-->
 <tr>
@@ -49,42 +45,34 @@ Imported from: AT-AT CI - login-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO
 Imported from: AT-AT CI - New Portfolio
 Imported from: AT-AT CI - login-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=.about-cloud > h1</td>
+<td>css=.home__content > h1</td>
 <td></td>
 </tr>
 <tr>
 <td>assertText</td>
-<td>css=.about-cloud > h1</td>
-<td>About Cloud Services</td>
+<td>css=.home__content > h1</td>
+<td>JEDI Cloud Services</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO
 Imported from: AT-AT CI - New Portfolio-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=a[href="/portfolios/new"]</td>
 <td></td>
 </tr>
-<tr>
+<tr original-target="a[href="/portfolios/new"],xpath=//a[contains(text(), "Add New Portfolio")]">
 <td>click</td>
 <td>css=a[href="/portfolios/new"]</td>
 <td></td>
@@ -94,34 +82,44 @@ Imported from: AT-AT CI - New Portfolio-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO
 Imported from: AT-AT CI - New Portfolio-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=main.usa-section > h1</td>
+<td>css=.portfolio-header__name > h1</td>
 <td></td>
 </tr>
 <tr>
 <td>assertText</td>
-<td>css=main.usa-section > h1</td>
-<td>*New Portfolio Form*</td>
+<td>css=.portfolio-header__name > h1</td>
+<td>*New Portfolio*</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO
+Imported from: AT-AT CI - New Portfolio-->
+<tr>
+<td>waitForElementPresent</td>
+<td>css=.sticky-cta-text > h3</td>
+<td></td>
+</tr>
+<tr>
+<td>assertText</td>
+<td>css=.sticky-cta-text > h3</td>
+<td>*Create New Portfolio*</td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO
 Imported from: AT-AT CI - New Portfolio-->
 <tr>
 <td>waitForElementPresent</td>
@@ -138,65 +136,17 @@ Imported from: AT-AT CI - New Portfolio-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO
 Imported from: AT-AT CI - New Portfolio-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=#defense_component</td>
+<td>css=fieldset.usa-input__choices > ul > li:nth-of-type(5) > label</td>
 <td></td>
 </tr>
-<tr>
-<td>type</td>
-<td>css=#defense_component</td>
-<td>Defense Logistics Agency</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#description</td>
-<td></td>
-</tr>
-<tr>
-<td>type</td>
-<td>css=#description</td>
-<td>Maintenance and monitoring of the energy grid</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#app_migration > li:nth-of-type(3) > label</td>
-<td></td>
-</tr>
-<tr>
+<tr original-target="fieldset.usa-input__choices > ul > li:nth-of-type(5) > label,xpath=//label[contains(text(), "Other")]">
 <td>click</td>
-<td>css=#app_migration > li:nth-of-type(3) > label</td>
+<td>css=fieldset.usa-input__choices > ul > li:nth-of-type(5) > label</td>
 <td></td>
 </tr>
 <tr>
@@ -204,285 +154,35 @@ Imported from: AT-AT CI - New Portfolio-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#native_apps > li:nth-of-type(1) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#native_apps > li:nth-of-type(1) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(1) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(1) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(2) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(2) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(3) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(3) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(4) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(4) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(5) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(6) > fieldset.usa-input__choices > ul > li:nth-of-type(5) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input:nth-of-type(7) > fieldset.usa-input__choices > ul > li:nth-of-type(2) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input:nth-of-type(7) > fieldset.usa-input__choices > ul > li:nth-of-type(2) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(7) > fieldset.usa-input__choices > ul > li:nth-of-type(3) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#portfolio-create > .usa-input.usa-input--success:nth-of-type(7) > fieldset.usa-input__choices > ul > li:nth-of-type(3) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#team_experience > li:nth-of-type(5) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=#team_experience > li:nth-of-type(5) > label</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO
 Imported from: AT-AT CI - New Portfolio-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=input[type="submit"]</td>
+<td></td>
+</tr>
+<tr>
+<td>click</td>
+<td>css=input[type="submit"]</td>
+<td></td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO
+Imported from: AT-AT CI - New Portfolio-->
+<tr>
+<td>waitForElementPresent</td>
+<td>css=.empty-state > h3</td>
 <td></td>
 </tr>
 <tr>
 <td>assertText</td>
-<td>css=input[type="submit"]</td>
-<td>Save</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=input[type="submit"]</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=input[type="submit"]</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.portfolio-header__name > h1</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=.portfolio-header__name > h1</td>
-<td>*Tatooine Energy Maintenance Systems*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-Imported from: AT-AT CI - New Portfolio-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.empty-state h3</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=.empty-state h3</td>
+<td>css=.empty-state > h3</td>
 <td>*You don't have any Applications yet*</td>
 </tr>
 <tr>
@@ -490,12 +190,8 @@ Imported from: AT-AT CI - New Portfolio-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=.icon--funding</td>
@@ -511,41 +207,16 @@ Imported from: AT-AT CI - TO Step 1-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=.sticky-cta-text h3</td>
+<td>css=.sticky-cta-buttons > .usa-button.usa-button-primary</td>
 <td></td>
 </tr>
-<tr>
-<td>assertText</td>
-<td>css=.sticky-cta-text h3</td>
-<td>*Task Orders*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.usa-button.usa-button-primary</td>
-<td></td>
-</tr>
-<tr>
+<tr original-target=".sticky-cta-buttons > .usa-button.usa-button-primary">
 <td>click</td>
-<td>css=.usa-button.usa-button-primary</td>
+<td>css=.sticky-cta-buttons > .usa-button.usa-button-primary</td>
 <td></td>
 </tr>
 <tr>
@@ -553,39 +224,14 @@ Imported from: AT-AT CI - TO Step 1-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.sticky-cta-text > h3</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=.sticky-cta-text > h3</td>
-<td>*Add Task Order (step 1 of 5)*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=.upload-button</td>
 <td></td>
 </tr>
-<tr>
+<tr original-target=".upload-button,xpath=//span[contains(text(), "Browse")]">
 <td>click</td>
 <td>css=.upload-button</td>
 <td></td>
@@ -595,12 +241,8 @@ Imported from: AT-AT CI - TO Step 1-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=#pdf</td>
@@ -609,20 +251,16 @@ Imported from: AT-AT CI - TO Step 1-->
 <tr>
 <td>type</td>
 <td>css=#pdf</td>
-<td>https://ghostinspector-prod.s3.amazonaws.com/uploads/726e1c95-2d16-4793-85d8-b4d3ae9cd35d.pdf</td>
+<td>https://ghostinspector-prod.s3.amazonaws.com/uploads/310638bb-42fd-4158-b14f-417826ae4f79.pdf</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1
-This is Ghost Inspector flow control. The test will wait until the file is uploaded, which in turn causes the button to be enabled (i.e., not disabled).-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO
+Ghost Inspector flow control because button tends to take a little while to become enabled-->
 <tr>
 <td>assertElementNotPresent</td>
 <td>css=input[type="submit"][disabled="disabled"]</td>
@@ -633,32 +271,8 @@ This is Ghost Inspector flow control. The test will wait until the file is uploa
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2
-Imported from: AT-AT CI - TO Step 1-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=a[href="#"].uploaded-file__remove</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=a[href="#"].uploaded-file__remove</td>
-<td>*Remove*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=input[type="submit"]</td>
@@ -674,31 +288,8 @@ Imported from: AT-AT CI - TO Step 2-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.sticky-cta-text > h3</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=.sticky-cta-text > h3</td>
-<td>*Add Task Order (step 2 of 5)*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=#number</td>
@@ -714,30 +305,8 @@ Imported from: AT-AT CI - TO Step 2-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3
-Imported from: AT-AT CI - TO Step 2-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=svg.svg-inline--fa.fa-check-circle > path</td>
-<td></td>
-</tr>
-<tr>
-<td>assertElementPresent</td>
-<td>css=svg.svg-inline--fa.fa-check-circle > path</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=input[type="submit"]</td>
@@ -753,29 +322,8 @@ Imported from: AT-AT CI - TO Step 3-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.sticky-cta-text > h3</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=.sticky-cta-text > h3</td>
-<td>*Add Task Order (step 3 of 5)*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=#clins-0-number</td>
@@ -791,29 +339,8 @@ Imported from: AT-AT CI - TO Step 3-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.card__title > .h4</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=.card__title > .h4</td>
-<td>*CLIN 0002*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=#clins-0-jedi_clin_type</td>
@@ -829,29 +356,8 @@ Imported from: AT-AT CI - TO Step 3-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#percent-obligated</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=#percent-obligated</td>
-<td>*0%*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=#clins-0-total_amount</td>
@@ -867,10 +373,8 @@ Imported from: AT-AT CI - TO Step 3-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=#clins-0-obligated_amount</td>
@@ -886,48 +390,8 @@ Imported from: AT-AT CI - TO Step 3-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=#percent-obligated</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=#percent-obligated</td>
-<td>*13%*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=fieldset[name="clins-0-start_date"] > .date-picker-component > .usa-form-group.usa-form-group-month > input[name="date-month"]</td>
-<td></td>
-</tr>
-<tr>
-<td>click</td>
-<td>css=fieldset[name="clins-0-start_date"] > .date-picker-component > .usa-form-group.usa-form-group-month > input[name="date-month"]</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=fieldset[name="clins-0-start_date"] > .date-picker-component > .usa-form-group.usa-form-group-month > input[name="date-month"]</td>
@@ -943,10 +407,8 @@ Imported from: AT-AT CI - TO Step 3-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=fieldset[name="clins-0-start_date"] > .date-picker-component > .usa-form-group.usa-form-group-day > input[name="date-day"]</td>
@@ -955,17 +417,15 @@ Imported from: AT-AT CI - TO Step 3-->
 <tr>
 <td>type</td>
 <td>css=fieldset[name="clins-0-start_date"] > .date-picker-component > .usa-form-group.usa-form-group-day > input[name="date-day"]</td>
-<td>01</td>
+<td>1</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=fieldset[name="clins-0-start_date"] > .date-picker-component > .usa-form-group.usa-form-group-year > input[name="date-year"]</td>
@@ -981,10 +441,8 @@ Imported from: AT-AT CI - TO Step 3-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=fieldset[name="clins-0-end_date"] > .date-picker-component > .usa-form-group.usa-form-group-month > input[name="date-month"]</td>
@@ -993,17 +451,15 @@ Imported from: AT-AT CI - TO Step 3-->
 <tr>
 <td>type</td>
 <td>css=fieldset[name="clins-0-end_date"] > .date-picker-component > .usa-form-group.usa-form-group-month > input[name="date-month"]</td>
-<td>06</td>
+<td>6</td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=fieldset[name="clins-0-end_date"] > .date-picker-component > .usa-form-group.usa-form-group-day > input[name="date-day"]</td>
@@ -1019,10 +475,8 @@ Imported from: AT-AT CI - TO Step 3-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=fieldset[name="clins-0-end_date"] > .date-picker-component > .usa-form-group.usa-form-group-year > input[name="date-year"]</td>
@@ -1038,18 +492,16 @@ Imported from: AT-AT CI - TO Step 3-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=fieldset[name="clins-0-start_date"] > .date-picker-component > .usa-form-group.usa-form-group-month > input[name="date-month"]</td>
+<td>css=fieldset[name="clins-0-end_date"] > .date-picker-component > .usa-form-group.usa-form-group-day > input[name="date-day"]</td>
 <td></td>
 </tr>
 <tr>
 <td>click</td>
-<td>css=fieldset[name="clins-0-start_date"] > .date-picker-component > .usa-form-group.usa-form-group-month > input[name="date-month"]</td>
+<td>css=fieldset[name="clins-0-end_date"] > .date-picker-component > .usa-form-group.usa-form-group-day > input[name="date-day"]</td>
 <td></td>
 </tr>
 <tr>
@@ -1057,28 +509,8 @@ Imported from: AT-AT CI - TO Step 3-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4
-Imported from: AT-AT CI - TO Step 3-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=fieldset[name="clins-0-end_date"] > .date-picker-component > div:nth-of-type(4) > .usa-form-group-date-ok > .icon.icon--ok.icon--green > svg.svg-inline--fa.fa-check-circle.fa-w-16</td>
-<td></td>
-</tr>
-<tr>
-<td>assertElementPresent</td>
-<td>css=fieldset[name="clins-0-end_date"] > .date-picker-component > div:nth-of-type(4) > .usa-form-group-date-ok > .icon.icon--ok.icon--green > svg.svg-inline--fa.fa-check-circle.fa-w-16</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=input[type="submit"]</td>
@@ -1094,104 +526,14 @@ Imported from: AT-AT CI - TO Step 4-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.sticky-cta-text > h3</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=.sticky-cta-text > h3</td>
-<td>*Add Task Order (step 4 of 5)*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.totals-box > .h3:nth-of-type(2)</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=.totals-box > .h3:nth-of-type(2)</td>
-<td>*$100,000.00*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.totals-box > .h3:nth-of-type(4)</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=.totals-box > .h3:nth-of-type(4)</td>
-<td>*$800,000.00*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.col.task-order__details > div:nth-of-type(2)</td>
-<td></td>
-</tr>
-<tr>
-<td>assertElementPresent</td>
-<td>css=.col.task-order__details > div:nth-of-type(2)</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5
-Imported from: AT-AT CI - TO Step 4-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=table.fixed-table-wrapper > thead > tr > th.task-order__amount:nth-of-type(6)</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=table.fixed-table-wrapper > thead > tr > th.task-order__amount:nth-of-type(6)</td>
-<td>*Amount Obligated*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=a.usa-button.usa-button-primary</td>
 <td></td>
 </tr>
-<tr>
+<tr original-target="a.usa-button.usa-button-primary,xpath=//a[contains(text(), "Next: Submit Task Order")]">
 <td>click</td>
 <td>css=a.usa-button.usa-button-primary</td>
 <td></td>
@@ -1201,33 +543,16 @@ Imported from: AT-AT CI - TO Step 5-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=.h2</td>
+<td>css=.task-order__confirmation > div:nth-of-type(1) > .usa-input > fieldset.usa-input__choices > legend > label</td>
 <td></td>
 </tr>
-<tr>
-<td>assertText</td>
-<td>css=.h2</td>
-<td>*Confirm Signature*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=fieldset.usa-input__choices > legend > label</td>
-<td></td>
-</tr>
-<tr>
+<tr original-target=".task-order__confirmation > div:nth-of-type(1) > .usa-input > fieldset.usa-input__choices > legend > label,xpath=//label[contains(text(), "I confirm the uploaded Task Order is signed by the appropriate")]">
 <td>click</td>
-<td>css=fieldset.usa-input__choices > legend > label</td>
+<td>css=.task-order__confirmation > div:nth-of-type(1) > .usa-input > fieldset.usa-input__choices > legend > label</td>
 <td></td>
 </tr>
 <tr>
@@ -1235,8 +560,25 @@ Imported from: AT-AT CI - TO Step 5-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
+<tr>
+<td>waitForElementPresent</td>
+<td>css=.task-order__confirmation > div:nth-of-type(2) > .usa-input > fieldset.usa-input__choices > legend > label</td>
+<td></td>
+</tr>
+<tr original-target=".task-order__confirmation > div:nth-of-type(2) > .usa-input > fieldset.usa-input__choices > legend > label,xpath=//label[contains(text(), "I confirm that the information entered here in matches that of the submitted Task Order.")]">
+<td>click</td>
+<td>css=.task-order__confirmation > div:nth-of-type(2) > .usa-input > fieldset.usa-input__choices > legend > label</td>
+<td></td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=input[type="submit"]</td>
@@ -1252,8 +594,8 @@ Imported from: AT-AT CI - TO Step 5-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5-->
+<!--Imported from: AT-AT CI - Reports - Basics
+Imported from: AT-AT CI - Create New TO-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=h3.usa-alert-heading</td>
@@ -1269,66 +611,15 @@ Imported from: AT-AT CI - TO Step 5-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5-->
+<!--Imported from: AT-AT CI - Reports - Basics-->
 <tr>
 <td>waitForElementPresent</td>
-<td>css=.usa-alert-text</td>
-<td></td>
-</tr>
-<tr>
-<td>assertText</td>
-<td>css=.usa-alert-text</td>
-<td>*Your task order form for Tatooine Energy Maintenance Systems has been submitted.*</td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.portfolio-funding</td>
-<td></td>
-</tr>
-<tr>
-<td>assertElementPresent</td>
-<td>css=.portfolio-funding</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics
-Imported from: AT-AT CI - TO Step 5-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.action-group</td>
-<td></td>
-</tr>
-<tr>
-<td>assertElementPresent</td>
-<td>css=.action-group</td>
-<td></td>
-</tr>
-<tr>
-<td>waitForPageToLoad</td>
-<td></td>
-<td></td>
-</tr>
-<!--Imported from: AT-AT CI - Report Basics-->
-<tr>
-<td>waitForElementPresent</td>
-<td>css=.icon.icon--chart-pie > svg</td>
+<td>css=.icon.icon--chart-pie</td>
 <td></td>
 </tr>
 <tr>
 <td>click</td>
-<td>css=.icon.icon--chart-pie > svg</td>
+<td>css=.icon.icon--chart-pie</td>
 <td></td>
 </tr>
 <tr>
@@ -1336,7 +627,7 @@ Imported from: AT-AT CI - TO Step 5-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics-->
+<!--Imported from: AT-AT CI - Reports - Basics-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=.sticky-cta-text > h3</td>
@@ -1352,7 +643,7 @@ Imported from: AT-AT CI - TO Step 5-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics-->
+<!--Imported from: AT-AT CI - Reports - Basics-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=.row > .col.col--grow.reporting-summary-item:nth-of-type(1) > .reporting-summary-item__value</td>
@@ -1368,7 +659,7 @@ Imported from: AT-AT CI - TO Step 5-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics-->
+<!--Imported from: AT-AT CI - Reports - Basics-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=.row > .col.col--grow.reporting-summary-item:nth-of-type(2) > .reporting-summary-item__value</td>
@@ -1386,7 +677,7 @@ Imported from: AT-AT CI - TO Step 5-->
 <td></td>
 <td></td>
 </tr>
-<!--Imported from: AT-AT CI - Report Basics-->
+<!--Imported from: AT-AT CI - Reports - Basics-->
 <tr>
 <td>waitForElementPresent</td>
 <td>css=.row > .col.col--grow.reporting-summary-item:nth-of-type(3) > h5.reporting-summary-item__header > .reporting-summary-item__header-text</td>
@@ -1396,6 +687,118 @@ Imported from: AT-AT CI - TO Step 5-->
 <td>assertText</td>
 <td>css=.row > .col.col--grow.reporting-summary-item:nth-of-type(3) > h5.reporting-summary-item__header > .reporting-summary-item__header-text</td>
 <td>*Days Remaining*</td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<!--Imported from: AT-AT CI - Reports - Basics-->
+<tr>
+<td>waitForElementPresent</td>
+<td>css=h3.h5</td>
+<td></td>
+</tr>
+<tr>
+<td>assertText</td>
+<td>css=h3.h5</td>
+<td>*IDIQ CLIN 0002 Classified IaaS/PaaS*</td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<!--Imported from: AT-AT CI - Reports - Basics-->
+<tr>
+<td>waitForElementPresent</td>
+<td>css=.jedi-clin-funding__subheader</td>
+<td></td>
+</tr>
+<tr>
+<td>assertText</td>
+<td>css=.jedi-clin-funding__subheader</td>
+<td>*Total obligated amount: $100,000.00*</td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<!--Imported from: AT-AT CI - Reports - Basics-->
+<tr>
+<td>waitForElementPresent</td>
+<td>css=.jedi-clin-funding__graph-values</td>
+<td></td>
+</tr>
+<tr>
+<td>assertElementPresent</td>
+<td>css=.jedi-clin-funding__graph-values</td>
+<td></td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<!--Imported from: AT-AT CI - Reports - Basics-->
+<tr>
+<td>waitForElementPresent</td>
+<td>css=.jedi-clin-funding__graph-values > .jedi-clin-funding__meta:nth-of-type(3) > .h3.jedi-clin-funding__meta-value</td>
+<td></td>
+</tr>
+<tr>
+<td>assertText</td>
+<td>css=.jedi-clin-funding__graph-values > .jedi-clin-funding__meta:nth-of-type(3) > .h3.jedi-clin-funding__meta-value</td>
+<td>*$100,000.00*</td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<!--Imported from: AT-AT CI - Reports - Basics-->
+<tr>
+<td>waitForElementPresent</td>
+<td>css=h3.h4</td>
+<td></td>
+</tr>
+<tr>
+<td>assertText</td>
+<td>css=h3.h4</td>
+<td>*Active Task Orders*</td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<!--Imported from: AT-AT CI - Reports - Basics-->
+<tr>
+<td>waitForElementPresent</td>
+<td>css=.jedi-clin-funding__active-task-orders</td>
+<td></td>
+</tr>
+<tr>
+<td>assertElementPresent</td>
+<td>css=.jedi-clin-funding__active-task-orders</td>
+<td></td>
+</tr>
+<tr>
+<td>waitForPageToLoad</td>
+<td></td>
+<td></td>
+</tr>
+<!--Imported from: AT-AT CI - Reports - Basics-->
+<tr>
+<td>waitForElementPresent</td>
+<td>css=button.usa-accordion-button</td>
+<td></td>
+</tr>
+<tr original-target="button.usa-accordion-button,xpath=//button[contains(text(), "Expired funding")]">
+<td>click</td>
+<td>css=button.usa-accordion-button</td>
+<td></td>
 </tr>
 <tr>
 <td>waitForPageToLoad</td>

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String, TIMESTAMP
+from sqlalchemy import Column, ForeignKey, String, TIMESTAMP, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB
 from enum import Enum
@@ -36,6 +36,12 @@ class Environment(
         "EnvironmentRole",
         back_populates="environment",
         primaryjoin="and_(EnvironmentRole.environment_id == Environment.id, EnvironmentRole.deleted == False)",
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "name", "application_id", name="environments_name_application_id_key"
+        ),
     )
 
     class ProvisioningStatus(Enum):

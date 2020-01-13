@@ -1,14 +1,8 @@
 {% from "components/icon.html" import Icon %}
 
 <footer class='app-footer'>
-  <div class='app-footer__info'>
-    <a href="#" class='icon-link app-footer__info__link' target='_blank' rel='noopener noreferrer'>
-      {{ Icon('help', classes='icon--footer') }}
-      <span>{{ "footer.jedi_help_link_text" | translate }}</span>
-    </a>
-  </div>
   {% if g.last_login %}
-    <div class="">
+    <div class="app-footer__login">
       {{ "footer.login" | translate }} <local-datetime timestamp='{{ g.last_login }}' format='MMM D YYYY H:mm Z'></local-datetime>
     </div>
   {% endif %}

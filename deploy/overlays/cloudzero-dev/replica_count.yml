@@ -1,0 +1,14 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: atst
+spec:
+  replicas: 2
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: atst-worker
+spec:
+  replicas: 1
