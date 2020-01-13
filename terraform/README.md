@@ -89,6 +89,16 @@ terraform apply
 
 Check the output for errors. Sometimes the syntax is valid, but some of the configuration may be wrong and only rejected by the Azure API at run time. If this is the case, fix your mistake, and re-run.
 
+# After running TF (Manual Steps)
+After running terraform, we need to make a manual change to the VM Scale Set that is used in the kubernetes. Terraform has a bug that is not applying this as of `v1.40` of the `azurerm` provider.
+
+In order to get the `SystemAssigned` identity to be set, it needs to be set manually in the console.
+
+Navigate to the VM Scale Set for the k8s cluster you're managing (in the console).
+
+![SystemAssigned Identity](images/system-assigned.png)
+_Just click the `Status` to `On`_
+
 # Shutting down and environment
 To shutdown and remove an environment completely as to not incur any costs you would need to run a `terraform destroy`.
 
