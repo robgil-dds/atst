@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from atst.models.user import User
 from atst.models.environment import Environment
 from atst.models.environment_role import EnvironmentRole
+from atst.utils import snake_to_camel
 
 
 class GeneralCSPException(Exception):
@@ -142,9 +143,32 @@ class BaselineProvisionException(GeneralCSPException):
         )
 
 
-class BaseCSPPayload(BaseModel):
+class AliasModel(BaseModel):
+    """
+    This provides automatic camel <-> snake conversion for serializing to/from json
+    You can override the alias generation in subclasses by providing a Config that defines
+    a fields property with a dict mapping variables to their cast names, for cases like:
+    * some_url:someURL
+    * user_object_id:objectId
+    """
+
+    class Config:
+        alias_generator = snake_to_camel
+        allow_population_by_field_name = True
+
+
+class BaseCSPPayload(AliasModel):
     # {"username": "mock-cloud", "pass": "shh"}
     creds: Dict
+
+    def dict(self, *args, **kwargs):
+        exclude = {"creds"}
+        if "exclude" not in kwargs:
+            kwargs["exclude"] = exclude
+        else:
+            kwargs["exclude"].update(exclude)
+
+        return super().dict(*args, **kwargs)
 
 
 class TenantCSPPayload(BaseCSPPayload):
@@ -156,52 +180,23 @@ class TenantCSPPayload(BaseCSPPayload):
     country_code: str
     password_recovery_email_address: str
 
-    class Config:
-        fields = {
-            "user_id": "userId",
-            "domain_name": "domainName",
-            "first_name": "firstName",
-            "last_name": "lastName",
-            "country_code": "countryCode",
-            "password_recovery_email_address": "passwordRecoveryEmailAddress",
-        }
-        allow_population_by_field_name = True
 
-
-class TenantCSPResult(BaseModel):
+class TenantCSPResult(AliasModel):
     user_id: str
     tenant_id: str
     user_object_id: str
 
     class Config:
-        allow_population_by_field_name = True
         fields = {
-            "user_id": "userId",
-            "tenant_id": "tenantId",
             "user_object_id": "objectId",
         }
 
 
-class BillingProfileAddress(BaseModel):
-    address: Dict
-    """
-    "address": {
-        "firstName": "string",
-        "lastName": "string",
-        "companyName": "string",
-        "addressLine1": "string",
-        "addressLine2": "string",
-        "addressLine3": "string",
-        "city": "string",
-        "region": "string",
-        "country": "string",
-        "postalCode": "string"
-    },
-    """
+class BillingProfileAddress(AliasModel):
 
 
-class BillingProfileCLINBudget(BaseModel):
-    clinBudget: Dict
+class BillingProfileCLINBudget(AliasModel):
+    clin_budget: Dict
     """
         "clinBudget": {
             "amount": 0,

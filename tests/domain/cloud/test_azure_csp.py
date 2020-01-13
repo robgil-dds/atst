@@ -3,7 +3,11 @@ from unittest.mock import Mock
 
 from uuid import uuid4
 
-from atst.domain.csp.cloud import AzureCloudProvider, TenantCSPResult
+from atst.domain.csp.cloud import (
+    AzureCloudProvider,
+    TenantCSPResult,
+    TenantCSPPayload,
+)
 
 from tests.mock_azure import mock_azure, AUTH_CREDENTIALS
 from tests.factories import EnvironmentFactory, ApplicationFactory
@@ -136,7 +140,19 @@ def test_create_tenant(mock_azure: AzureCloudProvider):
     }
     mock_result.status_code = 200
     mock_azure.sdk.requests.post.return_value = mock_result
-    result = mock_azure.create_tenant(None, suffix=2)
+    payload = TenantCSPPayload(
+        **dict(
+            creds={"username": "mock-cloud", "pass": "shh"},
+            user_id="123",
+            password="123",
+            domain_name="123",
+            first_name="john",
+            last_name="doe",
+            country_code="US",
+            password_recovery_email_address="password@email.com",
+        )
+    )
+    result = mock_azure.create_tenant(payload)
     print(result)
     body: TenantCSPResult = result.get("body")
     assert body.tenant_id == "60ff9d34-82bf-4f21-b565-308ef0533435"
