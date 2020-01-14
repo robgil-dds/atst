@@ -143,7 +143,7 @@ class BaselineProvisionException(GeneralCSPException):
 
 
 class BaseCSPPayload(BaseModel):
-    #{"username": "mock-cloud", "pass": "shh"}
+    # {"username": "mock-cloud", "pass": "shh"}
     creds: Dict
 
 
@@ -179,6 +179,8 @@ class BillingProfileAddress(BaseModel):
         "postalCode": "string"
     },
     """
+
+
 class BillingProfileCLINBudget(BaseModel):
     clinBudget: Dict
     """
@@ -190,7 +192,10 @@ class BillingProfileCLINBudget(BaseModel):
         }
     """
 
-class BillingProfileCSPPayload(BaseCSPPayload, BillingProfileAddress, BillingProfileCLINBudget):
+
+class BillingProfileCSPPayload(
+    BaseCSPPayload, BillingProfileAddress, BillingProfileCLINBudget
+):
     displayName: str
     poNumber: str
     invoiceEmailOptIn: str
@@ -411,7 +416,6 @@ class MockCloudProvider(CloudProviderInterface):
 
         return {"id": self._id(), "credentials": self._auth_credentials}
 
-
     def create_tenant(self, payload):
         """
         payload is an instance of TenantCSPPayload data class
@@ -431,7 +435,6 @@ class MockCloudProvider(CloudProviderInterface):
             "user_id": response["userId"],
             "user_object_id": response["objectId"],
         }
-
 
     def create_billing_profile(self, creds, tenant_admin_details, billing_owner_id):
         # call billing profile creation endpoint, specifying owner
@@ -474,7 +477,6 @@ class MockCloudProvider(CloudProviderInterface):
 
         response = {"id": "string"}
         return {"billing_profile_id": response["id"]}
-
 
     def create_or_update_user(self, auth_credentials, user_info, csp_role_id):
         self._authorize(auth_credentials)
@@ -654,7 +656,6 @@ class AzureCloudProvider(CloudProviderInterface):
             "credentials": managment_principal.password_credentials,
             "role_name": role_assignment_id,
         }
-
 
     def create_tenant(self, payload):
         # auth as SP that is allowed to create tenant? (tenant creation sp creds)

@@ -15,8 +15,8 @@ class EnvironmentRoleJobFailure(Base, mixins.JobFailureMixin):
 
     environment_role_id = Column(ForeignKey("environment_roles.id"), nullable=False)
 
+
 class PortfolioJobFailure(Base, mixins.JobFailureMixin):
     __tablename__ = "portfolio_job_failures"
 
     portfolio_id = Column(ForeignKey("portfolios.id"), nullable=False)
-

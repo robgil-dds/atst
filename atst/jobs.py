@@ -8,12 +8,10 @@ from atst.models import (
     EnvironmentRoleJobFailure,
     EnvironmentRole,
     PortfolioJobFailure,
-    FSMStates,
 )
 from atst.domain.csp.cloud import CloudProviderInterface, GeneralCSPException
 from atst.domain.environments import Environments
 from atst.domain.portfolios import Portfolios
-from atst.domain.portfolios.query import PortfolioStateMachinesQuery
 
 from atst.domain.environment_roles import EnvironmentRoles
 from atst.models.utils import claim_for_update
@@ -28,6 +26,7 @@ class RecordPortfolioFailure(celery.Task):
             )
             db.session.add(failure)
             db.session.commit()
+
 
 class RecordEnvironmentFailure(celery.Task):
     def on_failure(self, exc, task_id, args, kwargs, einfo):
@@ -62,7 +61,6 @@ def send_notification_mail(recipients, subject, body):
         )
     )
     app.mailer.send(recipients, subject, body)
-
 
 
 def do_create_environment(csp: CloudProviderInterface, environment_id=None):
@@ -149,6 +147,7 @@ def do_provision_portfolio(csp: CloudProviderInterface, portfolio_id=None):
 @celery.task(bind=True, base=RecordPortfolioFailure)
 def provision_portfolio(self, portfolio_id=None):
     do_work(do_provision_portfolio, self, app.csp.cloud, portfolio_id=portfolio_id)
+
 
 @celery.task(bind=True, base=RecordEnvironmentFailure)
 def create_environment(self, environment_id=None):

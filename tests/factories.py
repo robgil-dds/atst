@@ -343,6 +343,7 @@ class NotificationRecipientFactory(Base):
 
     email = factory.Faker("email")
 
+
 class PortfolioStateMachineFactory(Base):
     class Meta:
         model = PortfolioStateMachine
@@ -352,6 +353,6 @@ class PortfolioStateMachineFactory(Base):
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
         portfolio = kwargs.pop("portfolio", PortfolioFactory.create())
-        kwargs.update({'portfolio': portfolio})
+        kwargs.update({"portfolio": portfolio})
         fsm = super()._create(model_class, *args, **kwargs)
         return fsm

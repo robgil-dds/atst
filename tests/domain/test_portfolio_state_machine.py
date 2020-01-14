@@ -13,9 +13,11 @@ def portfolio():
     portfolio = PortfolioFactory.create()
     return portfolio
 
+
 def test_fsm_creation(portfolio):
     sm = PortfolioStateMachineFactory.create(portfolio=portfolio)
     assert sm.portfolio
+
 
 def test_fsm_transition_start(portfolio):
     sm = PortfolioStateMachineFactory.create(portfolio=portfolio)
@@ -23,16 +25,12 @@ def test_fsm_transition_start(portfolio):
     assert sm.state == FSMStates.UNSTARTED
 
     # next_state does not create the trigger callbacks !!!
-    #sm.next_state()
+    # sm.next_state()
 
     sm.init()
     assert sm.state == FSMStates.STARTING
 
     sm.start()
     assert sm.state == FSMStates.STARTED
-    #import ipdb;ipdb.set_trace()
     sm.create_tenant(a=1, b=2)
     assert sm.state == FSMStates.TENANT_CREATED
-
-
-

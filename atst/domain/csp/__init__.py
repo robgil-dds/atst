@@ -32,8 +32,12 @@ def make_csp_provider(app, csp=None):
     else:
         app.csp = MockCSP(app)
 
+
 def _stage_to_classname(stage):
-    return "".join(map(lambda word: word.capitalize(), stage.replace('_', ' ').split(" ")))
+    return "".join(
+        map(lambda word: word.capitalize(), stage.replace("_", " ").split(" "))
+    )
+
 
 def get_stage_csp_class(stage, class_type):
     """
@@ -46,4 +50,3 @@ def get_stage_csp_class(stage, class_type):
         return getattr(importlib.import_module("atst.domain.csp.cloud"), cls_name)
     except AttributeError:
         print("could not import CSP Result class <%s>" % cls_name)
-

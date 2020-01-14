@@ -17,6 +17,8 @@ from atst.jobs import (
     create_environment,
     do_provision_user,
     do_provision_portfolio,
+    do_create_environment,
+    do_create_atat_admin_user,
 )
 from atst.models.utils import claim_for_update
 from atst.domain.exceptions import ClaimFailedException
@@ -33,6 +35,7 @@ from atst.models import CSPRole, EnvironmentRole, ApplicationRoleStatus
 @pytest.fixture(autouse=True, scope="function")
 def csp():
     return Mock(wraps=MockCloudProvider({}, with_delay=False, with_failure=False))
+
 
 @pytest.fixture(scope="function")
 def portfolio():
@@ -316,21 +319,28 @@ def test_do_provision_user(csp, session):
     # I expect that the EnvironmentRole now has a csp_user_id
     assert environment_role.csp_user_id
 
-def test_dispatch_provision_portfolio(csp, session, portfolio, celery_app, celery_worker, monkeypatch):
+
+def test_dispatch_provision_portfolio(
+    csp, session, portfolio, celery_app, celery_worker, monkeypatch
+):
     sm = PortfolioStateMachineFactory.create(portfolio=portfolio)
     mock = Mock()
     monkeypatch.setattr("atst.jobs.provision_portfolio", mock)
     dispatch_provision_portfolio.run()
     mock.delay.assert_called_once_with(portfolio_id=portfolio.id)
 
+
 def test_do_provision_portfolio(csp, session, portfolio):
     do_provision_portfolio(csp=csp, portfolio_id=portfolio.id)
     session.refresh(portfolio)
     assert portfolio.state_machine
 
-def test_provision_portfolio_create_tenant(csp, session, portfolio, celery_app, celery_worker, monkeypatch):
+
+def test_provision_portfolio_create_tenant(
+    csp, session, portfolio, celery_app, celery_worker, monkeypatch
+):
     sm = PortfolioStateMachineFactory.create(portfolio=portfolio)
-    #mock = Mock()
-    #monkeypatch.setattr("atst.jobs.provision_portfolio", mock)
-    #dispatch_provision_portfolio.run()
-    #mock.delay.assert_called_once_with(portfolio_id=portfolio.id)
+    # mock = Mock()
+    # monkeypatch.setattr("atst.jobs.provision_portfolio", mock)
+    # dispatch_provision_portfolio.run()
+    # mock.delay.assert_called_once_with(portfolio_id=portfolio.id)

@@ -9,7 +9,8 @@ from atst.models.application_role import (
 )
 from atst.models.application import Application
 from atst.models.portfolio_state_machine import PortfolioStateMachine
-#from atst.models.application import Application
+
+# from atst.models.application import Application
 
 
 class PortfolioStateMachinesQuery(Query):

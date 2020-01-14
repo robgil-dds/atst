@@ -6,6 +6,7 @@ from atst.domain.portfolios import (
     Portfolios,
     PortfolioError,
     PortfolioDeletionApplicationsExistError,
+    PortfolioStateMachines,
 )
 from atst.domain.portfolio_roles import PortfolioRoles
 from atst.domain.applications import Applications
@@ -256,16 +257,16 @@ def test_for_user_does_not_include_deleted_application_roles():
     )
     assert len(Portfolios.for_user(user2)) == 0
 
+
 def test_create_state_machine(portfolio):
-    fsm = Portfolios.create_state_machine(portfolio)
+    fsm = PortfolioStateMachines.create(portfolio)
     assert fsm
+
 
 def test_get_portfolios_pending_provisioning(session):
     for x in range(5):
         portfolio = PortfolioFactory.create()
         sm = PortfolioStateMachineFactory.create(portfolio=portfolio)
-        if x == 2: sm.state = FSMStates.COMPLETED
+        if x == 2:
+            sm.state = FSMStates.COMPLETED
     assert len(Portfolios.get_portfolios_pending_provisioning()) == 4
-
-
-
