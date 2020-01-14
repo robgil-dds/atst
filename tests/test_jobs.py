@@ -24,7 +24,7 @@ from tests.factories import (
     PortfolioFactory,
     ApplicationRoleFactory,
 )
-from atst.models import EnvironmentRole, ApplicationRoleStatus
+from atst.models import CSPRole, EnvironmentRole, ApplicationRoleStatus
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -293,7 +293,7 @@ def test_do_provision_user(csp, session):
     environment_role = EnvironmentRoleFactory.create(
         environment=provisioned_environment,
         status=EnvironmentRole.Status.PENDING,
-        role="my_role",
+        role="ADMIN",
     )
 
     # When I call the user provisoning task
@@ -302,7 +302,7 @@ def test_do_provision_user(csp, session):
     session.refresh(environment_role)
     # I expect that the CSP create_or_update_user method will be called
     csp.create_or_update_user.assert_called_once_with(
-        credentials, environment_role, "my_role"
+        credentials, environment_role, CSPRole.ADMIN
     )
     # I expect that the EnvironmentRole now has a csp_user_id
     assert environment_role.csp_user_id
