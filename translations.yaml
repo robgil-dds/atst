@@ -402,7 +402,7 @@ portfolios:
   applications:
     add_application_text: Add a new application
     add_environment: Create an Environment
-    add_member: Add Team Member
+    add_member: Add New Member
     add_another_environment: Add another environment
     app_settings_text: App settings
     create_button: Create Application
