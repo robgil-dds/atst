@@ -231,15 +231,15 @@ class BillingProfileCSPPayload(BaseCSPPayload):
 
 
 class BillingProfileCreateCSPResult(AliasModel):
-    location: str
+    billing_profile_validate_url: str
     retry_after: int
 
     class Config:
-        fields = {"location": "Location", "retry_after": "Retry-After"}
+        fields = {"billing_profile_validate_url": "Location", "retry_after": "Retry-After"}
 
 
 class BillingProfileVerifyCSPPayload(BaseCSPPayload):
-    location: str
+    billing_profile_validate_url: str
 
 
 class BillingInvoiceSection(AliasModel):
@@ -268,6 +268,70 @@ class BillingProfileCSPResult(AliasModel):
             "billing_profile_properties": "properties",
         }
 
+
+class BillingRoleAssignmentCSPPayload(BaseCSPPayload):
+    tenant_id: str
+    user_object_id: str
+    billing_account_name: str
+    billing_profile_name: str
+
+
+class BillingRoleAssignmentCSPResult(AliasModel):
+    billing_role_assignment_id: str
+    billing_role_assignment_name: str
+
+    class Config:
+        fields = {
+            "billing_role_assignment_id": "id",
+            "billing_role_assignment_name": "name",
+        }
+
+class EnableTaskOrderBillingCSPPayload(BaseCSPPayload):
+    billing_account_name: str
+    billing_profile_name: str
+
+class EnableTaskOrderBillingCSPResult(AliasModel):
+    task_order_billing_validation_url: str
+    retry_after: int
+
+    class Config:
+        fields = {"task_order_billing_validation_url": "Location", "retry_after": "Retry-After"}
+
+class VerifyTaskOrderBillingCSPPayload(BaseCSPPayload):
+    task_order_billing_validation_url: str
+
+class BillingProfileEnabledPlanDetails(AliasModel):
+    enabled_azure_plans: List[Dict]
+
+
+class BillingProfileEnabledCSPResult(AliasModel):
+    billing_profile_id: str
+    billing_profile_name: str
+    billing_profile_enabled_plan_details: BillingProfileEnabledPlanDetails
+
+    class Config:
+        fields = {
+            "billing_profile_id": "id",
+            "billing_profile_name": "name",
+            "billing_profile_enabled_plan_details": "properties",
+        }
+
+class ReportCLINCSPPayload(BaseCSPPayload):
+    amount: float
+    start_date: str
+    end_date: str
+    clin_type: str
+    task_order_id: str
+    billing_account_name: str
+    billing_profile_name: str
+
+class ReportCLINCSPResult(AliasModel):
+    reported_clin_name: str
+
+    class Config:
+        fields = {
+            "reported_clin_name": "name",
+        }
 
 class CloudProviderInterface:
     def root_creds(self) -> Dict:
@@ -705,7 +769,6 @@ class AzureCloudProvider(CloudProviderInterface):
         create_tenant_body = payload.dict(by_alias=True)
 
         create_tenant_headers = {
-            "Content-Type": "application/json",
             "Authorization": f"Bearer {sp_token}",
         }
 
@@ -730,7 +793,6 @@ class AzureCloudProvider(CloudProviderInterface):
         create_billing_account_body = payload.dict(by_alias=True)
 
         create_billing_account_headers = {
-            "Content-Type": "application/json",
             "Authorization": f"Bearer {sp_token}",
         }
 
@@ -745,7 +807,11 @@ class AzureCloudProvider(CloudProviderInterface):
         )
 
         if result.status_code == 202:
+            # 202 has location/retry after headers
             return self._ok(BillingProfileCreateCSPResult(**result.headers))
+        elif result.status_code == 200:
+            # NB: Swagger docs imply call can sometimes resolve immediately
+            return self._ok(BillingProfileCSPResult(**result.json()))
         else:
             return self._error(result.json())
 
@@ -760,56 +826,116 @@ class AzureCloudProvider(CloudProviderInterface):
             "Authorization": f"Bearer {sp_token}",
         }
 
-        result = self.sdk.requests.get(payload.location, headers=auth_header)
+        result = self.sdk.requests.get(payload.billing_profile_validate_url, headers=auth_header)
 
-        if result.status_code == 200:
+        if result.status_code == 202:
+            # 202 has location/retry after headers
+            return self._ok(BillingProfileCreateCSPResult(**result.headers))
+        elif result.status_code == 200:
             return self._ok(BillingProfileCSPResult(**result.json()))
         else:
             return self._error(result.json())
 
-    def create_billing_owner(self, creds, tenant_admin_details):
-        # authenticate as tenant_admin
-        # create billing owner identity
-
-        # TODO: Lookup response format
-        # Managed service identity?
-        response = {"id": "string"}
-        return self._ok({"billing_owner_id": response["id"]})
-
-    def assign_billing_owner(self, creds, billing_owner_id, tenant_id):
-        # TODO: Do we source role definition ID from config, api or self-defined?
-        # TODO: If from api,
-        """
-        {
-            "principalId": "string",
-            "principalTenantId": "string",
-            "billingRoleDefinitionId": "string"
-        }
-        """
-
-        return self.ok()
-
-    def report_clin(self, creds, clin_id, clin_amount, clin_start, clin_end, clin_to):
-        # should consumer be responsible for reporting each clin or
-        # should this take a list and manage the sequential reporting?
-        """ Payload
-        {
-            "enabledAzurePlans": [
-                {
-                "skuId": "string"
-                }
-            ],
-            "clinBudget": {
-                "amount": 0,
-                "startDate": "2019-12-18T16:47:40.909Z",
-                "endDate": "2019-12-18T16:47:40.909Z",
-                "externalReferenceId": "string"
+    def grant_billing_profile_tenant_access(self, payload: BillingRoleAssignmentCSPPayload):
+        sp_token = self._get_sp_token(payload.creds)
+        request_body = {
+            "properties": {
+                "principalTenantId": payload.tenant_id,  # from tenant creation
+                "principalId": payload.user_object_id,  # from tenant creationn
+                "roleDefinitionId": f"/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/billingRoleDefinitions/40000000-aaaa-bbbb-cccc-100000000000",
             }
         }
-        """
 
-        # we don't need any of the returned info for this
-        return self._ok()
+        headers = {
+            "Authorization": f"Bearer {sp_token}",
+        }
+
+        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/createBillingRoleAssignment?api-version=2019-10-01-preview"
+
+        result = self.sdk.requests.post(url, headers=headers, json=request_body)
+        if result.status_code == 201:
+            return self._ok(BillingRoleAssignmentCSPResult(**result.json()))
+        else:
+            return self._error(result.json())
+
+    def enable_task_order_billing(self, payload: EnableTaskOrderBillingCSPPayload):
+        sp_token = self._get_sp_token(payload.creds)
+        request_body = [
+            {
+                "op": "replace",
+                "path": "/enabledAzurePlans",
+                "value": [
+                    {
+                        "skuId": "0001"
+                    }
+                ]
+            }
+        ]
+
+        request_headers = {
+            "Authorization": f"Bearer {sp_token}",
+        }
+
+        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}?api-version=2019-10-01-preview"
+
+        result = self.sdk.requests.patch(url, headers=request_headers, json=request_body)
+
+        if result.status_code == 202:
+            # 202 has location/retry after headers
+            return self._ok(BillingProfileCreateCSPResult(**result.headers))
+        elif result.status_code == 200:
+            return self._ok(BillingProfileEnabledCSPResult(**result.json()))
+        else:
+            return self._error(result.json())
+
+    def validate_task_order_billing_enabled(self, payload: VerifyTaskOrderBillingCSPPayload):
+        sp_token = self._get_sp_token(payload.creds)
+        if sp_token is None:
+            raise AuthenticationException(
+                "Could not resolve token for task order billing validation"
+            )
+
+        auth_header = {
+            "Authorization": f"Bearer {sp_token}",
+        }
+
+        result = self.sdk.requests.get(payload.task_order_billing_validation_url, headers=auth_header)
+
+        if result.status_code == 202:
+            # 202 has location/retry after headers
+            return self._ok(EnableTaskOrderBillingCSPResult(**result.headers))
+        elif result.status_code == 200:
+            return self._ok(BillingProfileEnabledCSPResult(**result.json()))
+        else:
+            return self._error(result.json())
+
+    def report_clin(self, payload: ReportCLINCSPPayload):
+        sp_token = self._get_sp_token(payload.creds)
+        if sp_token is None:
+            raise AuthenticationException(
+                "Could not resolve token for task order billing validation"
+            )
+
+        request_body = {
+            "properties": {
+                "amount": payload.amount,
+                "startDate": payload.start_date,
+                "endDate": payload.end_date
+            }
+        }
+
+        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/instructions/{payload.task_order_id}:CLIN00{payload.clin_type}?api-version=2019-10-01-preview"
+
+        auth_header = {
+            "Authorization": f"Bearer {sp_token}",
+        }
+
+        result = self.sdk.requests.put(url, headers=auth_header, json=request_body)
+
+        if result.status_code == 200:
+            return self._ok(ReportCLINCSPResult(**result.json()))
+        else:
+            return self._error(result.json())
 
     def create_remote_admin(self, creds, tenant_details):
         # create app/service principal within tenant, with name constructed from tenant details
