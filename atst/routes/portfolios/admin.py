@@ -112,7 +112,7 @@ def admin(portfolio_id):
 # Updating PPoC is a post-MVP feature
 # @portfolios_bp.route("/portfolios/<portfolio_id>/update_ppoc", methods=["POST"])
 @user_can(Permissions.EDIT_PORTFOLIO_POC, message="update portfolio ppoc")
-def update_ppoc(portfolio_id):
+def update_ppoc(portfolio_id):  # pragma: no cover
     role_id = http_request.form.get("role_id")
 
     portfolio = Portfolios.get(g.current_user, portfolio_id)
