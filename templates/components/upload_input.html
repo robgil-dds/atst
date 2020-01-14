@@ -15,7 +15,7 @@
   <div>
     <div v-show="valid" class="uploaded-file">
       {{ Icon("ok") }}
-      <a class="uploaded-file__name" v-html="baseName" v-bind:href="downloadLink"></a>
+      <a class="uploaded-file__name" v-text="baseName" v-bind:href="downloadLink"></a>
       <a href="#" class="uploaded-file__remove" v-on:click="removeAttachment">Remove</a>
     </div>
     <div v-show="valid === false" v-bind:class='{ "usa-input": true, "usa-input--error": showErrors }'>
