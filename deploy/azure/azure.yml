@@ -15,7 +15,6 @@ spec:
   selector:
     matchLabels:
       role: web
-  replicas: 4
   strategy:
     type: RollingUpdate
   template:
@@ -169,7 +168,6 @@ spec:
   selector:
     matchLabels:
       role: worker
-  replicas: 2
   strategy:
     type: RollingUpdate
   template:
