@@ -96,11 +96,11 @@ def test_scoped_portfolio_for_admin_missing_view_apps_perms(portfolio_owner, por
 def test_scoped_portfolio_returns_all_applications_for_portfolio_admin(
     portfolio, portfolio_owner
 ):
-    for _ in range(5):
+    for i in range(5):
         Applications.create(
             portfolio.owner,
             portfolio,
-            "My Application",
+            f"My Application {i}",
             "My application",
             ["dev", "staging", "prod"],
         )
@@ -119,11 +119,11 @@ def test_scoped_portfolio_returns_all_applications_for_portfolio_admin(
 def test_scoped_portfolio_returns_all_applications_for_portfolio_owner(
     portfolio, portfolio_owner
 ):
-    for _ in range(5):
+    for i in range(5):
         Applications.create(
             portfolio.owner,
             portfolio,
-            "My Application",
+            f"My Application {i}",
             "My application",
             ["dev", "staging", "prod"],
         )
