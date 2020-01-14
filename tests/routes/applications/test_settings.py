@@ -212,7 +212,7 @@ def test_get_members_data(app, client, user_session):
             {
                 "environment_id": str(environment.id),
                 "environment_name": environment.name,
-                "role": env_role.role,
+                "role": env_role.role.value,
             }
         ]
         assert member["role_status"]
