@@ -42,7 +42,9 @@ def filter_members_data(members_list):
     members_data = []
     for member in members_list:
         permission_sets = filter_perm_sets_data(member)
-        ppoc = PermissionSets.PORTFOLIO_POC in member.permission_sets
+        ppoc = (
+            PermissionSets.get(PermissionSets.PORTFOLIO_POC) in member.permission_sets
+        )
         member_data = {
             "role_id": member.id,
             "user_name": member.user_name,
