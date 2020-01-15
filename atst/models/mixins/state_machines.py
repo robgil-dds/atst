@@ -10,7 +10,6 @@ class StageStates(Enum):
 class AzureStages(Enum):
     TENANT = "tenant"
     BILLING_PROFILE = "billing profile"
-    ADMIN_SUBSCRIPTION = "admin subscription"
 
 
 def _build_csp_states(csp_stages):
@@ -31,14 +30,14 @@ def _build_csp_states(csp_stages):
 
 FSMStates = Enum("FSMStates", _build_csp_states(AzureStages))
 
+compose_state = lambda csp_stage, state: getattr(
+    FSMStates, "_".join([csp_stage.name, state.name])
+)
+
 
 def _build_transitions(csp_stages):
     transitions = []
     states = []
-    compose_state = lambda csp_stage, state: getattr(
-        FSMStates, "_".join([csp_stage.name, state.name])
-    )
-
     for stage_i, csp_stage in enumerate(csp_stages):
         for state in StageStates:
             states.append(
@@ -99,6 +98,24 @@ class FSMMixin:
         {"trigger": "fail", "source": "*", "dest": FSMStates.FAILED,},
     ]
 
+    def fail_stage(self, stage):
+        fail_trigger = "fail" + stage
+        if fail_trigger in self.machine.get_triggers(self.current_state.name):
+            self.trigger(fail_trigger)
+
+    def finish_stage(self, stage):
+        finish_trigger = "finish_" + stage
+        if finish_trigger in self.machine.get_triggers(self.current_state.name):
+            self.trigger(finish_trigger)
+
+    def _get_first_stage_create_trigger(self):
+        return list(
+            filter(
+                lambda trigger: trigger.startswith("create_"),
+                self.machine.get_triggers(FSMStates.STARTED.name),
+            )
+        )[0]
+
     def prepare_init(self, event):
         pass
 
@@ -125,13 +142,3 @@ class FSMMixin:
 
     def after_reset(self, event):
         pass
-
-    def fail_stage(self, stage):
-        fail_trigger = "fail" + stage
-        if fail_trigger in self.machine.get_triggers(self.current_state.name):
-            self.trigger(fail_trigger)
-
-    def finish_stage(self, stage):
-        finish_trigger = "finish_" + stage
-        if finish_trigger in self.machine.get_triggers(self.current_state.name):
-            self.trigger(finish_trigger)

@@ -84,13 +84,11 @@ class PortfolioStateMachine(
 
             elif self.current_state == FSMStates.STARTED:
                 # get the first trigger that starts with 'create_'
-                create_trigger = list(
-                    filter(
-                        lambda trigger: trigger.startswith("create_"),
-                        self.machine.get_triggers(FSMStates.STARTED.name),
-                    )
-                )[0]
-                self.trigger(create_trigger)
+                create_trigger = self._get_first_stage_create_trigger()
+                if create_trigger:
+                    self.trigger(create_trigger)
+                else:
+                    self.fail_stage(stage)
 
         elif state_obj.is_IN_PROGRESS:
             pass
