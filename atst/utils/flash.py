@@ -129,8 +129,8 @@ MESSAGES = {
         "category": "success",
     },
     "resend_portfolio_invitation_error": {
-        "title_template": "Portfolio invitation error",
-        "message_template": "There was an error processing the invitation for {{ user_name }}.",
+        "title": "flash.portfolio_invite.error.title",
+        "message": "flash.portfolio_invite.error.message",
         "category": "error",
     },
     "revoked_portfolio_access": {
@@ -159,15 +159,13 @@ MESSAGES = {
         "category": "success",
     },
     "update_portfolio_member": {
-        "title_template": "Success!",
-        "message_template": """
-        You have successfully updated access permissions for {{ member_name }}.
-        """,
+        "title": "flash.portfolio_member.update.title",
+        "message": "flash.portfolio_member.update.message",
         "category": "success",
     },
     "update_portfolio_member_error": {
-        "title_template": "Permissions for {{ member_name }} could not be updated",
-        "message_template": "An unexpected problem occurred with your request, please try again. If the problem persists, contact an administrator.",
+        "title": "flash.portfolio_member.update_error.title",
+        "message": "flash.portfolio_member.update_error.message",
         "category": "error",
     },
     "updated_application_team_settings": {
