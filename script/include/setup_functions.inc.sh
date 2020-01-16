@@ -22,7 +22,7 @@ check_for_existing_virtual_environment() {
   local target_python_version_regex="^Python ${python_version}"
 
   # Check for existing venv, and if one exists, save the Python version string
-  existing_venv_version=$($(pipenv --py) --version)
+  existing_venv_version=$($(pipenv --py 2> /dev/null) --version)
   if [ "$?" = "0" ]; then
     # Existing venv; see if the Python version matches
     if [[ "${existing_venv_version}" =~ ${target_python_version_regex} ]]; then
