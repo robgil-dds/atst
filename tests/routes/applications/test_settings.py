@@ -401,10 +401,10 @@ def test_create_member(monkeypatch, client, user_session, session):
             "user_data-last_name": user.last_name,
             "user_data-dod_id": user.dod_id,
             "user_data-email": user.email,
-            "environment_roles-0-environment_id": env.id,
+            "environment_roles-0-environment_id": str(env.id),
             "environment_roles-0-role": "ADMIN",
             "environment_roles-0-environment_name": env.name,
-            "environment_roles-1-environment_id": env_1.id,
+            "environment_roles-1-environment_id": str(env_1.id),
             "environment_roles-1-role": NO_ACCESS,
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
@@ -527,13 +527,13 @@ def test_update_member(client, user_session, session):
             application_role_id=app_role.id,
         ),
         data={
-            "environment_roles-0-environment_id": env.id,
+            "environment_roles-0-environment_id": str(env.id),
             "environment_roles-0-role": "CONTRIBUTOR",
             "environment_roles-0-environment_name": env.name,
-            "environment_roles-1-environment_id": env_1.id,
+            "environment_roles-1-environment_id": str(env_1.id),
             "environment_roles-1-environment_name": env_1.name,
             "environment_roles-1-disabled": "True",
-            "environment_roles-2-environment_id": env_2.id,
+            "environment_roles-2-environment_id": str(env_2.id),
             "environment_roles-2-role": "BILLING_READ",
             "environment_roles-2-environment_name": env_2.name,
             "perms_env_mgmt": True,
@@ -694,10 +694,10 @@ def test_handle_create_member(monkeypatch, set_g, session):
             "user_data-last_name": user.last_name,
             "user_data-dod_id": user.dod_id,
             "user_data-email": user.email,
-            "environment_roles-0-environment_id": env.id,
+            "environment_roles-0-environment_id": str(env.id),
             "environment_roles-0-role": "ADMIN",
             "environment_roles-0-environment_name": env.name,
-            "environment_roles-1-environment_id": env_1.id,
+            "environment_roles-1-environment_id": str(env_1.id),
             "environment_roles-1-role": NO_ACCESS,
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
@@ -731,10 +731,10 @@ def test_handle_update_member_success(set_g):
 
     form_data = ImmutableMultiDict(
         {
-            "environment_roles-0-environment_id": env.id,
+            "environment_roles-0-environment_id": str(env.id),
             "environment_roles-0-role": "ADMIN",
             "environment_roles-0-environment_name": env.name,
-            "environment_roles-1-environment_id": env_1.id,
+            "environment_roles-1-environment_id": str(env_1.id),
             "environment_roles-1-role": NO_ACCESS,
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
@@ -742,6 +742,7 @@ def test_handle_update_member_success(set_g):
             "perms_del_env": True,
         }
     )
+
     handle_update_member(application.id, app_role.id, form_data)
 
     assert len(application.roles) == 1
@@ -771,10 +772,10 @@ def test_handle_update_member_with_error(set_g, monkeypatch, mock_logger):
 
     form_data = ImmutableMultiDict(
         {
-            "environment_roles-0-environment_id": env.id,
+            "environment_roles-0-environment_id": str(env.id),
             "environment_roles-0-role": "ADMIN",
             "environment_roles-0-environment_name": env.name,
-            "environment_roles-1-environment_id": env_1.id,
+            "environment_roles-1-environment_id": str(env_1.id),
             "environment_roles-1-role": NO_ACCESS,
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
