@@ -108,13 +108,17 @@ class PortfolioStateMachine(
             # the create trigger for the next stage should be in the available
             # triggers for the current state
             triggers = self.machine.get_triggers(state_obj.name)
-            create_trigger = list(
-                filter(
-                    lambda trigger: trigger.startswith("create_"),
-                    self.machine.get_triggers(self.state.name),
-                )
-            )[0]
-            if create_trigger:
+            try:
+                create_trigger = list(
+                    filter(
+                        lambda trigger: trigger.startswith("create_"),
+                        self.machine.get_triggers(self.state.name),
+                    )
+                )[0]
+            except IndexError:
+                # are we done ?
+                pass
+            else:
                 self.trigger(create_trigger, **kwargs)
 
     # @with_payload
