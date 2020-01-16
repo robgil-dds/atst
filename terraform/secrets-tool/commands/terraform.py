@@ -1,7 +1,5 @@
-import os
 import click
 import logging
-import subprocess
 
 from utils.keyvault.secrets import SecretsClient
 from utils.terraform.wrapper import TFWrapper
