@@ -186,11 +186,29 @@ class TenantCSPResult(AliasModel):
     tenant_id: str
     user_object_id: str
 
+    tenant_admin_username: str
+    tenant_admin_password: str
+
     class Config:
         fields = {
             "user_object_id": "objectId",
         }
 
+    def dict(self, *args, **kwargs):
+        exclude = {"tenant_admin_username", "tenant_admin_password"}
+        if "exclude" not in kwargs:
+            kwargs["exclude"] = exclude
+        else:
+            kwargs["exclude"].update(exclude)
+
+        return super().dict(*args, **kwargs)
+
+    def get_creds(self):
+        return {
+            "tenant_admin_username": self.tenant_admin_username,
+            "tenant_admin_password": self.tenant_admin_password,
+            "tenant_id": self.tenant_id
+        }
 
 class BillingProfileAddress(AliasModel):
     company_name: str
@@ -215,7 +233,7 @@ class BillingProfileCLINBudget(AliasModel):
 
 class BillingProfileCSPPayload(BaseCSPPayload):
     tenant_id: str
-    display_name: str
+    billing_profile_display_name: str
     enabled_azure_plans: Optional[List[str]]
     address: BillingProfileAddress
 
@@ -228,6 +246,11 @@ class BillingProfileCSPPayload(BaseCSPPayload):
         to rely on a validator to ensure this has an empty value when not specified
         """
         return v or []
+
+    class Config:
+        fields = {
+            "billing_profile_display_name": "displayName"
+        }
 
 
 class BillingProfileCreateCSPResult(AliasModel):
@@ -252,8 +275,13 @@ class BillingInvoiceSection(AliasModel):
 
 class BillingProfileProperties(AliasModel):
     address: BillingProfileAddress
-    display_name: str
+    billing_profile_display_name: str
     invoice_sections: List[BillingInvoiceSection]
+
+    class Config:
+        fields = {
+            "billing_profile_display_name": "displayName"
+        }
 
 
 class BillingProfileCSPResult(AliasModel):
@@ -269,14 +297,14 @@ class BillingProfileCSPResult(AliasModel):
         }
 
 
-class BillingRoleAssignmentCSPPayload(BaseCSPPayload):
+class BillingProfileTenantAccessCSPPayload(BaseCSPPayload):
     tenant_id: str
     user_object_id: str
     billing_account_name: str
     billing_profile_name: str
 
 
-class BillingRoleAssignmentCSPResult(AliasModel):
+class BillingProfileTenantAccessCSPResult(AliasModel):
     billing_role_assignment_id: str
     billing_role_assignment_name: str
 
@@ -286,7 +314,7 @@ class BillingRoleAssignmentCSPResult(AliasModel):
             "billing_role_assignment_name": "name",
         }
 
-class EnableTaskOrderBillingCSPPayload(BaseCSPPayload):
+class TaskOrderBillingCSPPayload(BaseCSPPayload):
     billing_account_name: str
     billing_profile_name: str
 
@@ -297,14 +325,14 @@ class EnableTaskOrderBillingCSPResult(AliasModel):
     class Config:
         fields = {"task_order_billing_validation_url": "Location", "retry_after": "Retry-After"}
 
-class VerifyTaskOrderBillingCSPPayload(BaseCSPPayload):
+class TaskOrderBillingCSPResult(BaseCSPPayload):
     task_order_billing_validation_url: str
 
 class BillingProfileEnabledPlanDetails(AliasModel):
     enabled_azure_plans: List[Dict]
 
 
-class BillingProfileEnabledCSPResult(AliasModel):
+class TaskOrderBillingCSPResult(AliasModel):
     billing_profile_id: str
     billing_profile_name: str
     billing_profile_enabled_plan_details: BillingProfileEnabledPlanDetails
@@ -534,9 +562,11 @@ class MockCloudProvider(CloudProviderInterface):
             "tenant_id": response["tenantId"],
             "user_id": response["userId"],
             "user_object_id": response["objectId"],
+            "tenant_admin_username": "test",
+            "tenant_admin_password": "test"
         }
 
-    def create_billing_profile(self, creds, tenant_admin_details, billing_owner_id):
+    def create_billing_profile(self, payload):
         # call billing profile creation endpoint, specifying owner
         # Payload:
         """
@@ -576,7 +606,55 @@ class MockCloudProvider(CloudProviderInterface):
         self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
 
         response = {"id": "string"}
-        return {"billing_profile_id": response["id"]}
+        # return {"billing_profile_id": response["id"]}
+        return {
+            'id': '/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB',
+            'name': 'KQWI-W2SU-BG7-TGB',
+            'properties': {
+                'address': {
+                    'addressLine1': '123 S Broad Street, Suite 2400',
+                    'city': 'Philadelphia',
+                    'companyName': 'Promptworks',
+                    'country': 'US',
+                    'postalCode': '19109',
+                    'region': 'PA'
+                },
+                'currency': 'USD',
+                'displayName': 'Test Billing Profile',
+                'enabledAzurePlans': [],
+                'hasReadAccess': True,
+                'invoiceDay': 5,
+                'invoiceEmailOptIn': False,
+                'invoiceSections': [{
+                    'id': '/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB/invoiceSections/CHCO-BAAR-PJA-TGB',
+                    'name': 'CHCO-BAAR-PJA-TGB',
+                    'properties': {
+                        'displayName': 'Test Billing Profile'
+                    },
+                    'type': 'Microsoft.Billing/billingAccounts/billingProfiles/invoiceSections'
+                }]
+            },
+            'type': 'Microsoft.Billing/billingAccounts/billingProfiles'
+        }
+
+    def create_billing_profile_tenant_access(self, payload):
+        self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
+        self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
+        self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
+
+        return {
+            "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB/billingRoleAssignments/40000000-aaaa-bbbb-cccc-100000000000_0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
+            "name": "40000000-aaaa-bbbb-cccc-100000000000_0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
+            "properties": {
+                "createdOn": "2020-01-14T14:39:26.3342192+00:00",
+                "createdByPrincipalId": "82e2b376-3297-4096-8743-ed65b3be0b03",
+                "principalId": "0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
+                "principalTenantId": "60ff9d34-82bf-4f21-b565-308ef0533435",
+                "roleDefinitionId": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB/billingRoleDefinitions/40000000-aaaa-bbbb-cccc-100000000000",
+                "scope": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB"
+            },
+            "type": "Microsoft.Billing/billingRoleAssignments"
+        }
 
     def create_or_update_user(self, auth_credentials, user_info, csp_role_id):
         self._authorize(auth_credentials)
@@ -633,7 +711,7 @@ class MockCloudProvider(CloudProviderInterface):
 
     @property
     def _auth_credentials(self):
-        return {"username": "mock-cloud", "pass": "shh"}
+        return {"username": "mock-cloud", "password": "shh"}
 
     def _authorize(self, credentials):
         self._delay(1, 5)
@@ -778,6 +856,9 @@ class AzureCloudProvider(CloudProviderInterface):
             headers=create_tenant_headers,
         )
 
+        print('create tenant result')
+        print(result.json())
+
         if result.status_code == 200:
             return self._ok(TenantCSPResult(**result.json()))
         else:
@@ -836,7 +917,7 @@ class AzureCloudProvider(CloudProviderInterface):
         else:
             return self._error(result.json())
 
-    def grant_billing_profile_tenant_access(self, payload: BillingRoleAssignmentCSPPayload):
+    def create_billing_profile_tenant_access(self, payload: BillingProfileTenantAccessCSPPayload):
         sp_token = self._get_sp_token(payload.creds)
         request_body = {
             "properties": {
@@ -854,11 +935,11 @@ class AzureCloudProvider(CloudProviderInterface):
 
         result = self.sdk.requests.post(url, headers=headers, json=request_body)
         if result.status_code == 201:
-            return self._ok(BillingRoleAssignmentCSPResult(**result.json()))
+            return self._ok(BillingProfileTenantAccessCSPResult(**result.json()))
         else:
             return self._error(result.json())
 
-    def enable_task_order_billing(self, payload: EnableTaskOrderBillingCSPPayload):
+    def enable_task_order_billing(self, payload: TaskOrderBillingCSPPayload):
         sp_token = self._get_sp_token(payload.creds)
         request_body = [
             {
@@ -884,7 +965,7 @@ class AzureCloudProvider(CloudProviderInterface):
             # 202 has location/retry after headers
             return self._ok(BillingProfileCreateCSPResult(**result.headers))
         elif result.status_code == 200:
-            return self._ok(BillingProfileEnabledCSPResult(**result.json()))
+            return self._ok(TaskOrderBillingCSPResult(**result.json()))
         else:
             return self._error(result.json())
 
@@ -903,13 +984,13 @@ class AzureCloudProvider(CloudProviderInterface):
 
         if result.status_code == 202:
             # 202 has location/retry after headers
-            return self._ok(EnableTaskOrderBillingCSPResult(**result.headers))
+            return self._ok(TaskOrderBillingCSPResult(**result.headers))
         elif result.status_code == 200:
-            return self._ok(BillingProfileEnabledCSPResult(**result.json()))
+            return self._ok(TaskOrderBillingCSPResult(**result.json()))
         else:
             return self._error(result.json())
 
-    def report_clin(self, payload: ReportCLINCSPPayload):
+    def create_billing_instruction(self, payload: ReportCLINCSPPayload):
         sp_token = self._get_sp_token(payload.creds)
         if sp_token is None:
             raise AuthenticationException(
@@ -1022,7 +1103,9 @@ class AzureCloudProvider(CloudProviderInterface):
             return sub_id_match.group(1)
 
     def _get_sp_token(self, creds):
-        home_tenant_id = creds.get("home_tenant_id")
+        home_tenant_id = creds.get(
+            "home_tenant_id"
+        )
         client_id = creds.get("client_id")
         secret_key = creds.get("secret_key")
 

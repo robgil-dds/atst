@@ -10,6 +10,9 @@ class StageStates(Enum):
 class AzureStages(Enum):
     TENANT = "tenant"
     BILLING_PROFILE = "billing profile"
+    BILLING_PROFILE_TENANT_ACCESS = "billing profile tenant access"
+    TASK_ORDER_BILLING = "task order billing"
+    BILLING_INSTRUCTION = "billing instruction"
 
 
 def _build_csp_states(csp_stages):

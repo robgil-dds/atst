@@ -1,11 +1,12 @@
 import pytest
+import re
 
 from tests.factories import (
     PortfolioFactory,
     PortfolioStateMachineFactory,
 )
 
-from atst.models import FSMStates
+from atst.models import FSMStates, PortfolioStateMachine
 from atst.models.mixins.state_machines import AzureStages, StageStates, compose_state
 from atst.domain.csp import get_stage_csp_class
 
@@ -78,7 +79,7 @@ def test_state_machine_initialization(portfolio):
 
 
 def test_fsm_transition_start(portfolio):
-    sm = PortfolioStateMachineFactory.create(portfolio=portfolio)
+    sm: PortfolioStateMachine = PortfolioStateMachineFactory.create(portfolio=portfolio)
     assert sm.portfolio
     assert sm.state == FSMStates.UNSTARTED
 
@@ -87,5 +88,48 @@ def test_fsm_transition_start(portfolio):
 
     sm.start()
     assert sm.state == FSMStates.STARTED
-    sm.create_tenant(a=1, b=2)
+
+    # Should source all creds for portfolio? might be easier to manage than per-step specific ones
+    creds = {"username": "mock-cloud", "password": "shh"}
+    if portfolio.csp_data is not None:
+        csp_data = portfolio.csp_data
+    else:
+        csp_data = {}
+
+    ppoc = portfolio.owner
+    user_id = f"{ppoc.first_name[0]}{ppoc.last_name}".lower()
+    domain_name = re.sub("[^0-9a-zA-Z]+", "", portfolio.name).lower()
+
+    portfolio_data = {
+        "user_id": user_id,
+        "password": "jklfsdNCVD83nklds2#202",
+        "domain_name": domain_name,
+        "first_name": ppoc.first_name,
+        "last_name": ppoc.last_name,
+        "country_code": "US",
+        "password_recovery_email_address": ppoc.email,
+        "address": {
+            "company_name": "",
+            "address_line_1": "",
+            "city": "",
+            "region": "",
+            "country": "",
+            "postal_code": "",
+        },
+        "billing_profile_display_name": "My Billing Profile",
+    }
+
+    collected_data = dict(list(csp_data.items()) + list(portfolio_data.items()))
+    sm.trigger_next_transition(creds=creds, csp_data=collected_data)
+
     assert sm.state == FSMStates.TENANT_CREATED
+    assert portfolio.csp_data.get("tenant_id", None) is not None
+
+    if portfolio.csp_data is not None:
+        csp_data = portfolio.csp_data
+    else:
+        csp_data = {}
+    collected_data = dict(list(csp_data.items()) + list(portfolio_data.items()))
+    sm.trigger_next_transition(creds=creds, csp_data=collected_data)
+    assert sm.state == FSMStates.BILLING_PROFILE_CREATED
+

@@ -153,7 +153,7 @@ def test_create_tenant(mock_azure: AzureCloudProvider):
     mock_azure.sdk.requests.post.return_value = mock_result
     payload = TenantCSPPayload(
         **dict(
-            creds={"username": "mock-cloud", "pass": "shh"},
+            creds={"username": "mock-cloud", "password": "shh"},
             user_id="admin",
             password="JediJan13$coot",
             domain_name="jediccpospawnedtenant2",
@@ -190,7 +190,7 @@ def test_create_billing_profile(mock_azure: AzureCloudProvider):
                 country="US",
                 postal_code="19109",
             ),
-            creds={"username": "mock-cloud", "pass": "shh"},
+            creds={"username": "mock-cloud", "password": "shh"},
             tenant_id="60ff9d34-82bf-4f21-b565-308ef0533435",
             display_name="Test Billing Profile",
         )
@@ -258,7 +258,7 @@ def test_validate_billing_profile_creation(mock_azure: AzureCloudProvider):
     )
 
 
-def test_grant_billing_profile_tenant_access(mock_azure: AzureCloudProvider):
+def test_create_billing_profile_tenant_access(mock_azure: AzureCloudProvider):
     mock_azure.sdk.adal.AuthenticationContext.return_value.context.acquire_token_with_client_credentials.return_value = {
         "accessToken": "TOKEN"
     }
@@ -295,7 +295,7 @@ def test_grant_billing_profile_tenant_access(mock_azure: AzureCloudProvider):
         )
     )
 
-    result = mock_azure.grant_billing_profile_tenant_access(payload)
+    result = mock_azure.create_billing_profile_tenant_access(payload)
     body: BillingRoleAssignmentCSPResult = result.get("body")
     assert (
         body.billing_role_assignment_name
@@ -303,7 +303,7 @@ def test_grant_billing_profile_tenant_access(mock_azure: AzureCloudProvider):
     )
 
 
-def test_enable_task_order_billing(mock_azure: AzureCloudProvider):
+def test_create_task_order_billing(mock_azure: AzureCloudProvider):
     mock_azure.sdk.adal.AuthenticationContext.return_value.context.acquire_token_with_client_credentials.return_value = {
         "accessToken": "TOKEN"
     }
@@ -401,7 +401,7 @@ def test_validate_task_order_billing_enabled(mock_azure):
     )
 
 
-def test_report_clin(mock_azure: AzureCloudProvider):
+def test_create_billing_instruction(mock_azure: AzureCloudProvider):
     mock_azure.sdk.adal.AuthenticationContext.return_value.context.acquire_token_with_client_credentials.return_value = {
         "accessToken": "TOKEN"
     }
@@ -432,7 +432,7 @@ def test_report_clin(mock_azure: AzureCloudProvider):
             billing_profile_name="KQWI-W2SU-BG7-TGB",
         )
     )
-    result = mock_azure.report_clin(payload)
+    result = mock_azure.create_billing_instruction(payload)
     body: ReportCLINCSPResult = result.get("body")
     assert body.reported_clin_name == "TO1:CLIN001"
 

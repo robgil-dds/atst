@@ -34,9 +34,7 @@ def make_csp_provider(app, csp=None):
 
 
 def _stage_to_classname(stage):
-    return "".join(
-        map(lambda word: word.capitalize(), stage.replace("_", " ").split(" "))
-    )
+    return "".join(map(lambda word: word.capitalize(), stage.split("_")))
 
 
 def get_stage_csp_class(stage, class_type):
@@ -45,7 +43,7 @@ def get_stage_csp_class(stage, class_type):
     class_type is either 'payload' or 'result'
 
     """
-    cls_name = "".join([_stage_to_classname(stage), "CSP", class_type.capitalize()])
+    cls_name = f"{_stage_to_classname(stage)}CSP{class_type.capitalize()}"
     try:
         return getattr(importlib.import_module("atst.domain.csp.cloud"), cls_name)
     except AttributeError:
