@@ -49,6 +49,10 @@ loggers:
         level: DEBUG
         handlers: [console]
         propogate: yes
+    utils.terraform.wrapper:
+        level: DEBUG
+        handlers: [console]
+        propogate: yes
     commands:
         level: INFO
         handlers: [console]
