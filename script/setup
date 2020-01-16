@@ -6,7 +6,7 @@
 source "$(dirname "${0}")"/../script/include/global_header.inc.sh
 
 # create upload directory for app
-mkdir uploads | true
+mkdir -p uploads
 
 # Enable database resetting
 RESET_DB="true"
