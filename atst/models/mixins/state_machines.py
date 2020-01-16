@@ -111,14 +111,6 @@ class FSMMixin:
         if finish_trigger in self.machine.get_triggers(self.current_state.name):
             self.trigger(finish_trigger)
 
-    def _get_first_stage_create_trigger(self):
-        return list(
-            filter(
-                lambda trigger: trigger.startswith("create_"),
-                self.machine.get_triggers(FSMStates.STARTED.name),
-            )
-        )[0]
-
     def prepare_init(self, event):
         pass
 

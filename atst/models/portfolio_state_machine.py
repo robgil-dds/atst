@@ -98,7 +98,13 @@ class PortfolioStateMachine(
 
             elif self.current_state == FSMStates.STARTED:
                 # get the first trigger that starts with 'create_'
-                create_trigger = self._get_first_stage_create_trigger()
+                create_trigger = next(
+                    filter(
+                        lambda trigger: trigger.startswith("create_"),
+                        self.machine.get_triggers(FSMStates.STARTED.name),
+                    ),
+                    None,
+                )
                 if create_trigger:
                     self.trigger(create_trigger, **kwargs)
                 else:
@@ -108,20 +114,16 @@ class PortfolioStateMachine(
             # the create trigger for the next stage should be in the available
             # triggers for the current state
             triggers = self.machine.get_triggers(state_obj.name)
-            try:
-                create_trigger = list(
-                    filter(
-                        lambda trigger: trigger.startswith("create_"),
-                        self.machine.get_triggers(self.state.name),
-                    )
-                )[0]
-            except IndexError:
-                # are we done ?
-                pass
-            else:
+            create_trigger = next(
+                filter(
+                    lambda trigger: trigger.startswith("create_"),
+                    self.machine.get_triggers(self.state.name),
+                ),
+                None,
+            )
+            if create_trigger is not None:
                 self.trigger(create_trigger, **kwargs)
 
-    # @with_payload
     def after_in_progress_callback(self, event):
         stage = self.current_state.name.split("_IN_PROGRESS")[0].lower()
 
