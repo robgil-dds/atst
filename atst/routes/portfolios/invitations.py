@@ -79,7 +79,7 @@ def invite_member(portfolio_id):
 
     if form.validate():
         try:
-            invite = Portfolios.invite(portfolio, g.current_user, form.update_data)
+            invite = Portfolios.invite(portfolio, g.current_user, form.data)
             send_portfolio_invitation(
                 invitee_email=invite.email,
                 inviter_name=g.current_user.full_name,

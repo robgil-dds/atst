@@ -107,7 +107,7 @@
       />
 
       {% if show_validation %}
-        <span v-if='showError' class='usa-input__message' v-html='validationError'></span>
+        <span v-if='showError' class='usa-input__message' v-text='validationError'></span>
       {% endif %}
 
     </div>

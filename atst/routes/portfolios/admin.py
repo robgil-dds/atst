@@ -17,63 +17,51 @@ from atst.utils.flash import formatted_flash as flash
 from atst.domain.exceptions import UnauthorizedError
 
 
-def permission_str(member, edit_perm_set, view_perm_set):
-    if member.has_permission_set(edit_perm_set):
-        return edit_perm_set
-    else:
-        return view_perm_set
-
-
-def serialize_member_form_data(member):
-    return {
-        "member_name": member.full_name,
-        "member_id": member.id,
-        "perms_app_mgmt": permission_str(
-            member,
-            PermissionSets.EDIT_PORTFOLIO_APPLICATION_MANAGEMENT,
-            PermissionSets.VIEW_PORTFOLIO_APPLICATION_MANAGEMENT,
+def filter_perm_sets_data(member):
+    perm_sets_data = {
+        "perms_portfolio_mgmt": bool(
+            member.has_permission_set(PermissionSets.EDIT_PORTFOLIO_ADMIN)
         ),
-        "perms_funding": permission_str(
-            member,
-            PermissionSets.EDIT_PORTFOLIO_FUNDING,
-            PermissionSets.VIEW_PORTFOLIO_FUNDING,
+        "perms_app_mgmt": bool(
+            member.has_permission_set(
+                PermissionSets.EDIT_PORTFOLIO_APPLICATION_MANAGEMENT
+            )
         ),
-        "perms_reporting": permission_str(
-            member,
-            PermissionSets.EDIT_PORTFOLIO_REPORTS,
-            PermissionSets.VIEW_PORTFOLIO_REPORTS,
+        "perms_funding": bool(
+            member.has_permission_set(PermissionSets.EDIT_PORTFOLIO_FUNDING)
         ),
-        "perms_portfolio_mgmt": permission_str(
-            member,
-            PermissionSets.EDIT_PORTFOLIO_ADMIN,
-            PermissionSets.VIEW_PORTFOLIO_ADMIN,
+        "perms_reporting": bool(
+            member.has_permission_set(PermissionSets.EDIT_PORTFOLIO_REPORTS)
         ),
     }
 
+    return perm_sets_data
 
-def get_members_data(portfolio):
-    members = sorted(
-        [serialize_member_form_data(member) for member in portfolio.members],
-        key=lambda member: member["member_name"],
-    )
-    for member in members:
-        if member["member_id"] == portfolio.owner_role.id:
-            ppoc = member
-            members.remove(member)
-    members.insert(0, ppoc)
-    return members
+
+def filter_members_data(members_list, portfolio):
+    members_data = []
+    for member in members_list:
+        members_data.append(
+            {
+                "role_id": member.id,
+                "user_name": member.user_name,
+                "permission_sets": filter_perm_sets_data(member),
+                "status": member.display_status,
+                "ppoc": PermissionSets.PORTFOLIO_POC in member.permission_sets,
+                # add in stuff here for forms
+            }
+        )
+
+    return sorted(members_data, key=lambda member: member["user_name"])
 
 
 def render_admin_page(portfolio, form=None):
     pagination_opts = Paginator.get_pagination_opts(http_request)
     audit_events = AuditLog.get_portfolio_events(portfolio, pagination_opts)
-    members_data = get_members_data(portfolio)
     portfolio_form = PortfolioForm(obj=portfolio)
-    member_perms_form = member_forms.MembersPermissionsForm(
-        data={"members_permissions": members_data}
-    )
-
+    member_list = portfolio.members
     assign_ppoc_form = member_forms.AssignPPOCForm()
+
     for pf_role in portfolio.roles:
         if pf_role.user != portfolio.owner and pf_role.is_active:
             assign_ppoc_form.role_id.choices += [(pf_role.id, pf_role.full_name)]
@@ -87,13 +75,12 @@ def render_admin_page(portfolio, form=None):
         "portfolios/admin.html",
         form=form,
         portfolio_form=portfolio_form,
-        member_perms_form=member_perms_form,
-        member_form=member_forms.NewForm(),
+        members=filter_members_data(member_list, portfolio),
+        new_manager_form=member_forms.NewForm(),
         assign_ppoc_form=assign_ppoc_form,
         portfolio=portfolio,
         audit_events=audit_events,
         user=g.current_user,
-        ppoc_id=members_data[0].get("member_id"),
         current_member_id=current_member_id,
         applications_count=len(portfolio.applications),
     )
@@ -104,34 +91,6 @@ def render_admin_page(portfolio, form=None):
 def admin(portfolio_id):
     portfolio = Portfolios.get_for_update(portfolio_id)
     return render_admin_page(portfolio)
-
-
-@portfolios_bp.route("/portfolios/<portfolio_id>/admin", methods=["POST"])
-@user_can(Permissions.EDIT_PORTFOLIO_USERS, message="view portfolio admin page")
-def edit_members(portfolio_id):
-    portfolio = Portfolios.get_for_update(portfolio_id)
-    member_perms_form = member_forms.MembersPermissionsForm(http_request.form)
-
-    if member_perms_form.validate():
-        for subform in member_perms_form.members_permissions:
-            member_id = subform.member_id.data
-            member = PortfolioRoles.get_by_id(member_id)
-            if member is not portfolio.owner_role:
-                new_perm_set = subform.data["permission_sets"]
-                PortfolioRoles.update(member, new_perm_set)
-
-        flash("update_portfolio_members", portfolio=portfolio)
-
-        return redirect(
-            url_for(
-                "portfolios.admin",
-                portfolio_id=portfolio_id,
-                fragment="portfolio-members",
-                _anchor="portfolio-members",
-            )
-        )
-    else:
-        return render_admin_page(portfolio)
 
 
 @portfolios_bp.route("/portfolios/<portfolio_id>/update_ppoc", methods=["POST"])

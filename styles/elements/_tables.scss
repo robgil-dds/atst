@@ -21,24 +21,8 @@ table.atat-table {
         text-align: right;
       }
 
-      &--align-center {
-        text-align: center;
-      }
-
-      &--shrink {
-        width: 1%;
-      }
-
-      &--expand {
-        width: 100%;
-      }
-
-      &--hide-small {
-        display: none;
-
-        @include media($medium-screen) {
-          display: table-cell;
-        }
+      &--third {
+        width: 33%;
       }
     }
   }
@@ -82,28 +66,6 @@ table.atat-table {
   overflow-x: auto;
 
   @include panel-margin;
-
-  &__header {
-    @include panel-base;
-    @include panel-theme-default;
-
-    border-top: none;
-    border-bottom: 0;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    padding: $gap * 2;
-
-    &__title {
-      @include h4;
-
-      font-size: $lead-font-size;
-      justify-content: space-between;
-      flex: 2;
-    }
-  }
 
   table {
     margin-bottom: 0;

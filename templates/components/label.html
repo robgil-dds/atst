@@ -9,11 +9,15 @@
           "text": "changes pending",
           "color": "default",
       },
+      "ppoc": {"text": "primary point of contact"}
   } %}
 
-  {% if type -%}
+  {% if type in label_info.keys() -%}
     <span class='label label--{{ label_info[type]["color"] }} {{ classes }}'>
-      {{ Icon(label_info[type]["icon"]) }} {{ label_info[type]["text"] }}
+      {% if label_info[type]["icon"] %}
+        {{ Icon(label_info[type]["icon"]) }}
+      {% endif %}
+      {{ label_info[type]["text"] }}
     </span>
   {%- endif %}
 {%- endmacro %}

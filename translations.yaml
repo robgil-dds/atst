@@ -118,22 +118,83 @@ flash:
       message: 'The application name {name} has already been used in this portfolio. Please enter a unique name.'
     env_name_error:
       message: 'The environment name {name} has already been used in this application. Please enter a unique name.'
+  application_invite:
+    error:
+      title: Application invitation error
+      message: There was an error processing the invitation for {user_name} from {application_name}
+    resent:
+      title: Application invitation resent
+      message: You have successfully resent the invite for {user_name} from {application_name}
+    revoked:
+      title: Application invitation revoked
+      message: You have successfully revoked the invite for {user_name} from {application_name}
+  application_member:
+    removed:
+      title: Team member removed from application
+      message: You have successfully deleted {user_name} from {application_name}
+    update_error:
+      title: "{user_name} could not be updated"
+      message: An unexpected problem occurred with your request, please try again. If the problem persists, contact an administrator.
+    updated:
+      title: Team member updated
+      message: You have successfully updated the permissions for {user_name}
+  ccpo_user:
+    added:
+      message: You have successfully given {user_name} CCPO permissions.
+    removed:
+      message: You have successfully removed {user_name}'s CCPO permissions.
   delete_member_success: 'You have successfully deleted {member_name} from the portfolio.'
   deleted_member: Portfolio member deleted
-  environment_added: 'The environment "{env_name}" has been added to the application.'
+  environment_added: 'The environment "{environment_name}" has been added to the application.'
+  environment:
+    updated:
+      title: Application environments updated
+      message: Application environments have been updated
+    deleted:
+      title: "{environment_name} deleted"
+      message: The environment "{environment_name}" has been deleted
+  form:
+    errors:
+      title: There were some errors
+      message: Please see below.
   login_required_message: After you log in, you will be redirected to your destination page.
   login_required_title: Log in required
+  logged_out:
+    title: Logged out
+    message: You've been logged out.
   new_portfolio_member: 'You have successfully invited {user_name} to the portfolio.'
   new_ppoc_message: 'You have successfully added {ppoc_name} as the primary point of contact. You are no longer the PPoC.'
   new_ppoc_title: Primary point of contact updated
+  portfolio_member:
+    revoked:
+      title: Removed portfolio access
+      message: Portfolio access successfully removed from {member_name}.
+  portfolio_invite:
+    resent:
+      title: Invitation resent
+      message: Successfully sent a new invitation to {user_name}.
+  session_expired:
+    title: Session Expired
+    message: Your session expired due to inactivity. Please log in again to continue.
   success: Success!
   task_order_number_error:
     message: 'The TO number has already been entered for a JEDI task order #{to_number}. Please double-check the TO number you are entering. If you believe this is in error, please contact support@cloud.mil.'
+  task_order:
+    insufficient_funds:
+      title: Insufficient Funds
+    submitted:
+      title: Your Task Order has been uploaded successfully.
+      message: Your task order form for {task_order.portfolio_name} has been submitted.
   new_application_member:
     title: "{user_name}'s invitation has been sent"
     message: "{user_name}'s access to this Application is pending until they sign in for the first time."
   updated_application_team_settings: 'You have updated the {application_name} team settings.'
-  logged_out: Logged out
+  user:
+    complete_profile:
+      title: You must complete your profile
+      message: Before continuing, you must complete your profile.
+    updated:
+      title: User information updated.
 footer:
   login: 'Last login:'
 forms:
@@ -161,15 +222,23 @@ forms:
     phone_number_label: Phone number
     service_branch_label: Service branch or agency
   new_member:
-    app_mgmt: App management
+    app_mgmt:
+      label: Edit Applications
+      description: Add, remove and edit applications in this Portfolio.
     dod_id_label: DoD ID
     email_label: Email address
     first_name_label: First name
-    funding: Funding
+    funding:
+      label: Edit Funding
+      description: Add and Modify Task Orders to fund this Portfolio.
     last_name_label: Last name
     phone_number_label: Phone number
-    portfolio_mgmt: Portfolio management
-    reporting: Reporting
+    portfolio_mgmt:
+      label: Edit Portfolio
+      description: "Edit this Portfolio's settings."
+    reporting:
+      label: Edit Reporting
+      description: "View and export reports about this Portfolio's funding."
   portfolio:
     name:
       label: Portfolio Name
@@ -223,6 +292,7 @@ forms:
   task_order:
     upload_error: There was an error uploading your file. Please try again. If you encounter repeated problems uploading this file, please contact CCPO.
     size_error: The file you have selected is too large. Please choose a file no larger than 64MB.
+    filename_error: File names can only contain the characters A-Z, 0-9, space, hyphen, underscore, and period.
     defense_component_label: Select DoD component(s) funding your Portfolio
     file_format_not_allowed: Only PDF or PNG files can be uploaded.
     number_description: Task order number (13 digits)
@@ -317,10 +387,23 @@ portfolios:
     portfolio_members_title: Portfolio members
     settings_info: Learn more about these settings
     portfolio_name: Portfolio name
+    members:
+      perms_portfolio_mgmt:
+        'False': View Portfolio
+        'True': Edit Portfolio
+      perms_app_mgmt:
+        'False': View Applications
+        'True': Edit Applications
+      perms_funding:
+        'False': View Funding
+        'True': Edit Funding
+      perms_reporting:
+        'False': View Reporting
+        'True': Edit Reporting
   applications:
     add_application_text: Add a new application
     add_environment: Create an Environment
-    add_member: Add Team Member
+    add_member: Add New Member
     add_another_environment: Add another environment
     app_settings_text: App settings
     create_button: Create Application

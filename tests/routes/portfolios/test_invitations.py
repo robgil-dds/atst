@@ -269,10 +269,10 @@ def test_existing_member_invite_resent_to_email_submitted_in_form(
 
 
 _DEFAULT_PERMS_FORM_DATA = {
-    "permission_sets-perms_app_mgmt": PermissionSets.VIEW_PORTFOLIO_APPLICATION_MANAGEMENT,
-    "permission_sets-perms_funding": PermissionSets.VIEW_PORTFOLIO_FUNDING,
-    "permission_sets-perms_reporting": PermissionSets.VIEW_PORTFOLIO_REPORTS,
-    "permission_sets-perms_portfolio_mgmt": PermissionSets.VIEW_PORTFOLIO_ADMIN,
+    "permission_sets-perms_app_mgmt": False,
+    "permission_sets-perms_funding": False,
+    "permission_sets-perms_reporting": False,
+    "permission_sets-perms_portfolio_mgmt": False,
 }
 
 
