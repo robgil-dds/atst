@@ -20,7 +20,7 @@ resource "azurerm_key_vault" "keyvault" {
 }
 
 resource "azurerm_key_vault_access_policy" "keyvault_k8s_policy" {
-  count = "${length(var.principal_id) > 0 ? 1 : 0}"
+  count        = length(var.principal_id) > 0 ? 1 : 0
   key_vault_id = azurerm_key_vault.keyvault.id
 
   tenant_id = data.azurerm_client_config.current.tenant_id

@@ -7,3 +7,4 @@ module "keyvault" {
   tenant_id    = var.tenant_id
   principal_id = "f9bcbe58-8b73-4957-aee2-133dc3e58063"
 }
+
