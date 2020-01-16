@@ -105,8 +105,17 @@ class PortfolioStateMachine(
                     self.fail_stage(stage)
 
         elif state_obj.is_CREATED:
+            # the create trigger for the next stage should be in the available
+            # triggers for the current state
             triggers = self.machine.get_triggers(state_obj.name)
-            self.trigger(triggers[-1], **kwargs)
+            create_trigger = list(
+                filter(
+                    lambda trigger: trigger.startswith("create_"),
+                    self.machine.get_triggers(self.state.name),
+                )
+            )[0]
+            if create_trigger:
+                self.trigger(create_trigger, **kwargs)
 
     # @with_payload
     def after_in_progress_callback(self, event):
