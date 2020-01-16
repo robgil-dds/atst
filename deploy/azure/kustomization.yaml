@@ -12,3 +12,4 @@ resources:
   - acme-challenges.yml
   - aadpodidentity.yml
   - nginx-snippets.yml
+  - autoscaling.yml

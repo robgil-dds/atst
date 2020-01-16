@@ -5,7 +5,6 @@ resources:
   - namespace.yml
   - reset-cron-job.yml
 patchesStrategicMerge:
-  - replica_count.yml
   - ports.yml
   - envvars.yml
   - flex_vol.yml
