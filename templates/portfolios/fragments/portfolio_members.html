@@ -124,11 +124,11 @@
               </td>
               <td class="toggle-menu__container">
                 {% for perm, value in member.permission_sets.items() -%}
-                  <div>
-                    {% if value -%}
+                  {% if value -%}
+                    <div>
                       {{ ("portfolios.admin.members.{}.{}".format(perm, value)) | translate }}
-                    {%- endif %}
-                  </div>
+                    </div>
+                  {%- endif %}
                 {%-endfor %}
                 {% if user_can(permissions.EDIT_PORTFOLIO_USERS) -%}
                   {% call ToggleMenu() %}

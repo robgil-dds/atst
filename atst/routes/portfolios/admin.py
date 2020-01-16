@@ -55,18 +55,16 @@ def filter_members_data(members_list):
         }
 
         if not ppoc:
-            update_invite_form = (
+            member_data["update_invite_form"] = (
                 member_forms.NewForm(user_data=member.latest_invitation)
                 if member.latest_invitation and member.latest_invitation.can_resend
                 else member_forms.NewForm()
             )
-            invite_token = (
+            member_data["invite_token"] = (
                 member.latest_invitation.token
                 if member.latest_invitation and member.latest_invitation.can_resend
                 else None
             )
-            member_data["update_invite_form"] = update_invite_form
-            member_data["invite_token"] = invite_token
 
         members_data.append(member_data)
 
@@ -113,25 +111,25 @@ def admin(portfolio_id):
 
 # Updating PPoC is a post-MVP feature
 # @portfolios_bp.route("/portfolios/<portfolio_id>/update_ppoc", methods=["POST"])
-@user_can(Permissions.EDIT_PORTFOLIO_POC, message="update portfolio ppoc")
-def update_ppoc(portfolio_id):  # pragma: no cover
-    role_id = http_request.form.get("role_id")
-
-    portfolio = Portfolios.get(g.current_user, portfolio_id)
-    new_ppoc_role = PortfolioRoles.get_by_id(role_id)
-
-    PortfolioRoles.make_ppoc(portfolio_role=new_ppoc_role)
-
-    flash("primary_point_of_contact_changed", ppoc_name=new_ppoc_role.full_name)
-
-    return redirect(
-        url_for(
-            "portfolios.admin",
-            portfolio_id=portfolio.id,
-            fragment="primary-point-of-contact",
-            _anchor="primary-point-of-contact",
-        )
-    )
+# @user_can(Permissions.EDIT_PORTFOLIO_POC, message="update portfolio ppoc")
+# def update_ppoc(portfolio_id):  # pragma: no cover
+#     role_id = http_request.form.get("role_id")
+#
+#     portfolio = Portfolios.get(g.current_user, portfolio_id)
+#     new_ppoc_role = PortfolioRoles.get_by_id(role_id)
+#
+#     PortfolioRoles.make_ppoc(portfolio_role=new_ppoc_role)
+#
+#     flash("primary_point_of_contact_changed", ppoc_name=new_ppoc_role.full_name)
+#
+#     return redirect(
+#         url_for(
+#             "portfolios.admin",
+#             portfolio_id=portfolio.id,
+#             fragment="primary-point-of-contact",
+#             _anchor="primary-point-of-contact",
+#         )
+#     )
 
 
 @portfolios_bp.route("/portfolios/<portfolio_id>/edit", methods=["POST"])

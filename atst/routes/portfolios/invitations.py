@@ -67,9 +67,7 @@ def resend_invitation(portfolio_id, portfolio_token):
         )
         flash("resend_portfolio_invitation", user_name=invite.user_name)
     else:
-        user_name = "{} {}".format(
-            form["user_data"]["first_name"].data, form["user_data"]["last_name"].data
-        )
+        user_name = f"{form['user_data']['first_name'].data} {form['user_data']['last_name'].data}"
         flash("resend_portfolio_invitation_error", user_name=user_name)
 
     return redirect(
