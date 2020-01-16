@@ -57,7 +57,7 @@
             <span class='usa-input__message'>{{ "forms.task_order.clin_funding_errors.obligated_amount_error" | translate }}</span>
           </template>
           <template v-else-if='showError'>
-            <span class='usa-input__message' v-html='validationError'></span>
+            <span class='usa-input__message' v-text='validationError'></span>
           </template>
           <template v-else>
             <span class='usa-input__message'></span>
