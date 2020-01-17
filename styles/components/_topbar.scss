@@ -12,10 +12,13 @@
     flex-direction: row;
     align-items: stretch;
     justify-content: space-between;
+
+    a {
+      color: $color-white;
+    }
   }
 
   &__link {
-    color: $color-white;
     display: inline-flex;
     align-items: center;
     height: $topbar-height;
@@ -30,6 +33,7 @@
 
     &-icon {
       margin: 0 $gap 0 0;
+      @include icon-color($color-white);
     }
 
     .icon--logout {
