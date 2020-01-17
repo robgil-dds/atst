@@ -78,7 +78,7 @@ components:
 errors:
   default_sub: An error has occured!
   not_found: Page Not Found
-  not_found_sub: Looks like that page does not exist!
+  not_found_sub: This page does not exist.
 email:
   application_invite: "{inviter_name} has invited you to a JEDI cloud application"
   portfolio_invite: "{inviter_name} has invited you to a JEDI cloud portfolio"
