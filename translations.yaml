@@ -453,6 +453,12 @@ portfolios:
   members:
     archive_button: Delete member
   reports:
+    days_remaining:
+      header: Days Remaining
+      toolip: Days remaining are the days of funding remaining in the portfolio.
+    duration:
+      header: Funding Duration
+      tooltip: Funding duration is the period of time that there is a valid task order funding the portfolio.
     estimate_warning: Reports displayed in JEDI are estimates and not a system of record.
     empty_state:
       message: Nothing to report.
@@ -460,6 +466,9 @@ portfolios:
         can_create_applications: This portfolio has no cloud environments set up, so there is no spending data to report. Create an application with some cloud environments to get started.
         cannot_create_applications: This portfolio has no cloud environments set up, so there is no spending data to report. Contact the portfolio owner to set up some cloud environments.
       action_label: 'Add a new application'
+    total_value:
+      header: Total Portfolio Value
+      tooltip: Total portfolio value is all obligated and projected funds for all task orders in this portfolio.
 task_orders:
   add_new_button: Add New Task Order
   review:
