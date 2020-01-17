@@ -20,9 +20,10 @@
   .sticky-cta-container {
     display: flex;
     align-items: center;
+    max-width: 90rem;
 
     .usa-button {
-      margin: $gap $gap * 1.5 $gap 0;
+      margin: 0;
       width: 20rem;
       height: 3.2rem;
       font-size: $small-font-size;

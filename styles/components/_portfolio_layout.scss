@@ -4,16 +4,19 @@
     min-height: 500px;
   }
 
-  margin-left: 2 * $gap;
+  .col.col--grow {
+    padding: 0;
+  }
 }
 
 .portfolio-header {
   flex-direction: column;
+  align-items: center;
+  margin: $spacing-medium 0;
+  max-width: 90rem;
   @include media($small-screen) {
     flex-direction: row;
   }
-
-  margin-bottom: $gap * 1;
 
   .col--grow {
     overflow: inherit;
@@ -21,8 +24,9 @@
 
   &__name {
     @include h1;
+    padding-right: $spacing-medium;
     h1 {
-      margin: 0 $gap ($gap * 2) 0;
+      margin: 0;
       font-size: 3.5rem;
     }
 
@@ -30,6 +34,7 @@
       font-size: $small-font-size;
       margin: 0 0 (-$gap * 0.5);
       color: $color-gray-medium;
+      max-width: 100%;
     }
   }
 
@@ -38,9 +43,15 @@
     font-size: $small-font-size;
 
     .icon-link {
-      padding: $gap;
+      padding: 0;
       border-radius: 0;
       color: $color-blue-darkest;
+      min-width: 10rem;
+      min-height: 10rem;
+
+      .col {
+        margin: 0 auto;
+      }
 
       &:hover {
         background-color: $color-aqua-lightest;
@@ -82,11 +93,19 @@
   margin-bottom: 3 * $gap;
 }
 
-.portfolio-content {
-  margin: (4 * $gap) $gap 0 $gap;
+.portfolio-admin {
+  margin: $spacing-large 0;
+  max-width: 90rem;
+}
 
+.portfolio-content {
   .panel {
     padding-bottom: 2rem;
+    max-width: 90rem;
+  }
+
+  hr {
+    max-width: 90rem;
   }
 
   a.add-new-button {
@@ -289,8 +308,8 @@
 }
 
 .portfolio-funding {
-  padding: 2 * $gap;
-  padding-top: 0;
+  max-width: 90rem;
+  margin: $spacing-large 0;
 
   .panel {
     @include shadow-panel;
