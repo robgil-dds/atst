@@ -56,4 +56,17 @@ resource "azurerm_key_vault_access_policy" "keyvault_admin_policy" {
     "list",
     "set",
   ]
+
+  # backup create delete deleteissuers get getissuers import list listissuers managecontacts manageissuers purge recover restore setissuers update
+  certificate_permissions = [
+    "get",
+    "list",
+    "create",
+    "import",
+    "listissuers",
+    "manageissuers",
+    "deleteissuers",
+    "backup",
+    "update",
+  ]
 }
