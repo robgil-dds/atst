@@ -276,7 +276,7 @@ forms:
     upload_error: There was an error uploading your file. Please try again. If you encounter repeated problems uploading this file, please contact CCPO.
     size_error: The file you have selected is too large. Please choose a file no larger than 64MB.
     filename_error: File names can only contain the characters A-Z, 0-9, space, hyphen, underscore, and period.
-    number_description: Task order number (13 digits)
+    number_description: 13-Digit Task Order Number
     pop_errors:
       date_order: PoP start date must be before end date.
       range: Date must be between {start} and {end}.
@@ -481,8 +481,8 @@ task_orders:
       expended_funds: All funds spend from the Task Order so far.
   form:
     add_clin: Add another CLIN
-    add_to_header: Add your task order
-    add_to_description: Now, refer to your document to find the 13-digit task order number. It should be located at lorem ipsum dolar. From now on we'll refer to this portion of funding by the recorded task order number.
+    add_to_header: Enter the Task Order number
+    add_to_description: Please input your 13-digit Task Order number. This number may be listed under "Order Number" if your Contracting Officer used form 1149, or "Delivery Order/Call No." if form 1155 was used. Moving forward, this portion of funding will be referenced by the recorded Task Order number.
     clin_title: Enter Contract Line Items
     clin_description: "Refer to your task order to locate your Contract Line Item Numbers (CLINs)."
     clin_details: CLIN Details
