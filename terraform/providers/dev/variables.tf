@@ -71,3 +71,11 @@ variable "tenant_id" {
   type    = string
   default = "b5ab0e1e-09f8-4258-afb7-fb17654bc5b3"
 }
+
+variable "admin_users" {
+  type = map
+  default = {
+    "Rob Gil"         = "2ca63d41-d058-4e06-aef6-eb517a53b631"
+    "Daniel Corrigan" = "d5bb69c2-3b88-4e96-b1a2-320400f1bf1b"
+  }
+}

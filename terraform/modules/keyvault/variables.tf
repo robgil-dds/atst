@@ -27,3 +27,8 @@ variable "principal_id" {
   type        = string
   description = "The service principal_id of the k8s cluster"
 }
+
+variable "admin_principals" {
+  type        = map
+  description = "A list of user principals who need access to manage the keyvault"
+}
