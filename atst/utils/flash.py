@@ -128,6 +128,11 @@ MESSAGES = {
         "message": "flash.portfolio_invite.resent.message",
         "category": "success",
     },
+    "resend_portfolio_invitation_error": {
+        "title": "flash.portfolio_invite.error.title",
+        "message": "flash.portfolio_invite.error.message",
+        "category": "error",
+    },
     "revoked_portfolio_access": {
         "title": "flash.portfolio_member.revoked.title",
         "message": "flash.portfolio_member.revoked.message",
@@ -152,6 +157,16 @@ MESSAGES = {
         "title": "flash.task_order.submitted.title",
         "message": "flash.task_order.submitted.message",
         "category": "success",
+    },
+    "update_portfolio_member": {
+        "title": "flash.portfolio_member.update.title",
+        "message": "flash.portfolio_member.update.message",
+        "category": "success",
+    },
+    "update_portfolio_member_error": {
+        "title": "flash.portfolio_member.update_error.title",
+        "message": "flash.portfolio_member.update_error.message",
+        "category": "error",
     },
     "updated_application_team_settings": {
         "title": "flash.success",

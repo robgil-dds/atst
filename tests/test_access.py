@@ -373,6 +373,24 @@ def test_portfolios_edit_access(post_url_assert_status):
     post_url_assert_status(rando, url, 404)
 
 
+# portfolios.update_member
+def test_portfolios_update_member_access(post_url_assert_status):
+    ccpo = user_with(PermissionSets.EDIT_PORTFOLIO_ADMIN)
+    owner = user_with()
+    rando = user_with()
+    portfolio = PortfolioFactory.create(owner=owner)
+    portfolio_role = PortfolioRoleFactory.create(portfolio=portfolio)
+
+    url = url_for(
+        "portfolios.update_member",
+        portfolio_id=portfolio.id,
+        portfolio_role_id=portfolio_role.id,
+    )
+    post_url_assert_status(ccpo, url, 302)
+    post_url_assert_status(owner, url, 302)
+    post_url_assert_status(rando, url, 404)
+
+
 # applications.new
 def test_applications_new_access(get_url_assert_status):
     ccpo = user_with(PermissionSets.EDIT_PORTFOLIO_APPLICATION_MANAGEMENT)
