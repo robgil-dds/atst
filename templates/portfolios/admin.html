@@ -59,10 +59,6 @@
 
     <hr>
 
-    {% if user_can(permissions.VIEW_PORTFOLIO_POC) %}
-      {% include "portfolios/fragments/primary_point_of_contact.html" %}
-    {% endif %}
-
     {% if user_can(permissions.VIEW_PORTFOLIO_USERS) %}
       {% include "portfolios/fragments/portfolio_members.html" %}
     {% endif %}

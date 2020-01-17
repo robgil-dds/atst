@@ -169,10 +169,19 @@ flash:
     revoked:
       title: Removed portfolio access
       message: Portfolio access successfully removed from {member_name}.
+    update:
+      title: Success!
+      message: You have successfully updated access permissions for {member_name}.
+    update_error:
+      title: Permissions for {member_name} could not be updated
+      message: An unexpected problem occurred with your request, please try again. If the problem persists, contact an administrator.
   portfolio_invite:
     resent:
       title: Invitation resent
       message: Successfully sent a new invitation to {user_name}.
+    error:
+      title: Portfolio invitation error
+      message: There was an error processing the invitation for {user_name}.
   session_expired:
     title: Session Expired
     message: Your session expired due to inactivity. Please log in again to continue.

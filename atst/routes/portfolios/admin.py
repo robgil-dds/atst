@@ -19,9 +19,6 @@ from atst.domain.exceptions import UnauthorizedError
 
 def filter_perm_sets_data(member):
     perm_sets_data = {
-        "perms_portfolio_mgmt": bool(
-            member.has_permission_set(PermissionSets.EDIT_PORTFOLIO_ADMIN)
-        ),
         "perms_app_mgmt": bool(
             member.has_permission_set(
                 PermissionSets.EDIT_PORTFOLIO_APPLICATION_MANAGEMENT
@@ -33,24 +30,43 @@ def filter_perm_sets_data(member):
         "perms_reporting": bool(
             member.has_permission_set(PermissionSets.EDIT_PORTFOLIO_REPORTS)
         ),
+        "perms_portfolio_mgmt": bool(
+            member.has_permission_set(PermissionSets.EDIT_PORTFOLIO_ADMIN)
+        ),
     }
 
     return perm_sets_data
 
 
-def filter_members_data(members_list, portfolio):
+def filter_members_data(members_list):
     members_data = []
     for member in members_list:
-        members_data.append(
-            {
-                "role_id": member.id,
-                "user_name": member.user_name,
-                "permission_sets": filter_perm_sets_data(member),
-                "status": member.display_status,
-                "ppoc": PermissionSets.PORTFOLIO_POC in member.permission_sets,
-                # add in stuff here for forms
-            }
+        permission_sets = filter_perm_sets_data(member)
+        ppoc = (
+            PermissionSets.get(PermissionSets.PORTFOLIO_POC) in member.permission_sets
         )
+        member_data = {
+            "role_id": member.id,
+            "user_name": member.user_name,
+            "permission_sets": filter_perm_sets_data(member),
+            "status": member.display_status,
+            "ppoc": ppoc,
+            "form": member_forms.PermissionsForm(permission_sets),
+        }
+
+        if not ppoc:
+            member_data["update_invite_form"] = (
+                member_forms.NewForm(user_data=member.latest_invitation)
+                if member.latest_invitation and member.latest_invitation.can_resend
+                else member_forms.NewForm()
+            )
+            member_data["invite_token"] = (
+                member.latest_invitation.token
+                if member.latest_invitation and member.latest_invitation.can_resend
+                else None
+            )
+
+        members_data.append(member_data)
 
     return sorted(members_data, key=lambda member: member["user_name"])
 
@@ -75,7 +91,7 @@ def render_admin_page(portfolio, form=None):
         "portfolios/admin.html",
         form=form,
         portfolio_form=portfolio_form,
-        members=filter_members_data(member_list, portfolio),
+        members=filter_members_data(member_list),
         new_manager_form=member_forms.NewForm(),
         assign_ppoc_form=assign_ppoc_form,
         portfolio=portfolio,
@@ -93,26 +109,27 @@ def admin(portfolio_id):
     return render_admin_page(portfolio)
 
 
-@portfolios_bp.route("/portfolios/<portfolio_id>/update_ppoc", methods=["POST"])
-@user_can(Permissions.EDIT_PORTFOLIO_POC, message="update portfolio ppoc")
-def update_ppoc(portfolio_id):
-    role_id = http_request.form.get("role_id")
-
-    portfolio = Portfolios.get(g.current_user, portfolio_id)
-    new_ppoc_role = PortfolioRoles.get_by_id(role_id)
-
-    PortfolioRoles.make_ppoc(portfolio_role=new_ppoc_role)
-
-    flash("primary_point_of_contact_changed", ppoc_name=new_ppoc_role.full_name)
-
-    return redirect(
-        url_for(
-            "portfolios.admin",
-            portfolio_id=portfolio.id,
-            fragment="primary-point-of-contact",
-            _anchor="primary-point-of-contact",
-        )
-    )
+# Updating PPoC is a post-MVP feature
+# @portfolios_bp.route("/portfolios/<portfolio_id>/update_ppoc", methods=["POST"])
+# @user_can(Permissions.EDIT_PORTFOLIO_POC, message="update portfolio ppoc")
+# def update_ppoc(portfolio_id):  # pragma: no cover
+#     role_id = http_request.form.get("role_id")
+#
+#     portfolio = Portfolios.get(g.current_user, portfolio_id)
+#     new_ppoc_role = PortfolioRoles.get_by_id(role_id)
+#
+#     PortfolioRoles.make_ppoc(portfolio_role=new_ppoc_role)
+#
+#     flash("primary_point_of_contact_changed", ppoc_name=new_ppoc_role.full_name)
+#
+#     return redirect(
+#         url_for(
+#             "portfolios.admin",
+#             portfolio_id=portfolio.id,
+#             fragment="primary-point-of-contact",
+#             _anchor="primary-point-of-contact",
+#         )
+#     )
 
 
 @portfolios_bp.route("/portfolios/<portfolio_id>/edit", methods=["POST"])
@@ -166,3 +183,30 @@ def remove_member(portfolio_id, portfolio_role_id):
             fragment="portfolio-members",
         )
     )
+
+
+@portfolios_bp.route(
+    "/portfolios/<portfolio_id>/members/<portfolio_role_id>", methods=["POST"]
+)
+@user_can(Permissions.EDIT_PORTFOLIO_USERS, message="update portfolio members")
+def update_member(portfolio_id, portfolio_role_id):
+    form_data = http_request.form
+    form = member_forms.PermissionsForm(formdata=form_data)
+    portfolio_role = PortfolioRoles.get_by_id(portfolio_role_id)
+    portfolio = Portfolios.get(user=g.current_user, portfolio_id=portfolio_id)
+
+    if form.validate() and portfolio.owner_role != portfolio_role:
+        PortfolioRoles.update(portfolio_role, form.data["permission_sets"])
+        flash("update_portfolio_member", member_name=portfolio_role.full_name)
+
+        return redirect(
+            url_for(
+                "portfolios.admin",
+                portfolio_id=portfolio_id,
+                _anchor="portfolio-members",
+                fragment="portfolio-members",
+            )
+        )
+    else:
+        flash("update_portfolio_member_error", member_name=portfolio_role.full_name)
+        return (render_admin_page(portfolio), 400)
