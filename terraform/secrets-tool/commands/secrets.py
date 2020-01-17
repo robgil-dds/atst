@@ -1,6 +1,7 @@
 import click
 import logging
 from utils.keyvault.secrets import SecretsClient
+from utils.keyvault.secrets import SecretsLoader
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +31,17 @@ def list_secrets(ctx):
     keyvault = SecretsClient(vault_url=ctx.obj['keyvault'])
     click.echo(keyvault.list_secrets())
 
+@click.command('load')
+@click.option('-f', 'file', required=True, help="YAML file with secrets definitions")
+@click.pass_context
+def load_secrets(ctx, file):
+    """Generate and load secrets from yaml definition"""
+    keyvault = SecretsClient(vault_url=ctx.obj['keyvault'])
+    loader = SecretsLoader(yaml_file=file, keyvault=keyvault)
+    loader.load_secrets()
+
+
 
 secrets.add_command(create_secret)
 secrets.add_command(list_secrets)
+secrets.add_command(load_secrets)
