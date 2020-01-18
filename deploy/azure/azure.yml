@@ -309,6 +309,7 @@ metadata:
   namespace: atat
 spec:
   loadBalancerIP: 13.92.235.6
+  externalTrafficPolicy: Local
   ports:
     - port: 80
       targetPort: 8342
@@ -329,6 +330,7 @@ metadata:
   namespace: atat
 spec:
   loadBalancerIP: 23.100.24.41
+  externalTrafficPolicy: Local
   ports:
     - port: 80
       targetPort: 8343
