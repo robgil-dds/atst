@@ -210,6 +210,7 @@ forms:
       label: Edit Applications
       description: Add, remove and edit applications in this Portfolio.
     dod_id_label: DoD ID
+    dod_help: How do I find out the DoD ID?
     email_label: Email address
     first_name_label: First name
     funding:
@@ -358,7 +359,7 @@ portfolios:
         'True': Edit Reporting
   applications:
     add_environment: Create an Environment
-    add_member: Add New Member
+    add_member: Add New Application Member
     add_another_environment: Add another environment
     create_button: Create Application
     empty_state:
@@ -385,7 +386,7 @@ portfolios:
         description: |
           <div>
             <p>
-              Add a brief one to two sentence description of your application. You should be able to reference your TO Description of Work.
+              Add a brief one to two sentence description of your Application. You should be able to reference your TO Description of Work.
             </p>
             <p>
               <strong>Writer's Block? A description example includes:</strong>
@@ -395,10 +396,11 @@ portfolios:
             </p>
           </div>
       step_2_header: Add Environments to {application_name}
-      step_2_description: Development, Testing, Staging, and Production environments are included by default. However, you can add, edit, and delete environments based on the needs of your Application.
+      step_2_description: Production, Staging, Testing, and Development environments are included by default. However, you can add, edit, and delete environments based on the needs of your Application.
       step_2_button_text: "Next: Add Members"
       step_3_header: Add Members to {application_name}
       step_3_description: "To proceed, you will need each member's email address and DOD ID. Within this section, you will also assign Application-level permissions and environment-level roles for each member."
+      step_3_button_text: Save Application
     create_new_env: Create a new environment.
     create_new_env_info: Creating an environment gives you access to the Cloud Service Provider. This environment will function within the constraints of the task order, and any costs will be billed against the portfolio.
     csp_link: Cloud Service Provider Link
@@ -430,7 +432,7 @@ portfolios:
           description: Additional role controls are available in the CSP console. <a href="#"> Learn More </a>
           revoke_warning: Save changes to revoke access, <strong>this can not be undone.</strong>
           suspended: Suspended access cannot be modified.
-        next_button: "Next: Permissions"
+        next_button: "Next: Roles and Permissions"
         app_perms:
           title: Application Permissions
           description: Application permissions allow users to provision and modify applications and teams. <a href="#"> Learn More </a>
