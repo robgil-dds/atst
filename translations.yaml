@@ -358,7 +358,7 @@ portfolios:
         'False': View Reporting
         'True': Edit Reporting
   applications:
-    add_environment: Create an Environment
+    add_environment: Add an Environment
     add_member: Add New Application Member
     add_another_environment: Add another environment
     create_button: Create Application
@@ -452,6 +452,10 @@ portfolios:
       perms_del_env:
         'False': ""
         'True': Delete Application
+      roles:
+        ADMIN: Admin
+        BILLING_READ: Billing Read-only
+        CONTRIBUTOR: Contributor
   header: PORTFOLIO
   new:
     title: New Portfolio

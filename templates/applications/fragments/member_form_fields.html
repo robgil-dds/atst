@@ -21,7 +21,7 @@
               {{ sub_form.environment_name.data }}
             </div>
             <div class="usa-input__help">
-              {{ role }}
+              {{ "portfolios.applications.members.roles.{}".format(role) | translate }}
             </div>
           </div>
           <div class="form-col form-col--third">
