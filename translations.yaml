@@ -490,6 +490,10 @@ task_orders:
         JEDI_CLIN_2: 'Classified IaaS and PaaS (IDIQ CLIN 0002)'
         JEDI_CLIN_3: 'Unclassified Cloud Support Package (IDIQ CLIN 0003)'
         JEDI_CLIN_4: 'Classified Cloud Support Package (IDIQ CLIN 0004)'
+    summary:
+      obligated: Total obligated funds
+      total: Total Task Order value
+      expended: Total expended funds
     tooltip:
       obligated_funds: Funds committed to fund your portfolio. This may represent 100% of your total Task Order value, or a portion of it.
       total_value: All obligated and projected funds for the Task Order’s Base and Option CLINs.
