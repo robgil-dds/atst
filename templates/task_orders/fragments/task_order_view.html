@@ -11,7 +11,7 @@
     <section class="row">
       <div class='col col--grow summary-item'>
         <h4 class="summary-item__header">
-          <span class="summary-item__header-text">Total obligated funds</span>
+          <span class="summary-item__header-text">{{ 'task_orders.form.step_4.obligated' | translate }}</span>
           {{ Tooltip(("task_orders.review.tooltip.obligated_funds" | translate), title="", classes="summary-item__header-icon") }}
         </h4>
         <p class="summary-item__value--large">
@@ -20,7 +20,7 @@
       </div>
       <div class='col col--grow summary-item'>
         <h4 class="summary-item__header">
-          <span class="summary-item__header-text">Total Task Order value</span>
+          <span class="summary-item__header-text">{{ 'task_orders.form.step_4.total' | translate }}</span>
           {{ Tooltip(("task_orders.review.tooltip.total_value" | translate), title="", classes="summary-item__header-icon") }}
         </h4>
         <p class="summary-item__value--large">
@@ -29,7 +29,7 @@
       </div>
       <div class='col col--grow summary-item'>
         <h4 class="summary-item__header">
-          <span class="summary-item__header-text">Total expended funds</span>
+          <span class="summary-item__header-text">{{ 'task_orders.form.step_4.expended' | translate }}</span>
           {{ Tooltip(("task_orders.review.tooltip.expended_funds" | translate), title="", classes="summary-item__header-icon") }}
         </h4>
         <p class="summary-item__value--large">
@@ -39,7 +39,7 @@
     </section>
     <hr>
     <section>
-      <h4>Documents</h4>
+      <h4>{{ 'task_orders.form.step_4.documents' | translate }}</h4>
       <div class="panel panel__content">
         {% if builder_mode %}
           {{ Icon('ok', classes="icon--green icon--medium") }}
@@ -52,7 +52,7 @@
     </section>
     <hr>
     <section>
-      <h4>CLIN summary</h4>
+      <h4>{{ 'task_orders.form.step_4.clins' | translate }}</h4>
       <table class="fixed-table-wrapper atat-table clin-summary">
         <thead>
           <tr>

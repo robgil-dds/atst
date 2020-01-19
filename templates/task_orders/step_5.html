@@ -8,7 +8,7 @@
 {% set next_button_text = 'task_orders.form.step_5.next_button' | translate %}
 {% set previous_button_link = url_for("task_orders.form_step_four_review", task_order_id=task_order_id) %}
 {% set step = "5" %}
-{% set sticky_cta_text = 'task_orders.form.sticky_header_text' | translate %}
+{% set sticky_cta_text = 'task_orders.form.step_5.cta_text' | translate %}
 
 {% block to_builder_form_field %}
   {{ TOFormStepHeader(

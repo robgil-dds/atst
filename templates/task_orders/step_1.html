@@ -16,8 +16,8 @@
 
 {% block to_builder_form_field %}
   {{ TOFormStepHeader(
-    title='task_orders.form.supporting_docs_header' | translate,
-    description='task_orders.form.supporting_docs_text' | translate,
+    title='task_orders.form.step_1.title' | translate,
+    description='task_orders.form.step_1.description' | translate,
   ) }}
   {{ UploadInput(form.pdf, portfolio.id) }}
 {% endblock %}
