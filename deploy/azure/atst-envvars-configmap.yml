@@ -15,6 +15,7 @@ data:
   CSP: azure
   DEBUG: "0"
   FLASK_ENV: master
+  LIMIT_CONCURRENT_SESSIONS: "true"
   LOG_JSON: "true"
   MAIL_PORT: "587"
   MAIL_SENDER: postmaster@atat.code.mil
