@@ -12,9 +12,9 @@
   {% include "fragments/flash.html" %}
   <div class='portfolio-header__name'>
     <p>{{ "portfolios.header" | translate }}</p>
-    <h1>{{ "New Portfolio" }}</h1>
+    <h1>{{ "portfolios.new.title" | translate }}</h1>
   </div>
-  {{ StickyCTA(text="Create New Portfolio") }}
+  {{ StickyCTA(text="portfolios.new.cta_step_1"|translate, context=("portfolios.new.sticky_header_context"|translate({"step": "1"}) )) }}
   <base-form inline-template>
     <div class="row">
       <form id="portfolio-create" class="col" action="{{ url_for('portfolios.create_portfolio') }}" method="POST">
@@ -39,9 +39,9 @@
         </div>
         <div class='action-group-footer'>
         {% block next_button %}
-          {{ SaveButton(text=('common.save' | translate), form="portfolio-create", element="input") }}
+          {{ SaveButton(text=('portfolios.new.save' | translate), form="portfolio-create", element="input") }}
         {% endblock %}
-        <a href="{{ url_for('atst.home') }}">
+        <a class="usa-button usa-button-secondary" href="{{ url_for('atst.home') }}">
           Cancel
         </a>
       </form>
@@ -49,4 +49,3 @@
   </base-form>
 </main>
 {% endblock %}
-

@@ -260,6 +260,7 @@ forms:
         marine_corps: Marine Corps
         navy: Navy
         other: Other
+      title: Select DoD component(s) funding your Portfolio
       validation_message: You must select at least one defense component.
       help_text: |
         <p>
@@ -450,6 +451,11 @@ portfolios:
         'False': ""
         'True': Delete Application
   header: PORTFOLIO
+  new:
+    title: New Portfolio
+    cta_step_1: Name and Describe Portfolio
+    sticky_header_context: 'Step {step} of 1'
+    save: Save Portfolio
   members:
     archive_button: Delete member
   reports:
