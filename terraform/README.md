@@ -57,6 +57,7 @@ To create all the resources we need for this environment we'll need to enable so
 This registers the specific feature for _SystemAssigned_ principals
 ```
 az feature register --namespace Microsoft.ContainerService --name MSIPreview
+az feature register --namespace Microsoft.ContainerService --name NodePublicIPPreview
 ```
 
 To apply the registration, run the following
@@ -211,6 +212,9 @@ TODO
 # Quick Steps
 Copy paste (mostly)
 
+*Register Preview features*
+See [Registering Features](#Preview_Features)
+
 *Edit provider.tf and turn off remote bucket temporarily (comment out backend {} section)*
 ```
 provider "azurerm" {
@@ -255,10 +259,21 @@ Next, we'll create the operator keyvault.
 
 `terraform plan -target=module.operator_keyvault`
 
-Lastly, we'll pre-populate some secrets using the secrets-tool. Follow the install/setup section in the README.md first. Then populate the secrets with a definition file as described in the following link.
-
+Next, we'll pre-populate some secrets using the secrets-tool. Follow the install/setup section in the README.md first. Then populate the secrets with a definition file as described in the following link.
 
 https://github.com/dod-ccpo/atst/tree/staging/terraform/secrets-tool#populating-secrets-from-secrets-definition-file
+
+*Create service principal for AKS*
+```
+az ad sp create-for-rbac
+```
+Take note of the output, you'll need it in the next step to store the secret and `client_id` in keyvault.
+
+This also involves using secrets-tool. Substitute your keyvault url.
+```
+secrets-tool secrets --keyvault https://ops-jedidev-keyvault.vault.azure.net/ create --key k8s-client-id --value [value]
+secrets-tool secrets --keyvault https://ops-jedidev-keyvault.vault.azure.net/ create --key k8s-client-secret --value [value]
+```
 
 *Next we'll apply the rest of the TF configuration*
 
