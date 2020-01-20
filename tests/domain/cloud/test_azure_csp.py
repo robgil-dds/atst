@@ -5,31 +5,30 @@ from uuid import uuid4
 
 from atst.domain.csp.cloud import (
     AzureCloudProvider,
-    TenantCSPResult,
-    TenantCSPPayload,
-    BillingProfileCSPPayload,
-    BillingProfileAddress,
     BillingProfileCreateCSPResult,
-    BillingProfileVerifyCSPPayload,
+    BillingProfileCSPPayload,
     BillingProfileCSPResult,
-    BillingRoleAssignmentCSPPayload,
-    BillingRoleAssignmentCSPResult,
-    EnableTaskOrderBillingCSPPayload,
-    VerifyTaskOrderBillingCSPPayload,
-    BillingProfileEnabledCSPResult,
+    BillingProfileTenantAccessCSPPayload,
+    BillingProfileTenantAccessCSPResult,
+    BillingProfileVerifyCSPPayload,
     ReportCLINCSPPayload,
     ReportCLINCSPResult,
+    TaskOrderBillingCSPPayload,
+    TenantCSPPayload,
+    TenantCSPResult,
+    VerifyTaskOrderBillingCSPPayload,
 )
 
 from tests.mock_azure import mock_azure, AUTH_CREDENTIALS
 from tests.factories import EnvironmentFactory, ApplicationFactory
 
 
-# TODO: Directly test create subscription, provide all args √
-# TODO: Test create environment (create management group with parent)
-# TODO: Test create application (create manageemnt group with parent)
-# Create reusable mock for mocking the management group calls for multiple services
-#
+creds = {
+    "home_tenant_id": "",
+    "client_id": "",
+    "secret_key": "",
+}
+BILLING_ACCOUNT_NAME = "52865e4c-52e8-5a6c-da6b-c58f0814f06f:7ea5de9d-b8ce-4901-b1c5-d864320c7b03_2019-05-31"
 
 
 @pytest.mark.skip("Skipping legacy azure integration tests")
@@ -153,7 +152,7 @@ def test_create_tenant(mock_azure: AzureCloudProvider):
     mock_azure.sdk.requests.post.return_value = mock_result
     payload = TenantCSPPayload(
         **dict(
-            creds={"username": "mock-cloud", "password": "shh"},
+            creds=creds,
             user_id="admin",
             password="JediJan13$coot",
             domain_name="jediccpospawnedtenant2",
@@ -192,7 +191,8 @@ def test_create_billing_profile(mock_azure: AzureCloudProvider):
             ),
             creds={"username": "mock-cloud", "password": "shh"},
             tenant_id="60ff9d34-82bf-4f21-b565-308ef0533435",
-            display_name="Test Billing Profile",
+            billing_profile_display_name="Test Billing Profile",
+            billing_account_name=BILLING_ACCOUNT_NAME,
         )
     )
     result = mock_azure.create_billing_profile(payload)
@@ -250,10 +250,10 @@ def test_validate_billing_profile_creation(mock_azure: AzureCloudProvider):
     )
 
     result = mock_azure.validate_billing_profile_created(payload)
-    body: BillingProfileCreateCSPResult = result.get("body")
+    body: BillingProfileCSPResult = result.get("body")
     assert body.billing_profile_name == "KQWI-W2SU-BG7-TGB"
     assert (
-        body.billing_profile_properties.display_name
+        body.billing_profile_properties.billing_profile_display_name
         == "First Portfolio Billing Profile"
     )
 
@@ -281,7 +281,7 @@ def test_create_billing_profile_tenant_access(mock_azure: AzureCloudProvider):
 
     mock_azure.sdk.requests.post.return_value = mock_result
 
-    payload = BillingRoleAssignmentCSPPayload(
+    payload = BillingProfileTenantAccessCSPPayload(
         **dict(
             creds={
                 "username": "username",
@@ -296,7 +296,7 @@ def test_create_billing_profile_tenant_access(mock_azure: AzureCloudProvider):
     )
 
     result = mock_azure.create_billing_profile_tenant_access(payload)
-    body: BillingRoleAssignmentCSPResult = result.get("body")
+    body: BillingProfileTenantAccessCSPResult = result.get("body")
     assert (
         body.billing_role_assignment_name
         == "40000000-aaaa-bbbb-cccc-100000000000_0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d"
@@ -317,7 +317,7 @@ def test_create_task_order_billing(mock_azure: AzureCloudProvider):
 
     mock_azure.sdk.requests.patch.return_value = mock_result
 
-    payload = EnableTaskOrderBillingCSPPayload(
+    payload = TaskOrderBillingCSPPayload(
         **dict(
             creds={
                 "username": "username",
@@ -388,7 +388,7 @@ def test_validate_task_order_billing_enabled(mock_azure):
                 "password": "password",
                 "tenant_id": "tenant_id",
             },
-            task_order_billing_validation_url="https://management.azure.com/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/operationResults/createBillingProfile_478d5706-71f9-4a8b-8d4e-2cbaca27a668?api-version=2019-10-01-preview",
+            task_order_billing_validate_url="https://management.azure.com/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/operationResults/createBillingProfile_478d5706-71f9-4a8b-8d4e-2cbaca27a668?api-version=2019-10-01-preview",
         )
     )
 

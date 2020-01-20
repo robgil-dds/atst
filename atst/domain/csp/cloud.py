@@ -235,6 +235,7 @@ class BillingProfileCLINBudget(AliasModel):
 class BillingProfileCSPPayload(BaseCSPPayload):
     tenant_id: str
     billing_profile_display_name: str
+    billing_account_name: str
     enabled_azure_plans: Optional[List[str]]
     address: BillingProfileAddress
 
@@ -321,7 +322,7 @@ class TaskOrderBillingCSPPayload(BaseCSPPayload):
 
 
 class EnableTaskOrderBillingCSPResult(AliasModel):
-    task_order_billing_validation_url: str
+    task_order_billing_validate_url: str
     retry_after: int
 
     class Config:
@@ -331,8 +332,8 @@ class EnableTaskOrderBillingCSPResult(AliasModel):
         }
 
 
-class TaskOrderBillingCSPResult(BaseCSPPayload):
-    task_order_billing_validation_url: str
+class VerifyTaskOrderBillingCSPPayload(BaseCSPPayload):
+    task_order_billing_validate_url: str
 
 
 class BillingProfileEnabledPlanDetails(AliasModel):
@@ -754,7 +755,7 @@ class AzureSDKProvider(object):
         import azure.graphrbac as graphrbac
         import azure.common.credentials as credentials
         import azure.identity as identity
-        from azure.keyvault import secrets import secrets
+        from azure.keyvault import secrets
 
         from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
         import adal
@@ -896,11 +897,8 @@ class AzureCloudProvider(CloudProviderInterface):
             headers=create_tenant_headers,
         )
 
-        print("create tenant result")
-        print(result.json())
-
         if result.status_code == 200:
-            return self._ok(TenantCSPResult(**result.json()))
+            return self._ok(TenantCSPResult(**result.json(), tenant_admin_password=payload.password, tenant_admin_username=payload.user_id))
         else:
             return self._error(result.json())
 
@@ -917,9 +915,7 @@ class AzureCloudProvider(CloudProviderInterface):
             "Authorization": f"Bearer {sp_token}",
         }
 
-        # TODO: unsure if this is a static value or needs to be constructed/configurable
-        BILLING_ACCOUT_NAME = "7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31"
-        billing_account_create_url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{BILLING_ACCOUT_NAME}/billingProfiles?api-version=2019-10-01-preview"
+        billing_account_create_url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles?api-version=2019-10-01-preview"
 
         result = self.sdk.requests.post(
             billing_account_create_url,
@@ -1022,9 +1018,7 @@ class AzureCloudProvider(CloudProviderInterface):
             "Authorization": f"Bearer {sp_token}",
         }
 
-        result = self.sdk.requests.get(
-            payload.task_order_billing_validation_url, headers=auth_header
-        )
+        result = self.sdk.requests.get(payload.task_order_billing_validate_url, headers=auth_header)
 
         if result.status_code == 202:
             # 202 has location/retry after headers
