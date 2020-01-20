@@ -31,7 +31,7 @@ spec:
           image: $CONTAINER_IMAGE
           env:
             - name: UWSGI_PROCESSES
-              value: "4"
+              value: "2"
             - name: UWSGI_THREADS
               value: "2"
             - name: UWSGI_ENABLE_THREADS
@@ -58,10 +58,10 @@ spec:
           resources:
             requests:
               memory: 400Mi
-              cpu: 1200m
+              cpu: 940m
             limits:
               memory: 400Mi
-              cpu: 1200m
+              cpu: 940m
         - name: nginx
           image: nginx:alpine
           ports:
@@ -93,10 +93,10 @@ spec:
           resources:
             requests:
               memory: 20Mi
-              cpu: 100m
+              cpu: 25m
             limits:
               memory: 20Mi
-              cpu: 100m
+              cpu: 25m
       volumes:
         - name: nginx-client-ca-bundle
           configMap:
