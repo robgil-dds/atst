@@ -98,8 +98,7 @@ flash:
       title: Application invitation error
       message: There was an error processing the invitation for {user_name} from {application_name}
     resent:
-      title: Application invitation resent
-      message: You have successfully resent the invite for {user_name} from {application_name}
+      message: "{email} has been sent an invitation to access this Application"
     revoked:
       title: Application invitation revoked
       message: You have successfully revoked the invite for {user_name} from {application_name}
@@ -166,11 +165,11 @@ flash:
   task_order:
     insufficient_funds:
       title: Insufficient Funds
+      message: ""
     submitted:
       title: Your Task Order has been uploaded successfully.
       message: Your task order form for {task_order.portfolio_name} has been submitted.
   new_application_member:
-    title: "{user_name}'s invitation has been sent"
     message: "{user_name}'s access to this Application is pending until they sign in for the first time."
   updated_application_team_settings: 'You have updated the {application_name} team settings.'
   user:
@@ -287,7 +286,7 @@ forms:
       start_past_contract: PoP start date must be before or on {date}.
       start_pre_contract: PoP start date must be on or after {date}.
     clin_funding_errors:
-      obligated_amount_error: Obligated amount must be less than or equal to total amount
+      obligated_amount_error: Obligated funds can not exceed total CLIN value
       funding_range_error: Dollar amount must be from $0.00 to $1,000,000,000.00
   validators:
     is_number_message: Please enter a valid number.

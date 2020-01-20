@@ -509,11 +509,7 @@ def resend_invite(application_id, application_role_id):
             token=new_invite.token,
         )
 
-        flash(
-            "application_invite_resent",
-            user_name=new_invite.user_name,
-            application_name=app_role.application.name,
-        )
+        flash("application_invite_resent", email=new_invite.email)
     else:
         flash(
             "application_invite_error",

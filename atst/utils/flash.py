@@ -29,7 +29,7 @@ MESSAGES = {
         "category": "error",
     },
     "application_invite_resent": {
-        "title": "flash.application_invite.resent.title",
+        "title": "",
         "message": "flash.application_invite.resent.message",
         "category": "success",
     },
@@ -90,7 +90,7 @@ MESSAGES = {
     },
     "insufficient_funds": {
         "title": "flash.task_order.insufficient_funds.title",
-        "message": "",
+        "message": "flash.task_order.insufficient_funds.message",
         "category": "warning",
     },
     "logged_out": {
@@ -104,7 +104,7 @@ MESSAGES = {
         "category": "warning",
     },
     "new_application_member": {
-        "title": "flash.new_application_member.title",
+        "title": None,
         "message": "flash.new_application_member.message",
         "category": "success",
     },
