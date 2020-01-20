@@ -24,9 +24,6 @@
 
     .usa-button {
       margin: 0;
-      width: 20rem;
-      height: 3.2rem;
-      font-size: $small-font-size;
     }
   }
 
@@ -42,6 +39,10 @@
 
   &-buttons {
     display: flex;
+
+    a {
+      font-size: 1.5rem;
+    }
 
     .action-group {
       margin: 0;

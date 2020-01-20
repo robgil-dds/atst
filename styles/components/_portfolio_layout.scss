@@ -5,15 +5,16 @@
   }
 
   .col.col--grow {
+    position: relative;
     padding: 0;
   }
 }
 
 .portfolio-header {
   flex-direction: column;
-  align-items: center;
-  margin: $spacing-medium 0;
-  max-width: 90rem;
+  margin: $gap * 2 0;
+  max-width: $max-panel-width;
+
   @include media($small-screen) {
     flex-direction: row;
   }
@@ -25,6 +26,12 @@
   &__name {
     @include h1;
     padding-right: $spacing-medium;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    -webkit-transform: translateX(0%) translateY(-50%);
+    transform: translateX(0%) translateY(-50%);
+
     h1 {
       margin: 0;
       font-size: 3.5rem;
@@ -64,6 +71,7 @@
       &.active {
         color: $color-blue;
         background-color: $color-gray-lightest;
+        text-decoration: none;
 
         &:hover {
           background-color: $color-aqua-lightest;
@@ -95,17 +103,17 @@
 
 .portfolio-admin {
   margin: $spacing-large 0;
-  max-width: 90rem;
+  max-width: $max-panel-width;
 }
 
 .portfolio-content {
   .panel {
     padding-bottom: 2rem;
-    max-width: 90rem;
+    max-width: $max-panel-width;
   }
 
   hr {
-    max-width: 90rem;
+    max-width: $max-panel-width;
   }
 
   a.add-new-button {
@@ -263,6 +271,7 @@
 
 .portfolio-applications {
   margin-top: $gap * 5;
+  max-width: $max-panel-width;
 
   &__header {
     &--title {
@@ -308,7 +317,7 @@
 }
 
 .portfolio-funding {
-  max-width: 90rem;
+  max-width: $max-panel-width;
   margin: $spacing-large 0;
 
   .panel {
@@ -378,6 +387,8 @@
 }
 
 .portfolio-reports {
+  max-width: $max-panel-width;
+
   &__header {
     margin-bottom: 4 * $gap;
 

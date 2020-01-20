@@ -1,8 +1,6 @@
 .empty-state {
-  padding: $gap * 3;
-  max-width: 100%;
-  background-color: $color-gray-lightest;
-  margin-top: $gap * 5;
+  max-width: $max-panel-width;
+  background-color: #F6F6F7;
 
   &--white {
     background-color: $color-white;
@@ -18,17 +16,28 @@
     margin-top: 3rem;
   }
 
+  h3 {
+    margin: 0 0 1rem;
+    padding: 3.2rem 2.4rem 0;
+  }
+
+  p {
+    margin: 0;
+    padding: 0 $gap * 3;
+  }
+
   hr {
-    margin-left: -$gap * 3;
-    margin-right: -$gap * 3;
+    margin: $gap * 4 0 0;
   }
 
   &__footer {
     text-align: center;
+    background-color: $color-gray-lightest;
+    padding: $gap * 3;
 
     a.usa-button {
       width: 60%;
-      display: inline-block;
+      margin: 0 auto;
     }
   }
 }
