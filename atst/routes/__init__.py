@@ -42,16 +42,6 @@ def root():
     return render_template("login.html", redirect_url=redirect_url)
 
 
-@bp.route("/help")
-@bp.route("/help/<path:doc>")
-def helpdocs(doc=None):
-    docs = [os.path.splitext(file)[0] for file in os.listdir("templates/help/docs")]
-    if doc:
-        return render_template("help/docs/{}.html".format(doc), docs=docs, doc=doc)
-    else:
-        return render_template("help/index.html", docs=docs, doc=doc)
-
-
 @bp.route("/home")
 def home():
     return render_template("home.html")
