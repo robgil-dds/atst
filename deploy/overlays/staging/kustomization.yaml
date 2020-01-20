@@ -5,6 +5,7 @@ resources:
   - namespace.yml
   - reset-cron-job.yml
 patchesStrategicMerge:
+  - autoscaling.yml
   - ports.yml
   - envvars.yml
   - flex_vol.yml
