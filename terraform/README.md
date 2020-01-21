@@ -57,6 +57,7 @@ To create all the resources we need for this environment we'll need to enable so
 This registers the specific feature for _SystemAssigned_ principals
 ```
 az feature register --namespace Microsoft.ContainerService --name MSIPreview
+az feature register --namespace Microsoft.ContainerService --name NodePublicIPPreview
 ```
 
 To apply the registration, run the following
@@ -207,3 +208,76 @@ TODO
 
 ## Downloading a client profile
 TODO
+
+# Quick Steps
+Copy paste (mostly)
+
+*Register Preview features*
+See [Registering Features](#Preview_Features)
+
+*Edit provider.tf and turn off remote bucket temporarily (comment out backend {} section)*
+```
+provider "azurerm" {
+  version = "=1.40.0"
+}
+
+provider "azuread" {
+  # Whilst version is optional, we /strongly recommend/ using it to pin the version of the Provider being used
+  version = "=0.7.0"
+}
+
+terraform {
+  #backend "azurerm" {
+    #resource_group_name  = "cloudzero-dev-tfstate"
+    #storage_account_name = "cloudzerodevtfstate"
+    #container_name       = "tfstate"
+    #key                  = "dev.terraform.tfstate"
+  #}
+}
+```
+
+`terraform init`
+
+`terraform plan -target=module.tf_state`
+
+Ensure the state bucket is created.
+
+*create the container in the portal (or cli).*
+This simply involves going to the bucket in the azure portal and creating the container.
+
+Now is the tricky part. For this, we will be switching from local state (files) to remote state (stored in the azure bucket)
+
+Uncomment the `backend {}` section in the `provider.tf` file. Once uncommented, we will re-run the init. This will attempt to copy the local state to the remote bucket.
+
+`terraform init`
+
+*Say `yes` to the question*
+
+Now we need to update the Update `variables.tf` with the principals for the users in `admin_users` variable map. If these are not defined yet, just leave it as an empty set. 
+
+Next, we'll create the operator keyvault.
+
+`terraform plan -target=module.operator_keyvault`
+
+Next, we'll pre-populate some secrets using the secrets-tool. Follow the install/setup section in the README.md first. Then populate the secrets with a definition file as described in the following link.
+
+https://github.com/dod-ccpo/atst/tree/staging/terraform/secrets-tool#populating-secrets-from-secrets-definition-file
+
+*Create service principal for AKS*
+```
+az ad sp create-for-rbac
+```
+Take note of the output, you'll need it in the next step to store the secret and `client_id` in keyvault.
+
+This also involves using secrets-tool. Substitute your keyvault url.
+```
+secrets-tool secrets --keyvault https://ops-jedidev-keyvault.vault.azure.net/ create --key k8s-client-id --value [value]
+secrets-tool secrets --keyvault https://ops-jedidev-keyvault.vault.azure.net/ create --key k8s-client-secret --value [value]
+```
+
+*Next we'll apply the rest of the TF configuration*
+
+`terraform plan` # Make sure this looks correct
+
+`terraform apply`
+

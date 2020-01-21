@@ -1,6 +1,6 @@
 module "operator_keyvault" {
   source           = "../../modules/keyvault"
-  name             = "operator"
+  name             = "ops"
   region           = var.region
   owner            = var.owner
   environment      = var.environment

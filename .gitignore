@@ -31,6 +31,7 @@ static/buildinfo.*
 
 # local log files
 log/*
+*.log
 
 config/dev.ini
 .env*
@@ -74,3 +75,7 @@ celerybeat-schedule
 js/test_templates
 
 .mypy_cache/
+
+# terraform
+*.tfstate
+*.backup

@@ -9,13 +9,23 @@ spec:
         - name: nginx-secret
           flexVolume:
             options:
-              keyvaultname: "atat-vault-test"
-              keyvaultobjectnames: "dhparam4096;cert;cert"
+              keyvaultname: "cloudzero-dev-keyvault"
+              # keyvaultobjectnames: "dhparam4096;cert;cert"
+              keyvaultobjectnames: "foo"
+              keyvaultobjectaliases: "FOO"
+              keyvaultobjecttypes: "secret"
+              usevmmanagedidentity: "true"
+              usepodidentity: "false"
         - name: flask-secret
           flexVolume:
             options:
-              keyvaultname: "atat-vault-test"
-              keyvaultobjectnames: "AZURE-STORAGE-KEY;MAIL-PASSWORD;PGPASSWORD;REDIS-PASSWORD;SECRET-KEY"
+              keyvaultname: "cloudzero-dev-keyvault"
+              # keyvaultobjectnames: "AZURE-STORAGE-KEY;MAIL-PASSWORD;PGPASSWORD;REDIS-PASSWORD;SECRET-KEY"
+              keyvaultobjectnames: "master-PGPASSWORD"
+              keyvaultobjectaliases: "PGPASSWORD"
+              keyvaultobjecttypes: "secret"
+              usevmmanagedidentity: "true"
+              usepodidentity: "false"
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -28,8 +38,10 @@ spec:
         - name: flask-secret
           flexVolume:
             options:
-              keyvaultname: "atat-vault-test"
+              keyvaultname: "cloudzero-dev-keyvault"
               keyvaultobjectnames: "AZURE-STORAGE-KEY;MAIL-PASSWORD;PGPASSWORD;REDIS-PASSWORD;SECRET-KEY"
+              usevmmanagedidentity: "true"
+              usepodidentity: "false"
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -42,8 +54,10 @@ spec:
         - name: flask-secret
           flexVolume:
             options:
-              keyvaultname: "atat-vault-test"
+              keyvaultname: "cloudzero-dev-keyvault"
               keyvaultobjectnames: "AZURE-STORAGE-KEY;MAIL-PASSWORD;PGPASSWORD;REDIS-PASSWORD;SECRET-KEY"
+              usevmmanagedidentity: "true"
+              usepodidentity: "false"
 ---
 apiVersion: batch/v1beta1
 kind: CronJob
@@ -58,5 +72,7 @@ spec:
             - name: flask-secret
               flexVolume:
                 options:
-                  keyvaultname: "atat-vault-test"
+                  keyvaultname: "cloudzero-dev-keyvault"
                   keyvaultobjectnames: "AZURE-STORAGE-KEY;MAIL-PASSWORD;PGPASSWORD;REDIS-PASSWORD;SECRET-KEY"
+                  usevmmanagedidentity: "true"
+                  usepodidentity: "false"

@@ -1,9 +1,9 @@
 variable "environment" {
-  default = "dev"
+  default = "jedidev"
 }
 
 variable "region" {
-  default = "eastus2"
+  default = "eastus"
 
 }
 
@@ -69,13 +69,13 @@ variable "k8s_dns_prefix" {
 
 variable "tenant_id" {
   type    = string
-  default = "b5ab0e1e-09f8-4258-afb7-fb17654bc5b3"
+  default = "47f616e9-6ff5-4736-9b9e-b3f62c93a915"
 }
 
 variable "admin_users" {
   type = map
   default = {
-    "Rob Gil"         = "2ca63d41-d058-4e06-aef6-eb517a53b631"
-    "Daniel Corrigan" = "d5bb69c2-3b88-4e96-b1a2-320400f1bf1b"
+    "Rob Gil"      = "cef37d01-1acf-4085-96c8-da9d34d0237e"
+    "Dan Corrigan" = "7e852ceb-eb0d-49b1-b71e-e9dcd1082ffc"
   }
 }
