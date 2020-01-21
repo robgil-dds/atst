@@ -7,30 +7,11 @@
   {% set contract_amount = task_order.total_contract_amount %}
   {% set expended_funds = task_order.invoiced_funds %}
 
-  {% if builder_mode -%}
-    {% set obligated = 'task_orders.form.step_4.obligated' %}
-    {% set total = 'task_orders.form.step_4.total' %}
-    {% set expended = 'task_orders.form.step_4.expended' %}
-  {% else %}
-    {% set obligated = 'task_orders.review.summary.obligated' %}
-    {% set total = 'task_orders.review.summary.total' %}
-    {% set expended = 'task_orders.review.summary.expended' %}
-  {%- endif %}
-
   <div>
     <section class="row">
       <div class='col col--grow summary-item'>
         <h4 class="summary-item__header">
-          <span class="summary-item__header-text">{{ obligated | translate }}</span>
-          {{ Tooltip(("task_orders.review.tooltip.obligated_funds" | translate), title="", classes="summary-item__header-icon") }}
-        </h4>
-        <p class="summary-item__value--large">
-          {{ obligated_funds | dollars }}
-        </p>
-      </div>
-      <div class='col col--grow summary-item'>
-        <h4 class="summary-item__header">
-          <span class="summary-item__header-text">{{ total | translate }}</span>
+          <span class="summary-item__header-text">{{ 'task_orders.summary.total' | translate }}</span>
           {{ Tooltip(("task_orders.review.tooltip.total_value" | translate), title="", classes="summary-item__header-icon") }}
         </h4>
         <p class="summary-item__value--large">
@@ -39,7 +20,16 @@
       </div>
       <div class='col col--grow summary-item'>
         <h4 class="summary-item__header">
-          <span class="summary-item__header-text">{{ expended | translate }}</span>
+          <span class="summary-item__header-text">{{ 'task_orders.summary.obligated' | translate }}</span>
+          {{ Tooltip(("task_orders.review.tooltip.obligated_funds" | translate), title="", classes="summary-item__header-icon") }}
+        </h4>
+        <p class="summary-item__value--large">
+          {{ obligated_funds | dollars }}
+        </p>
+      </div>
+      <div class='col col--grow summary-item'>
+        <h4 class="summary-item__header">
+          <span class="summary-item__header-text">{{ 'task_orders.summary.expended' | translate }}</span>
           {{ Tooltip(("task_orders.review.tooltip.expended_funds" | translate), title="", classes="summary-item__header-icon") }}
         </h4>
         <p class="summary-item__value--large">

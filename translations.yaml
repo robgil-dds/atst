@@ -496,10 +496,6 @@ task_orders:
         JEDI_CLIN_2: 'Classified IaaS and PaaS (IDIQ CLIN 0002)'
         JEDI_CLIN_3: 'Unclassified Cloud Support Package (IDIQ CLIN 0003)'
         JEDI_CLIN_4: 'Classified Cloud Support Package (IDIQ CLIN 0004)'
-    summary:
-      obligated: Total obligated funds
-      total: Total Task Order value
-      expended: Total expended funds
     tooltip:
       obligated_funds: Funds committed to fund your portfolio. This may represent 100% of your total Task Order value, or a portion of it.
       total_value: All obligated and projected funds for the Task Order’s Base and Option CLINs.
@@ -534,9 +530,6 @@ task_orders:
       next_button: 'Next: Review Task Order'
       percent_obligated: '% of Funds Obligated'
     step_4:
-      obligated: Total Obligated
-      total: Total Value
-      expended: Total Expended
       documents: Documents
       clins: CLIN Summary
     step_5:
@@ -559,6 +552,10 @@ task_orders:
       text: I acknowledge, by executing the confirmation above and submitting this verification, that I am subject to potential penalties that may include fines, imprisonment, or both, under the U.S. law and regulations for any false statement or misrepresentation in association with this Task Order submission or on any accompanying documentation.
   status_empty_state: 'This Portfolio has no {status} Task Orders.'
   status_list_title: '{status} Task Orders'
+  summary:
+    obligated: Total Obligated
+    total: Total Value
+    expended: Total Expended
 JEDICLINType:
   JEDI_CLIN_1: 'IDIQ CLIN 0001 Unclassified IaaS/PaaS'
   JEDI_CLIN_2: 'IDIQ CLIN 0002 Classified IaaS/PaaS'
