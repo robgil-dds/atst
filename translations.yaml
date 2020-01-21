@@ -359,7 +359,7 @@ portfolios:
         'True': Edit Reporting
   applications:
     add_environment: Add an Environment
-    add_member: Add New Application Member
+    add_member: Add Team Member
     add_another_environment: Add another environment
     create_button: Create Application
     empty_state:
