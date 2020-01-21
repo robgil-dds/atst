@@ -11,11 +11,11 @@
       <div class='panel__content'>
         <div class='form-row'>
           <div class='form-col form-col--half'>
-            {{ TextInput(form.first_name, validation='requiredField', optional=False) }}
+            {{ TextInput(form.first_name, validation='name', optional=False) }}
           </div>
 
           <div class='form-col form-col--half'>
-            {{ TextInput(form.last_name, validation='requiredField', optional=False) }}
+            {{ TextInput(form.last_name, validation='name', optional=False) }}
           </div>
         </div>
 
