@@ -10,8 +10,8 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   dns_prefix          = var.k8s_dns_prefix
 
   service_principal {
-    client_id     = "f05a4457-bd5e-4c63-98e1-89aab42645d0"
-    client_secret = "19b69e2c-9f55-4850-87cb-88c67a8dc811"
+    client_id     = var.client_id
+    client_secret = var.client_secret
   }
 
   default_node_pool {

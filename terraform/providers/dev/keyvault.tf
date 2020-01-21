@@ -1,6 +1,6 @@
 module "keyvault" {
   source           = "../../modules/keyvault"
-  name             = var.name
+  name             = "cz"
   region           = var.region
   owner            = var.owner
   environment      = var.environment
