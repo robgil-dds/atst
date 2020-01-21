@@ -29,6 +29,13 @@ spec:
       containers:
         - name: atst
           image: $CONTAINER_IMAGE
+          env:
+            - name: UWSGI_PROCESSES
+              value: "2"
+            - name: UWSGI_THREADS
+              value: "2"
+            - name: UWSGI_ENABLE_THREADS
+              value: "1"
           envFrom:
             - configMapRef:
                 name: atst-envvars
@@ -50,11 +57,11 @@ spec:
               mountPath: "/config"
           resources:
             requests:
-              memory: 200Mi
-              cpu: 400m
+              memory: 400Mi
+              cpu: 940m
             limits:
-              memory: 200Mi
-              cpu: 400m
+              memory: 400Mi
+              cpu: 940m
         - name: nginx
           image: nginx:alpine
           ports:
@@ -86,10 +93,10 @@ spec:
           resources:
             requests:
               memory: 20Mi
-              cpu: 10m
+              cpu: 25m
             limits:
               memory: 20Mi
-              cpu: 10m
+              cpu: 25m
       volumes:
         - name: nginx-client-ca-bundle
           configMap:
@@ -309,6 +316,7 @@ metadata:
   namespace: atat
 spec:
   loadBalancerIP: 13.92.235.6
+  externalTrafficPolicy: Local
   ports:
     - port: 80
       targetPort: 8342
@@ -329,6 +337,7 @@ metadata:
   namespace: atat
 spec:
   loadBalancerIP: 23.100.24.41
+  externalTrafficPolicy: Local
   ports:
     - port: 80
       targetPort: 8343

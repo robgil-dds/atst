@@ -219,11 +219,11 @@ def test_resend_invitation_sends_email(monkeypatch, client, user_session):
     monkeypatch.setattr("atst.jobs.send_mail.delay", job_mock)
     user = UserFactory.create()
     portfolio = PortfolioFactory.create()
-    ws_role = PortfolioRoleFactory.create(
+    portfolio_role = PortfolioRoleFactory.create(
         user=user, portfolio=portfolio, status=PortfolioRoleStatus.PENDING
     )
     invite = PortfolioInvitationFactory.create(
-        user_id=user.id, role=ws_role, status=InvitationStatus.PENDING
+        user_id=user.id, role=portfolio_role, status=InvitationStatus.PENDING
     )
     user_session(portfolio.owner)
     client.post(
@@ -231,48 +231,23 @@ def test_resend_invitation_sends_email(monkeypatch, client, user_session):
             "portfolios.resend_invitation",
             portfolio_id=portfolio.id,
             portfolio_token=invite.token,
-        )
+        ),
+        data={
+            "user_data-dod_id": user.dod_id,
+            "user_data-first_name": user.first_name,
+            "user_data-last_name": user.last_name,
+            "user_data-email": user.email,
+        },
     )
 
     assert job_mock.called
 
 
-def test_existing_member_invite_resent_to_email_submitted_in_form(
-    monkeypatch, client, user_session
-):
-    job_mock = Mock()
-    monkeypatch.setattr("atst.jobs.send_mail.delay", job_mock)
-    portfolio = PortfolioFactory.create()
-    user = UserFactory.create()
-    ws_role = PortfolioRoleFactory.create(
-        user=user, portfolio=portfolio, status=PortfolioRoleStatus.PENDING
-    )
-    invite = PortfolioInvitationFactory.create(
-        user_id=user.id,
-        role=ws_role,
-        status=InvitationStatus.PENDING,
-        email="example@example.com",
-    )
-    user_session(portfolio.owner)
-    client.post(
-        url_for(
-            "portfolios.resend_invitation",
-            portfolio_id=portfolio.id,
-            portfolio_token=invite.token,
-        )
-    )
-
-    assert user.email != "example@example.com"
-    ordered_args, _unordered_args = job_mock.call_args
-    recipients, _subject, _message = ordered_args
-    assert recipients[0] == "example@example.com"
-
-
 _DEFAULT_PERMS_FORM_DATA = {
-    "permission_sets-perms_app_mgmt": False,
-    "permission_sets-perms_funding": False,
-    "permission_sets-perms_reporting": False,
-    "permission_sets-perms_portfolio_mgmt": False,
+    "permission_sets-perms_app_mgmt": "n",
+    "permission_sets-perms_funding": "n",
+    "permission_sets-perms_reporting": "n",
+    "permission_sets-perms_portfolio_mgmt": "n",
 }
 
 

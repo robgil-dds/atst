@@ -40,9 +40,7 @@ reset_db() {
   local database_name="${1}"
 
   # If the DB exists, drop it
-  set +e
-  dropdb "${database_name}"
-  set -e
+  dropdb --if-exists "${database_name}"
 
   # Create a fresh DB
   createdb "${database_name}"
