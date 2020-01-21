@@ -10,9 +10,11 @@
 
 <main class="usa-section usa-content">
   {% include "fragments/flash.html" %}
-  <div class='portfolio-header__name'>
-    <p>{{ "portfolios.header" | translate }}</p>
-    <h1>{{ "New Portfolio" }}</h1>
+  <div class="portfolio-header-new">
+    <div class='portfolio-header__name'>
+      <p>{{ "portfolios.header" | translate }}</p>
+      <h1>{{ "New Portfolio" }}</h1>
+    </div>
   </div>
   {{ StickyCTA(text="Create New Portfolio") }}
   <base-form inline-template>

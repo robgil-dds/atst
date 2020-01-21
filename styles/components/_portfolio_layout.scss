@@ -3,11 +3,6 @@
     @include grid-row;
     min-height: 500px;
   }
-
-  .col.col--grow {
-    position: relative;
-    padding: 0;
-  }
 }
 
 .portfolio-header {
@@ -25,12 +20,6 @@
 
   &__name {
     @include h1;
-    padding-right: $spacing-medium;
-    position: absolute;
-    top: 50%;
-    left: 0;
-    -webkit-transform: translateX(0%) translateY(-50%);
-    transform: translateX(0%) translateY(-50%);
 
     h1 {
       margin: 0;
