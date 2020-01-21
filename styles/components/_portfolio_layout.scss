@@ -16,10 +16,14 @@
 
   .col--grow {
     overflow: inherit;
+    display: table;
+    min-height: 10rem;
   }
 
   &__name {
     @include h1;
+    display: table-cell;
+    vertical-align: middle;
 
     h1 {
       margin: 0;
