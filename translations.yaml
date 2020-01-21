@@ -136,7 +136,9 @@ flash:
   logged_out:
     title: Logged out
     message: You've been logged out.
-  new_portfolio_member: 'You have successfully invited {user_name} to the portfolio.'
+  new_portfolio_member:
+    title: "{user_name}'s invitation has been sent"
+    message: "{user_name}'s access to this Portfolio is pending until they sign in for the first time."
   new_ppoc_message: 'You have successfully added {ppoc_name} as the primary point of contact. You are no longer the PPoC.'
   new_ppoc_title: Primary point of contact updated
   portfolio_member:
@@ -151,8 +153,7 @@ flash:
       message: An unexpected problem occurred with your request, please try again. If the problem persists, contact an administrator.
   portfolio_invite:
     resent:
-      title: Invitation resent
-      message: Successfully sent a new invitation to {user_name}.
+      message: "{email} has been sent an invitation to access this Application"
     error:
       title: Portfolio invitation error
       message: There was an error processing the invitation for {user_name}.
@@ -165,11 +166,11 @@ flash:
   task_order:
     insufficient_funds:
       title: Insufficient Funds
-      message: ""
     submitted:
       title: Your Task Order has been uploaded successfully.
       message: Your task order form for {task_order.portfolio_name} has been submitted.
   new_application_member:
+    title: "{user_name}'s invitation has been sent"
     message: "{user_name}'s access to this Application is pending until they sign in for the first time."
   updated_application_team_settings: 'You have updated the {application_name} team settings.'
   user:
