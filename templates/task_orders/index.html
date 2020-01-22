@@ -66,7 +66,7 @@
 
 
 {% call StickyCTA(text="common.task_orders"|translate) %}
-    {% if user_can(permissions.CREATE_TASK_ORDER) and task_orders %}
+    {% if user_can(permissions.CREATE_TASK_ORDER) and to_count > 0 %}
       <a href="{{ url_for("task_orders.form_step_one_add_pdf", portfolio_id=portfolio.id) }}" class="usa-button usa-button-primary">
         {{ "task_orders.add_new_button" | translate }}
       </a>

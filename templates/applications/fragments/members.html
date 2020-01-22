@@ -46,7 +46,7 @@
               {{ member_form.SubmitStep(
                 name=modal_name,
                 form=member_fields.PermsFields(form=member.form, member_role_id=member.role_id),
-                submit_text="Update",
+                submit_text="common.save_changes"|translate,
                 previous=False,
                 modal=modal_name,
               ) }}
@@ -179,7 +179,7 @@
           member_form.SubmitStep(
             name=new_member_modal_name,
             form=member_fields.PermsFields(form=new_member_form, new=True),
-            submit_text="portfolios.applications.members.form.add_member"|translate,
+            submit_text="common.save_changes"|translate,
             modal=new_member_modal_name,
           )
         ],

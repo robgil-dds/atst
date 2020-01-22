@@ -29,7 +29,7 @@ MESSAGES = {
         "category": "error",
     },
     "application_invite_resent": {
-        "title": "flash.application_invite.resent.title",
+        "title": None,
         "message": "flash.application_invite.resent.message",
         "category": "success",
     },
@@ -90,7 +90,7 @@ MESSAGES = {
     },
     "insufficient_funds": {
         "title": "flash.task_order.insufficient_funds.title",
-        "message": "",
+        "message": None,
         "category": "warning",
     },
     "logged_out": {
@@ -109,8 +109,8 @@ MESSAGES = {
         "category": "success",
     },
     "new_portfolio_member": {
-        "title": "flash.success",
-        "message": "flash.new_portfolio_member",
+        "title": "flash.new_portfolio_member.title",
+        "message": "flash.new_portfolio_member.message",
         "category": "success",
     },
     "portfolio_member_removed": {
@@ -124,7 +124,7 @@ MESSAGES = {
         "category": "success",
     },
     "resend_portfolio_invitation": {
-        "title": "flash.portfolio_invite.resent.title",
+        "title": None,
         "message": "flash.portfolio_invite.resent.message",
         "category": "success",
     },

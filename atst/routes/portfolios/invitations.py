@@ -65,7 +65,7 @@ def resend_invitation(portfolio_id, portfolio_token):
             inviter_name=g.current_user.full_name,
             token=invite.token,
         )
-        flash("resend_portfolio_invitation", user_name=invite.user_name)
+        flash("resend_portfolio_invitation", email=invite.email)
     else:
         user_name = f"{form['user_data']['first_name'].data} {form['user_data']['last_name'].data}"
         flash("resend_portfolio_invitation_error", user_name=user_name)
