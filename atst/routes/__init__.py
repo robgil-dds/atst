@@ -47,14 +47,6 @@ def home():
     return render_template("home.html")
 
 
-@bp.route("/<path:path>")
-def catch_all(path):
-    try:
-        return render_template("{}.html".format(path))
-    except TemplateNotFound:
-        raise NotFound()
-
-
 def _client_s_dn():
     return request.environ.get("HTTP_X_SSL_CLIENT_S_DN")
 
