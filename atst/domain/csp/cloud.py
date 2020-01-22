@@ -576,58 +576,68 @@ class MockCloudProvider(CloudProviderInterface):
         self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
         self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
 
-        return TenantCSPResult(**{
-            "tenant_id": "",
-            "user_id": "",
-            "user_object_id": "",
-            "tenant_admin_username": "test",
-            "tenant_admin_password": "test"
-        }).dict()
+        return TenantCSPResult(
+            **{
+                "tenant_id": "",
+                "user_id": "",
+                "user_object_id": "",
+                "tenant_admin_username": "test",
+                "tenant_admin_password": "test",
+            }
+        ).dict()
 
-    def create_billing_profile_creation(self, payload: BillingProfileCreationCSPPayload):
+    def create_billing_profile_creation(
+        self, payload: BillingProfileCreationCSPPayload
+    ):
         # response will be mostly the same as the body, but we only really care about the id
         self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
         self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
         self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
 
-        return BillingProfileCreationCSPResult(**dict(
-            billing_profile_verify_url = "https://zombo.com",
-            billing_profile_retry_after = 10
-        )).dict()
+        return BillingProfileCreationCSPResult(
+            **dict(
+                billing_profile_verify_url="https://zombo.com",
+                billing_profile_retry_after=10,
+            )
+        ).dict()
 
-    def create_billing_profile_verification(self, payload: BillingProfileVerificationCSPPayload):
+    def create_billing_profile_verification(
+        self, payload: BillingProfileVerificationCSPPayload
+    ):
         self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
         self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
         self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
-        return BillingProfileVerificationCSPResult(**{
-            'id': '/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB',
-            'name': 'KQWI-W2SU-BG7-TGB',
-            'properties': {
-                'address': {
-                    'addressLine1': '123 S Broad Street, Suite 2400',
-                    'city': 'Philadelphia',
-                    'companyName': 'Promptworks',
-                    'country': 'US',
-                    'postalCode': '19109',
-                    'region': 'PA'
+        return BillingProfileVerificationCSPResult(
+            **{
+                "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB",
+                "name": "KQWI-W2SU-BG7-TGB",
+                "properties": {
+                    "address": {
+                        "addressLine1": "123 S Broad Street, Suite 2400",
+                        "city": "Philadelphia",
+                        "companyName": "Promptworks",
+                        "country": "US",
+                        "postalCode": "19109",
+                        "region": "PA",
+                    },
+                    "currency": "USD",
+                    "displayName": "Test Billing Profile",
+                    "enabledAzurePlans": [],
+                    "hasReadAccess": True,
+                    "invoiceDay": 5,
+                    "invoiceEmailOptIn": False,
+                    "invoiceSections": [
+                        {
+                            "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB/invoiceSections/CHCO-BAAR-PJA-TGB",
+                            "name": "CHCO-BAAR-PJA-TGB",
+                            "properties": {"displayName": "Test Billing Profile"},
+                            "type": "Microsoft.Billing/billingAccounts/billingProfiles/invoiceSections",
+                        }
+                    ],
                 },
-                "currency": "USD",
-                "displayName": "Test Billing Profile",
-                "enabledAzurePlans": [],
-                "hasReadAccess": True,
-                "invoiceDay": 5,
-                "invoiceEmailOptIn": False,
-                "invoiceSections": [
-                    {
-                        "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB/invoiceSections/CHCO-BAAR-PJA-TGB",
-                        "name": "CHCO-BAAR-PJA-TGB",
-                        "properties": {"displayName": "Test Billing Profile"},
-                        "type": "Microsoft.Billing/billingAccounts/billingProfiles/invoiceSections",
-                    }
-                ],
-            },
-            'type': 'Microsoft.Billing/billingAccounts/billingProfiles'
-        }).dict()
+                "type": "Microsoft.Billing/billingAccounts/billingProfiles",
+            }
+        ).dict()
 
     def create_billing_profile_tenant_access(self, payload):
         self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
@@ -722,6 +732,7 @@ SUBSCRIPTION_ID_REGEX = re.compile(
 REMOTE_ROOT_ROLE_DEF_ID = "/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-4000-8000-000000000000"
 AZURE_MANAGEMENT_API = "https://management.azure.com"
 
+
 class AzureSDKProvider(object):
     def __init__(self):
         from azure.mgmt import subscription, authorization, managementgroups
@@ -768,16 +779,14 @@ class AzureCloudProvider(CloudProviderInterface):
     def set_secret(secret_key, secret_value):
         credential = self._get_client_secret_credential_obj()
         secret_client = self.secrets.SecretClient(
-            vault_url=self.vault_url,
-            credential=credential,
+            vault_url=self.vault_url, credential=credential,
         )
         return secret_client.set_secret(secret_key, secret_value)
 
     def get_secret(secret_key):
         credential = self._get_client_secret_credential_obj()
         secret_client = self.secrets.SecretClient(
-            vault_url=self.vault_url,
-            credential=credential,
+            vault_url=self.vault_url, credential=credential,
         )
         return secret_client.get_secret(secret_key).value
 
@@ -976,11 +985,19 @@ class AzureCloudProvider(CloudProviderInterface):
         )
 
         if result.status_code == 200:
-            return self._ok(TenantCSPResult(**result.json(), tenant_admin_password=payload.password, tenant_admin_username=payload.user_id))
+            return self._ok(
+                TenantCSPResult(
+                    **result.json(),
+                    tenant_admin_password=payload.password,
+                    tenant_admin_username=payload.user_id,
+                )
+            )
         else:
             return self._error(result.json())
 
-    def create_billing_profile_creation(self, payload: BillingProfileCreationCSPPayload):
+    def create_billing_profile_creation(
+        self, payload: BillingProfileCreationCSPPayload
+    ):
         sp_token = self._get_sp_token(payload.creds)
         if sp_token is None:
             raise AuthenticationException(
@@ -1010,7 +1027,9 @@ class AzureCloudProvider(CloudProviderInterface):
         else:
             return self._error(result.json())
 
-    def create_billing_profile_verification(self, payload: BillingProfileVerificationCSPPayload):
+    def create_billing_profile_verification(
+        self, payload: BillingProfileVerificationCSPPayload
+    ):
         sp_token = self._get_sp_token(payload.creds)
         if sp_token is None:
             raise AuthenticationException(
@@ -1057,7 +1076,9 @@ class AzureCloudProvider(CloudProviderInterface):
         else:
             return self._error(result.json())
 
-    def create_task_order_billing_creation(self, payload: TaskOrderBillingCreationCSPPayload):
+    def create_task_order_billing_creation(
+        self, payload: TaskOrderBillingCreationCSPPayload
+    ):
         sp_token = self._get_sp_token(payload.creds)
         request_body = [
             {
@@ -1085,7 +1106,9 @@ class AzureCloudProvider(CloudProviderInterface):
         else:
             return self._error(result.json())
 
-    def create_task_order_billing_verification(self, payload: TaskOrderBillingVerificationCSPPayload):
+    def create_task_order_billing_verification(
+        self, payload: TaskOrderBillingVerificationCSPPayload
+    ):
         sp_token = self._get_sp_token(payload.creds)
         if sp_token is None:
             raise AuthenticationException(
@@ -1096,7 +1119,9 @@ class AzureCloudProvider(CloudProviderInterface):
             "Authorization": f"Bearer {sp_token}",
         }
 
-        result = self.sdk.requests.get(payload.task_order_billing_verify_url, headers=auth_header)
+        result = self.sdk.requests.get(
+            payload.task_order_billing_verify_url, headers=auth_header
+        )
 
         if result.status_code == 202:
             # 202 has location/retry after headers
@@ -1250,8 +1275,8 @@ class AzureCloudProvider(CloudProviderInterface):
     def _get_client_secret_credential_obj(self, creds):
         return self.sdk.identity.ClientSecretCredential(
             tenant_id=creds.get("tenant_id"),
-            client_id =creds.get("client_id"),
-            client_secret = creds.get("secret_key"),
+            client_id=creds.get("client_id"),
+            client_secret=creds.get("secret_key"),
         )
 
     def _make_tenant_admin_cred_obj(self, username, password):

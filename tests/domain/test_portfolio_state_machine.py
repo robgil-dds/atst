@@ -140,4 +140,3 @@ def test_fsm_transition_start(portfolio):
     assert sm.state == FSMStates.BILLING_PROFILE_CREATED
 
     print(portfolio.csp_data.keys())
-
