@@ -160,7 +160,6 @@ def test_post_new_member(monkeypatch, client, user_session, session):
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
             "perms_team_mgmt": True,
-            "perms_del_env": True,
         },
     )
 
@@ -208,7 +207,6 @@ def test_post_update_member(client, user_session):
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
             "perms_team_mgmt": True,
-            "perms_del_env": True,
         },
     )
 

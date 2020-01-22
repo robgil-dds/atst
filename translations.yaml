@@ -448,11 +448,9 @@ portfolios:
         "False": View Team
         "True": Edit Team
       perms_env_mgmt:
+
         "False": View Environments
         "True": Edit Environments
-      perms_del_env:
-        "False": ""
-        "True": Delete Application
       roles:
         ADMIN: Admin
         BILLING_READ: Billing Read-only

@@ -89,16 +89,13 @@
     {% if new %}
       {% set team_mgmt = form.perms_team_mgmt.name %}
       {% set env_mgmt = form.perms_env_mgmt.name %}
-      {% set del_env = form.perms_del_env.name %}
     {% else %}
       {% set team_mgmt = "perms_team_mgmt-{}".format(member_role_id) %}
       {% set env_mgmt = "perms_env_mgmt-{}".format(member_role_id) %}
-      {% set del_env = "perms_del_env-{}".format(member_role_id) %}
     {% endif %}
 
     {{ CheckboxInput(form.perms_team_mgmt, classes="input__inline-fields", key=team_mgmt, id=team_mgmt, optional=True) }}
     {{ CheckboxInput(form.perms_env_mgmt, classes="input__inline-fields", key=env_mgmt, id=env_mgmt, optional=True) }}
-    {{ CheckboxInput(form.perms_del_env, classes="input__inline-fields", key=del_env, id=del_env, optional=True) }}
   </div>
   <hr class="full-width">
   <div class="environment_roles environment-roles-new">

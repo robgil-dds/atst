@@ -46,13 +46,6 @@ class PermissionsForm(FlaskForm):
             "portfolios.applications.members.form.team_mgmt.description"
         ),
     )
-    perms_del_env = BooleanField(
-        translate("portfolios.applications.members.form.del_env.label"),
-        default=False,
-        description=translate(
-            "portfolios.applications.members.form.del_env.description"
-        ),
-    )
 
     @property
     def data(self):
@@ -65,9 +58,6 @@ class PermissionsForm(FlaskForm):
 
         if _data["perms_team_mgmt"]:
             perm_sets.append(PermissionSets.EDIT_APPLICATION_TEAM)
-
-        if _data["perms_del_env"]:
-            perm_sets.append(PermissionSets.DELETE_APPLICATION_ENVIRONMENTS)
 
         _data["permission_sets"] = perm_sets
         return _data
