@@ -119,17 +119,25 @@ def test_fsm_transition_start(portfolio):
         "billing_profile_display_name": "My Billing Profile",
     }
 
-    collected_data = dict(list(csp_data.items()) + list(portfolio_data.items()))
+    config = {"billing_account_name": "billing_account_name"}
+
+    collected_data = dict(
+        list(csp_data.items()) + list(portfolio_data.items()) + list(config.items())
+    )
     sm.trigger_next_transition(creds=creds, csp_data=collected_data)
 
     assert sm.state == FSMStates.TENANT_CREATED
     assert portfolio.csp_data.get("tenant_id", None) is not None
-
+    print(portfolio.csp_data.keys())
     if portfolio.csp_data is not None:
         csp_data = portfolio.csp_data
     else:
         csp_data = {}
-    collected_data = dict(list(csp_data.items()) + list(portfolio_data.items()))
+    collected_data = dict(
+        list(csp_data.items()) + list(portfolio_data.items()) + list(config.items())
+    )
     sm.trigger_next_transition(creds=creds, csp_data=collected_data)
     assert sm.state == FSMStates.BILLING_PROFILE_CREATED
+
+    print(portfolio.csp_data.keys())
 

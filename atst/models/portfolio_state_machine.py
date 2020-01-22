@@ -199,6 +199,8 @@ class PortfolioStateMachine(
                 # self.store_creds(self.portfolio, new_creds)
 
         except PydanticValidationError as exc:
+            print("is_csp_data_valid: False")
+            print(cls)
             print(exc.json())
             return False
 

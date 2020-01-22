@@ -186,8 +186,8 @@ class TenantCSPResult(AliasModel):
     tenant_id: str
     user_object_id: str
 
-    tenant_admin_username: str
-    tenant_admin_password: str
+    tenant_admin_username: Optional[str]
+    tenant_admin_password: Optional[str]
 
     class Config:
         fields = {
@@ -232,7 +232,7 @@ class BillingProfileCLINBudget(AliasModel):
     """
 
 
-class BillingProfileCSPPayload(BaseCSPPayload):
+class BillingProfileCreationCSPPayload(BaseCSPPayload):
     tenant_id: str
     billing_profile_display_name: str
     billing_account_name: str
@@ -253,19 +253,19 @@ class BillingProfileCSPPayload(BaseCSPPayload):
         fields = {"billing_profile_display_name": "displayName"}
 
 
-class BillingProfileCreateCSPResult(AliasModel):
-    billing_profile_validate_url: str
-    retry_after: int
+class BillingProfileCreationCSPResult(AliasModel):
+    billing_profile_verify_url: str
+    billing_profile_retry_after: int
 
     class Config:
         fields = {
-            "billing_profile_validate_url": "Location",
-            "retry_after": "Retry-After",
+            "billing_profile_verify_url": "Location",
+            "billing_profile_retry_after": "Retry-After",
         }
 
 
-class BillingProfileVerifyCSPPayload(BaseCSPPayload):
-    billing_profile_validate_url: str
+class BillingProfileVerificationCSPPayload(BaseCSPPayload):
+    billing_profile_verify_url: str
 
 
 class BillingInvoiceSection(AliasModel):
@@ -285,7 +285,7 @@ class BillingProfileProperties(AliasModel):
         fields = {"billing_profile_display_name": "displayName"}
 
 
-class BillingProfileCSPResult(AliasModel):
+class BillingProfileVerificationCSPResult(AliasModel):
     billing_profile_id: str
     billing_profile_name: str
     billing_profile_properties: BillingProfileProperties
@@ -316,31 +316,31 @@ class BillingProfileTenantAccessCSPResult(AliasModel):
         }
 
 
-class TaskOrderBillingCSPPayload(BaseCSPPayload):
+class TaskOrderBillingCreationCSPPayload(BaseCSPPayload):
     billing_account_name: str
     billing_profile_name: str
 
 
-class EnableTaskOrderBillingCSPResult(AliasModel):
-    task_order_billing_validate_url: str
+class TaskOrderBillingCreationCSPResult(AliasModel):
+    task_order_billing_verify_url: str
     retry_after: int
 
     class Config:
         fields = {
-            "task_order_billing_validation_url": "Location",
+            "task_order_billing_verify_url": "Location",
             "retry_after": "Retry-After",
         }
 
 
-class VerifyTaskOrderBillingCSPPayload(BaseCSPPayload):
-    task_order_billing_validate_url: str
+class TaskOrderBillingVerificationCSPPayload(BaseCSPPayload):
+    task_order_billing_verify_url: str
 
 
 class BillingProfileEnabledPlanDetails(AliasModel):
     enabled_azure_plans: List[Dict]
 
 
-class TaskOrderBillingCSPResult(AliasModel):
+class TaskOrderBillingVerificationCSPResult(AliasModel):
     billing_profile_id: str
     billing_profile_name: str
     billing_profile_enabled_plan_details: BillingProfileEnabledPlanDetails
@@ -353,7 +353,7 @@ class TaskOrderBillingCSPResult(AliasModel):
         }
 
 
-class ReportCLINCSPPayload(BaseCSPPayload):
+class BillingInstructionCSPPayload(BaseCSPPayload):
     amount: float
     start_date: str
     end_date: str
@@ -363,7 +363,7 @@ class ReportCLINCSPPayload(BaseCSPPayload):
     billing_profile_name: str
 
 
-class ReportCLINCSPResult(AliasModel):
+class BillingInstructionCSPResult(AliasModel):
     reported_clin_name: str
 
     class Config:
@@ -373,12 +373,10 @@ class ReportCLINCSPResult(AliasModel):
 
 
 class CloudProviderInterface:
-
-
-    def set_secret(secret_key: str, secret_value: str):
+    def set_secret(self, secret_key: str, secret_value: str):
         raise NotImplementedError()
 
-    def get_secret(secret_key: str, secret_value: str):
+    def get_secret(self, secret_key: str, secret_value: str):
         raise NotImplementedError()
 
     def root_creds(self) -> Dict:
@@ -563,7 +561,7 @@ class MockCloudProvider(CloudProviderInterface):
 
         return {"id": self._id(), "credentials": self._auth_credentials}
 
-    def create_tenant(self, payload):
+    def create_tenant(self, payload: TenantCSPPayload):
         """
         payload is an instance of TenantCSPPayload data class
         """
@@ -575,68 +573,41 @@ class MockCloudProvider(CloudProviderInterface):
         self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
         self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
         self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
-        # return tenant id, tenant owner id and tenant owner object id from:
-        response = {"tenantId": "string", "userId": "string", "objectId": "string"}
-        return {
-            "tenant_id": response["tenantId"],
-            "user_id": response["userId"],
-            "user_object_id": response["objectId"],
-            "tenant_admin_username": "test",
-            "tenant_admin_password": "test",
-        }
 
-    def create_billing_profile(self, payload):
-        # call billing profile creation endpoint, specifying owner
-        # Payload:
-        """
-        {
-            "displayName": "string",
-            "poNumber": "string",
-            "address": {
-                "firstName": "string",
-                "lastName": "string",
-                "companyName": "string",
-                "addressLine1": "string",
-                "addressLine2": "string",
-                "addressLine3": "string",
-                "city": "string",
-                "region": "string",
-                "country": "string",
-                "postalCode": "string"
-            },
-            "invoiceEmailOptIn": true,
-            Note: These last 2 are also the body for adding/updating new TOs/clins
-            "enabledAzurePlans": [
-                {
-                "skuId": "string"
-                }
-            ],
-            "clinBudget": {
-                "amount": 0,
-                "startDate": "2019-12-18T16:47:40.909Z",
-                "endDate": "2019-12-18T16:47:40.909Z",
-                "externalReferenceId": "string"
-            }
-        }
-        """
+        return TenantCSPResult(**{
+            "tenant_id": "",
+            "user_id": "",
+            "user_object_id": "",
+            "tenant_admin_username": "test",
+            "tenant_admin_password": "test"
+        }).dict()
+
+    def create_billing_profile_creation(self, payload: BillingProfileCreationCSPPayload):
         # response will be mostly the same as the body, but we only really care about the id
         self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
         self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
         self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
 
-        response = {"id": "string"}
-        # return {"billing_profile_id": response["id"]}
-        return {
-            "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB",
-            "name": "KQWI-W2SU-BG7-TGB",
-            "properties": {
-                "address": {
-                    "addressLine1": "123 S Broad Street, Suite 2400",
-                    "city": "Philadelphia",
-                    "companyName": "Promptworks",
-                    "country": "US",
-                    "postalCode": "19109",
-                    "region": "PA",
+        return BillingProfileCreationCSPResult(**dict(
+            billing_profile_verify_url = "https://zombo.com",
+            billing_profile_retry_after = 10
+        )).dict()
+
+    def create_billing_profile_verification(self, payload: BillingProfileVerificationCSPPayload):
+        self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
+        self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
+        self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
+        return BillingProfileVerificationCSPResult(**{
+            'id': '/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB',
+            'name': 'KQWI-W2SU-BG7-TGB',
+            'properties': {
+                'address': {
+                    'addressLine1': '123 S Broad Street, Suite 2400',
+                    'city': 'Philadelphia',
+                    'companyName': 'Promptworks',
+                    'country': 'US',
+                    'postalCode': '19109',
+                    'region': 'PA'
                 },
                 "currency": "USD",
                 "displayName": "Test Billing Profile",
@@ -653,8 +624,8 @@ class MockCloudProvider(CloudProviderInterface):
                     }
                 ],
             },
-            "type": "Microsoft.Billing/billingAccounts/billingProfiles",
-        }
+            'type': 'Microsoft.Billing/billingAccounts/billingProfiles'
+        }).dict()
 
     def create_billing_profile_tenant_access(self, payload):
         self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
@@ -795,7 +766,7 @@ class AzureCloudProvider(CloudProviderInterface):
         )
         return secret_client.set_secret(secret_key, secret_value)
 
-    def get_secret(secret_key)
+    def get_secret(secret_key):
         credential = self._get_client_secret_credential_obj()
         secret_client = self.secrets.SecretClient(
             vault_url=self.vault_url,
@@ -902,7 +873,7 @@ class AzureCloudProvider(CloudProviderInterface):
         else:
             return self._error(result.json())
 
-    def create_billing_profile(self, payload: BillingProfileCSPPayload):
+    def create_billing_profile_creation(self, payload: BillingProfileCreationCSPPayload):
         sp_token = self._get_sp_token(payload.creds)
         if sp_token is None:
             raise AuthenticationException(
@@ -925,14 +896,14 @@ class AzureCloudProvider(CloudProviderInterface):
 
         if result.status_code == 202:
             # 202 has location/retry after headers
-            return self._ok(BillingProfileCreateCSPResult(**result.headers))
+            return self._ok(BillingProfileCreationCSPResult(**result.headers))
         elif result.status_code == 200:
             # NB: Swagger docs imply call can sometimes resolve immediately
-            return self._ok(BillingProfileCSPResult(**result.json()))
+            return self._ok(BillingProfileVerificationCSPResult(**result.json()))
         else:
             return self._error(result.json())
 
-    def validate_billing_profile_created(self, payload: BillingProfileVerifyCSPPayload):
+    def create_billing_profile_verification(self, payload: BillingProfileVerificationCSPPayload):
         sp_token = self._get_sp_token(payload.creds)
         if sp_token is None:
             raise AuthenticationException(
@@ -944,14 +915,14 @@ class AzureCloudProvider(CloudProviderInterface):
         }
 
         result = self.sdk.requests.get(
-            payload.billing_profile_validate_url, headers=auth_header
+            payload.billing_profile_verify_url, headers=auth_header
         )
 
         if result.status_code == 202:
             # 202 has location/retry after headers
-            return self._ok(BillingProfileCreateCSPResult(**result.headers))
+            return self._ok(BillingProfileCreationCSPResult(**result.headers))
         elif result.status_code == 200:
-            return self._ok(BillingProfileCSPResult(**result.json()))
+            return self._ok(BillingProfileVerificationCSPResult(**result.json()))
         else:
             return self._error(result.json())
 
@@ -979,7 +950,7 @@ class AzureCloudProvider(CloudProviderInterface):
         else:
             return self._error(result.json())
 
-    def enable_task_order_billing(self, payload: TaskOrderBillingCSPPayload):
+    def create_task_order_billing_creation(self, payload: TaskOrderBillingCreationCSPPayload):
         sp_token = self._get_sp_token(payload.creds)
         request_body = [
             {
@@ -1001,13 +972,13 @@ class AzureCloudProvider(CloudProviderInterface):
 
         if result.status_code == 202:
             # 202 has location/retry after headers
-            return self._ok(BillingProfileCreateCSPResult(**result.headers))
+            return self._ok(TaskOrderBillingCreationCSPResult(**result.headers))
         elif result.status_code == 200:
-            return self._ok(TaskOrderBillingCSPResult(**result.json()))
+            return self._ok(TaskOrderBillingVerificationCSPResult(**result.json()))
         else:
             return self._error(result.json())
 
-    def validate_task_order_billing_enabled(self, payload: TaskOrderBillingCSPPayload):
+    def create_task_order_billing_verification(self, payload: TaskOrderBillingVerificationCSPPayload):
         sp_token = self._get_sp_token(payload.creds)
         if sp_token is None:
             raise AuthenticationException(
@@ -1018,17 +989,17 @@ class AzureCloudProvider(CloudProviderInterface):
             "Authorization": f"Bearer {sp_token}",
         }
 
-        result = self.sdk.requests.get(payload.task_order_billing_validate_url, headers=auth_header)
+        result = self.sdk.requests.get(payload.task_order_billing_verify_url, headers=auth_header)
 
         if result.status_code == 202:
             # 202 has location/retry after headers
-            return self._ok(TaskOrderBillingCSPResult(**result.headers))
+            return self._ok(TaskOrderBillingCreationCSPResult(**result.headers))
         elif result.status_code == 200:
-            return self._ok(TaskOrderBillingCSPResult(**result.json()))
+            return self._ok(TaskOrderBillingVerificationCSPResult(**result.json()))
         else:
             return self._error(result.json())
 
-    def create_billing_instruction(self, payload: ReportCLINCSPPayload):
+    def create_billing_instruction(self, payload: BillingInstructionCSPPayload):
         sp_token = self._get_sp_token(payload.creds)
         if sp_token is None:
             raise AuthenticationException(
@@ -1052,7 +1023,7 @@ class AzureCloudProvider(CloudProviderInterface):
         result = self.sdk.requests.put(url, headers=auth_header, json=request_body)
 
         if result.status_code == 200:
-            return self._ok(ReportCLINCSPResult(**result.json()))
+            return self._ok(BillingInstructionCSPResult(**result.json()))
         else:
             return self._error(result.json())
 

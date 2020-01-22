@@ -5,18 +5,20 @@ from uuid import uuid4
 
 from atst.domain.csp.cloud import (
     AzureCloudProvider,
-    BillingProfileCreateCSPResult,
-    BillingProfileCSPPayload,
-    BillingProfileCSPResult,
+    BillingProfileCreationCSPResult,
+    BillingProfileCreationCSPPayload,
     BillingProfileTenantAccessCSPPayload,
     BillingProfileTenantAccessCSPResult,
-    BillingProfileVerifyCSPPayload,
-    ReportCLINCSPPayload,
-    ReportCLINCSPResult,
-    TaskOrderBillingCSPPayload,
+    BillingProfileVerificationCSPPayload,
+    BillingProfileVerificationCSPResult,
+    BillingInstructionCSPPayload,
+    BillingInstructionCSPResult,
+    TaskOrderBillingCreationCSPPayload,
+    TaskOrderBillingCreationCSPResult,
+    TaskOrderBillingVerificationCSPPayload,
+    TaskOrderBillingVerificationCSPResult,
     TenantCSPPayload,
     TenantCSPResult,
-    VerifyTaskOrderBillingCSPPayload,
 )
 
 from tests.mock_azure import mock_azure, AUTH_CREDENTIALS
@@ -167,7 +169,7 @@ def test_create_tenant(mock_azure: AzureCloudProvider):
     assert body.tenant_id == "60ff9d34-82bf-4f21-b565-308ef0533435"
 
 
-def test_create_billing_profile(mock_azure: AzureCloudProvider):
+def test_create_billing_profile_creation(mock_azure: AzureCloudProvider):
     mock_azure.sdk.adal.AuthenticationContext.return_value.context.acquire_token_with_client_credentials.return_value = {
         "accessToken": "TOKEN"
     }
@@ -179,7 +181,7 @@ def test_create_billing_profile(mock_azure: AzureCloudProvider):
     }
     mock_result.status_code = 202
     mock_azure.sdk.requests.post.return_value = mock_result
-    payload = BillingProfileCSPPayload(
+    payload = BillingProfileCreationCSPPayload(
         **dict(
             address=dict(
                 address_line_1="123 S Broad Street, Suite 2400",
@@ -195,9 +197,9 @@ def test_create_billing_profile(mock_azure: AzureCloudProvider):
             billing_account_name=BILLING_ACCOUNT_NAME,
         )
     )
-    result = mock_azure.create_billing_profile(payload)
-    body: BillingProfileCreateCSPResult = result.get("body")
-    assert body.retry_after == 10
+    result = mock_azure.create_billing_profile_creation(payload)
+    body: BillingProfileCreationCSPResult = result.get("body")
+    assert body.billing_profile_retry_after == 10
 
 
 def test_validate_billing_profile_creation(mock_azure: AzureCloudProvider):
@@ -238,19 +240,19 @@ def test_validate_billing_profile_creation(mock_azure: AzureCloudProvider):
     }
     mock_azure.sdk.requests.get.return_value = mock_result
 
-    payload = BillingProfileVerifyCSPPayload(
+    payload = BillingProfileVerificationCSPPayload(
         **dict(
             creds={
                 "username": "username",
                 "password": "password",
                 "tenant_id": "tenant_id",
             },
-            billing_profile_validate_url="https://management.azure.com/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/operationResults/createBillingProfile_478d5706-71f9-4a8b-8d4e-2cbaca27a668?api-version=2019-10-01-preview",
+            billing_profile_verify_url="https://management.azure.com/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/operationResults/createBillingProfile_478d5706-71f9-4a8b-8d4e-2cbaca27a668?api-version=2019-10-01-preview",
         )
     )
 
-    result = mock_azure.validate_billing_profile_created(payload)
-    body: BillingProfileCSPResult = result.get("body")
+    result = mock_azure.create_billing_profile_verification(payload)
+    body: BillingProfileVerificationCSPResult = result.get("body")
     assert body.billing_profile_name == "KQWI-W2SU-BG7-TGB"
     assert (
         body.billing_profile_properties.billing_profile_display_name
@@ -303,7 +305,7 @@ def test_create_billing_profile_tenant_access(mock_azure: AzureCloudProvider):
     )
 
 
-def test_create_task_order_billing(mock_azure: AzureCloudProvider):
+def test_create_task_order_billing_creation(mock_azure: AzureCloudProvider):
     mock_azure.sdk.adal.AuthenticationContext.return_value.context.acquire_token_with_client_credentials.return_value = {
         "accessToken": "TOKEN"
     }
@@ -317,7 +319,7 @@ def test_create_task_order_billing(mock_azure: AzureCloudProvider):
 
     mock_azure.sdk.requests.patch.return_value = mock_result
 
-    payload = TaskOrderBillingCSPPayload(
+    payload = TaskOrderBillingCreationCSPPayload(
         **dict(
             creds={
                 "username": "username",
@@ -329,15 +331,15 @@ def test_create_task_order_billing(mock_azure: AzureCloudProvider):
         )
     )
 
-    result = mock_azure.enable_task_order_billing(payload)
-    body: BillingProfileCreateCSPResult = result.get("body")
+    result = mock_azure.create_task_order_billing_creation(payload)
+    body: TaskOrderBillingCreationCSPResult = result.get("body")
     assert (
-        body.billing_profile_validate_url
+        body.task_order_billing_verify_url
         == "https://management.azure.com/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/operationResults/patchBillingProfile_KQWI-W2SU-BG7-TGB:02715576-4118-466c-bca7-b1cd3169ff46?api-version=2019-10-01-preview"
     )
 
 
-def test_validate_task_order_billing_enabled(mock_azure):
+def test_create_task_order_billing_verification(mock_azure):
     mock_azure.sdk.adal.AuthenticationContext.return_value.context.acquire_token_with_client_credentials.return_value = {
         "accessToken": "TOKEN"
     }
@@ -381,19 +383,19 @@ def test_validate_task_order_billing_enabled(mock_azure):
     }
     mock_azure.sdk.requests.get.return_value = mock_result
 
-    payload = VerifyTaskOrderBillingCSPPayload(
+    payload = TaskOrderBillingVerificationCSPPayload(
         **dict(
             creds={
                 "username": "username",
                 "password": "password",
                 "tenant_id": "tenant_id",
             },
-            task_order_billing_validate_url="https://management.azure.com/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/operationResults/createBillingProfile_478d5706-71f9-4a8b-8d4e-2cbaca27a668?api-version=2019-10-01-preview",
+            task_order_billing_verify_url="https://management.azure.com/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/operationResults/createBillingProfile_478d5706-71f9-4a8b-8d4e-2cbaca27a668?api-version=2019-10-01-preview",
         )
     )
 
-    result = mock_azure.validate_task_order_billing_enabled(payload)
-    body: BillingProfileEnabledCSPResult = result.get("body")
+    result = mock_azure.create_task_order_billing_verification(payload)
+    body: TaskOrderBillingVerificationCSPResult = result.get("body")
     assert body.billing_profile_name == "KQWI-W2SU-BG7-TGB"
     assert (
         body.billing_profile_enabled_plan_details.enabled_azure_plans[0].get("skuId")
@@ -420,7 +422,7 @@ def test_create_billing_instruction(mock_azure: AzureCloudProvider):
 
     mock_azure.sdk.requests.put.return_value = mock_result
 
-    payload = ReportCLINCSPPayload(
+    payload = BillingInstructionCSPPayload(
         **dict(
             creds={},
             amount=1000.00,
@@ -433,6 +435,5 @@ def test_create_billing_instruction(mock_azure: AzureCloudProvider):
         )
     )
     result = mock_azure.create_billing_instruction(payload)
-    body: ReportCLINCSPResult = result.get("body")
+    body: BillingInstructionCSPResult = result.get("body")
     assert body.reported_clin_name == "TO1:CLIN001"
-

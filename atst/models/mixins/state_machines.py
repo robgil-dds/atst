@@ -9,9 +9,11 @@ class StageStates(Enum):
 
 class AzureStages(Enum):
     TENANT = "tenant"
-    BILLING_PROFILE = "billing profile"
+    BILLING_PROFILE_CREATION = "billing profile creation"
+    BILLING_PROFILE_VERIFICATION = "billing profile verification"
     BILLING_PROFILE_TENANT_ACCESS = "billing profile tenant access"
-    TASK_ORDER_BILLING = "task order billing"
+    TASK_ORDER_BILLING_CREATION = "task order billing creation"
+    TASK_ORDER_BILLING_VERIFICATION = "task order billing verification"
     BILLING_INSTRUCTION = "billing instruction"
 
 

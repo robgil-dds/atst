@@ -8,6 +8,7 @@ AZURE_CONFIG = {
     "AZURE_SECRET_KEY": "MOCK",
     "AZURE_TENANT_ID": "MOCK",
     "AZURE_POLICY_LOCATION": "policies",
+    "AZURE_VAULT_URL": "http://vault",
 }
 
 AUTH_CREDENTIALS = {
