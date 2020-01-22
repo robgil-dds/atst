@@ -118,7 +118,7 @@
         {{ CLINDollarAmount("obligated", funding_validation=True) }}
         {% endif %}
 
-        <div class="h5 clin-card__title">Percent Obligated</div>
+        <div class="h5 clin-card__title">{{ "task_orders.form.step_3.percent_obligated" | translate }}</div>
         <p id="percent-obligated" v-text='percentObligated'></p>
 
         <hr>

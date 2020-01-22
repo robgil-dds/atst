@@ -21,7 +21,7 @@
               {{ sub_form.environment_name.data }}
             </div>
             <div class="usa-input__help">
-              {{ role }}
+              {{ "portfolios.applications.members.roles.{}".format(role) | translate }}
             </div>
           </div>
           <div class="form-col form-col--third">
@@ -124,6 +124,6 @@
     {{ TextInput(member_form.email, validation='email', optional=False) }}
     {{ PhoneInput(member_form.phone_number, member_form.phone_ext)}}
     {{ TextInput(member_form.dod_id, validation='dodId', optional=False) }}
-    <a href="#">How do I find the DoD ID?</a>
+    <a href="#">{{ "forms.new_member.dod_help" | translate }}</a>
   </div>
 {% endmacro %}
