@@ -26,14 +26,13 @@ from tests.factories import EnvironmentFactory, ApplicationFactory
 
 
 creds = {
-    "home_tenant_id": "",
-    "client_id": "",
-    "secret_key": "",
+    "home_tenant_id": "tenant_id",
+    "client_id": "client_id",
+    "secret_key": "secret_key",
 }
 BILLING_ACCOUNT_NAME = "52865e4c-52e8-5a6c-da6b-c58f0814f06f:7ea5de9d-b8ce-4901-b1c5-d864320c7b03_2019-05-31"
 
 
-@pytest.mark.skip("Skipping legacy azure integration tests")
 def test_create_subscription_succeeds(mock_azure: AzureCloudProvider):
     environment = EnvironmentFactory.create()
 
@@ -74,7 +73,6 @@ def mock_management_group_create(mock_azure, spec_dict):
     )
 
 
-@pytest.mark.skip("Skipping legacy azure integration tests")
 def test_create_environment_succeeds(mock_azure: AzureCloudProvider):
     environment = EnvironmentFactory.create()
 
@@ -87,7 +85,6 @@ def test_create_environment_succeeds(mock_azure: AzureCloudProvider):
     assert result.id == "Test Id"
 
 
-@pytest.mark.skip("Skipping legacy azure integration tests")
 def test_create_application_succeeds(mock_azure: AzureCloudProvider):
     application = ApplicationFactory.create()
 
@@ -98,7 +95,6 @@ def test_create_application_succeeds(mock_azure: AzureCloudProvider):
     assert result.id == "Test Id"
 
 
-@pytest.mark.skip("Skipping legacy azure integration tests")
 def test_create_atat_admin_user_succeeds(mock_azure: AzureCloudProvider):
     environment_id = str(uuid4())
 
@@ -113,7 +109,6 @@ def test_create_atat_admin_user_succeeds(mock_azure: AzureCloudProvider):
     assert result.get("csp_user_id") == csp_user_id
 
 
-@pytest.mark.skip("Skipping legacy azure integration tests")
 def test_create_policy_definition_succeeds(mock_azure: AzureCloudProvider):
     subscription_id = str(uuid4())
     management_group_id = str(uuid4())
@@ -191,7 +186,7 @@ def test_create_billing_profile_creation(mock_azure: AzureCloudProvider):
                 country="US",
                 postal_code="19109",
             ),
-            creds={"username": "mock-cloud", "password": "shh"},
+            creds=creds,
             tenant_id="60ff9d34-82bf-4f21-b565-308ef0533435",
             billing_profile_display_name="Test Billing Profile",
             billing_account_name=BILLING_ACCOUNT_NAME,
@@ -242,11 +237,7 @@ def test_validate_billing_profile_creation(mock_azure: AzureCloudProvider):
 
     payload = BillingProfileVerificationCSPPayload(
         **dict(
-            creds={
-                "username": "username",
-                "password": "password",
-                "tenant_id": "tenant_id",
-            },
+            creds=creds,
             billing_profile_verify_url="https://management.azure.com/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/operationResults/createBillingProfile_478d5706-71f9-4a8b-8d4e-2cbaca27a668?api-version=2019-10-01-preview",
         )
     )
@@ -285,11 +276,7 @@ def test_create_billing_profile_tenant_access(mock_azure: AzureCloudProvider):
 
     payload = BillingProfileTenantAccessCSPPayload(
         **dict(
-            creds={
-                "username": "username",
-                "password": "password",
-                "tenant_id": "tenant_id",
-            },
+            creds=creds,
             tenant_id="60ff9d34-82bf-4f21-b565-308ef0533435",
             user_object_id="0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
             billing_account_name="7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31",
@@ -321,11 +308,7 @@ def test_create_task_order_billing_creation(mock_azure: AzureCloudProvider):
 
     payload = TaskOrderBillingCreationCSPPayload(
         **dict(
-            creds={
-                "username": "username",
-                "password": "password",
-                "tenant_id": "tenant_id",
-            },
+            creds=creds,
             billing_account_name="7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31",
             billing_profile_name="KQWI-W2SU-BG7-TGB",
         )
@@ -385,11 +368,7 @@ def test_create_task_order_billing_verification(mock_azure):
 
     payload = TaskOrderBillingVerificationCSPPayload(
         **dict(
-            creds={
-                "username": "username",
-                "password": "password",
-                "tenant_id": "tenant_id",
-            },
+            creds=creds,
             task_order_billing_verify_url="https://management.azure.com/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/operationResults/createBillingProfile_478d5706-71f9-4a8b-8d4e-2cbaca27a668?api-version=2019-10-01-preview",
         )
     )
@@ -424,7 +403,7 @@ def test_create_billing_instruction(mock_azure: AzureCloudProvider):
 
     payload = BillingInstructionCSPPayload(
         **dict(
-            creds={},
+            creds=creds,
             amount=1000.00,
             start_date="2020/1/1",
             end_date="2020/3/1",

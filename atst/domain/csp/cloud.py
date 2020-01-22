@@ -5,9 +5,11 @@ from uuid import uuid4
 from pydantic import BaseModel, validator
 
 from atst.models.user import User
+from atst.models.application import Application
 from atst.models.environment import Environment
 from atst.models.environment_role import EnvironmentRole
 from atst.utils import snake_to_camel
+from .policy import AzurePolicyManager
 
 
 class GeneralCSPException(Exception):
@@ -718,11 +720,12 @@ SUBSCRIPTION_ID_REGEX = re.compile(
 
 # This needs to be a fully pathed role definition identifier, not just a UUID
 REMOTE_ROOT_ROLE_DEF_ID = "/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-4000-8000-000000000000"
-
+AZURE_MANAGEMENT_API = "https://management.azure.com"
 
 class AzureSDKProvider(object):
     def __init__(self):
-        from azure.mgmt import subscription, authorization
+        from azure.mgmt import subscription, authorization, managementgroups
+        from azure.mgmt.resource import policy
         import azure.graphrbac as graphrbac
         import azure.common.credentials as credentials
         import azure.identity as identity
@@ -733,6 +736,8 @@ class AzureSDKProvider(object):
         import requests
 
         self.subscription = subscription
+        self.policy = policy
+        self.managementgroups = managementgroups
         self.authorization = authorization
         self.adal = adal
         self.graphrbac = graphrbac
@@ -758,6 +763,8 @@ class AzureCloudProvider(CloudProviderInterface):
         else:
             self.sdk = azure_sdk_provider
 
+        self.policy_manager = AzurePolicyManager(config["AZURE_POLICY_LOCATION"])
+
     def set_secret(secret_key, secret_value):
         credential = self._get_client_secret_credential_obj()
         secret_client = self.secrets.SecretClient(
@@ -777,42 +784,23 @@ class AzureCloudProvider(CloudProviderInterface):
     def create_environment(
         self, auth_credentials: Dict, user: User, environment: Environment
     ):
+        # since this operation would only occur within a tenant, should we source the tenant
+        # via lookup from environment once we've created the portfolio csp data schema
+        # something like this:
+        # environment_tenant = environment.application.portfolio.csp_data.get('tenant_id', None)
+        # though we'd probably source the whole credentials for these calls from the portfolio csp
+        # data, as it would have to be where we store the creds for the at-at user within the portfolio tenant
+        # credentials = self._get_credential_obj(environment.application.portfolio.csp_data.get_creds())
         credentials = self._get_credential_obj(self._root_creds)
-        sub_client = self.sdk.subscription.SubscriptionClient(credentials)
-
         display_name = f"{environment.application.name}_{environment.name}_{environment.id}"  # proposed format
+        management_group_id = "?"  # management group id chained from environment
+        parent_id = "?"  # from environment.application
 
-        billing_profile_id = "?"  # something chained from environment?
-        sku_id = AZURE_SKU_ID
-        # we want to set AT-AT as an owner here
-        # we could potentially associate subscriptions with "management groups" per DOD component
-        body = self.sdk.subscription.models.ModernSubscriptionCreationParameters(
-            display_name,
-            billing_profile_id,
-            sku_id,
-            # owner=<AdPrincipal: for AT-AT user>
+        management_group = self._create_management_group(
+            credentials, management_group_id, display_name, parent_id,
         )
 
-        # These 2 seem like something that might be worthwhile to allow tiebacks to
-        # TOs filed for the environment
-        billing_account_name = "?"
-        invoice_section_name = "?"
-        # We may also want to create billing sections in the enrollment account
-        sub_creation_operation = sub_client.subscription_factory.create_subscription(
-            billing_account_name, invoice_section_name, body
-        )
-
-        # the resulting object from this process is a link to the new subscription
-        # not a subscription model, so we'll have to unpack the ID
-        new_sub = sub_creation_operation.result()
-
-        subscription_id = self._extract_subscription_id(new_sub.subscription_link)
-        if subscription_id:
-            return subscription_id
-        else:
-            # troublesome error, subscription should exist at this point
-            # but we just don't have a valid ID
-            pass
+        return management_group
 
     def create_atat_admin_user(
         self, auth_credentials: Dict, csp_environment_id: str
@@ -850,6 +838,125 @@ class AzureCloudProvider(CloudProviderInterface):
             "credentials": managment_principal.password_credentials,
             "role_name": role_assignment_id,
         }
+
+    def _create_application(self, auth_credentials: Dict, application: Application):
+        management_group_name = str(uuid4())  # can be anything, not just uuid
+        display_name = application.name  # Does this need to be unique?
+        credentials = self._get_credential_obj(auth_credentials)
+        parent_id = "?"  # application.portfolio.csp_details.management_group_id
+
+        return self._create_management_group(
+            credentials, management_group_name, display_name, parent_id,
+        )
+
+    def _create_management_group(
+        self, credentials, management_group_id, display_name, parent_id=None,
+    ):
+        mgmgt_group_client = self.sdk.managementgroups.ManagementGroupsAPI(credentials)
+        create_parent_grp_info = self.sdk.managementgroups.models.CreateParentGroupInfo(
+            id=parent_id
+        )
+        create_mgmt_grp_details = self.sdk.managementgroups.models.CreateManagementGroupDetails(
+            parent=create_parent_grp_info
+        )
+        mgmt_grp_create = self.sdk.managementgroups.models.CreateManagementGroupRequest(
+            name=management_group_id,
+            display_name=display_name,
+            details=create_mgmt_grp_details,
+        )
+        create_request = mgmgt_group_client.management_groups.create_or_update(
+            management_group_id, mgmt_grp_create
+        )
+
+        # result is a synchronous wait, might need to do a poll instead to handle first mgmt group create
+        # since we were told it could take 10+ minutes to complete, unless this handles that polling internally
+        return create_request.result()
+
+    def _create_subscription(
+        self,
+        credentials,
+        display_name,
+        billing_profile_id,
+        sku_id,
+        management_group_id,
+        billing_account_name,
+        invoice_section_name,
+    ):
+        sub_client = self.sdk.subscription.SubscriptionClient(credentials)
+
+        billing_profile_id = "?"  # where do we source this?
+        sku_id = AZURE_SKU_ID
+        # These 2 seem like something that might be worthwhile to allow tiebacks to
+        # TOs filed for the environment
+        billing_account_name = "?"  # from TO?
+        invoice_section_name = "?"  # from TO?
+
+        body = self.sdk.subscription.models.ModernSubscriptionCreationParameters(
+            display_name=display_name,
+            billing_profile_id=billing_profile_id,
+            sku_id=sku_id,
+            management_group_id=management_group_id,
+        )
+
+        # We may also want to create billing sections in the enrollment account
+        sub_creation_operation = sub_client.subscription_factory.create_subscription(
+            billing_account_name, invoice_section_name, body
+        )
+
+        # the resulting object from this process is a link to the new subscription
+        # not a subscription model, so we'll have to unpack the ID
+        new_sub = sub_creation_operation.result()
+
+        subscription_id = self._extract_subscription_id(new_sub.subscription_link)
+        if subscription_id:
+            return subscription_id
+        else:
+            # troublesome error, subscription should exist at this point
+            # but we just don't have a valid ID
+            pass
+
+    def _create_policy_definition(
+        self, credentials, subscription_id, management_group_id, properties,
+    ):
+        """
+        Requires credentials that have AZURE_MANAGEMENT_API
+        specified as the resource. The Service Principal
+        specified in the credentials must have the "Resource
+        Policy Contributor" role assigned with a scope at least
+        as high as the management group specified by
+        management_group_id.
+
+        Arguments:
+            credentials -- ServicePrincipalCredentials
+            subscription_id -- str, ID of the subscription (just the UUID, not the path)
+            management_group_id -- str, ID of the management group (just the UUID, not the path)
+            properties -- dictionary, the "properties" section of a valid Azure policy definition document
+
+        Returns:
+            azure.mgmt.resource.policy.[api version].models.PolicyDefinition: the PolicyDefinition object provided to Azure
+
+        Raises:
+            TBD
+        """
+        # TODO: which subscription would this be?
+        client = self.sdk.policy.PolicyClient(credentials, subscription_id)
+
+        definition = client.policy_definitions.models.PolicyDefinition(
+            policy_type=properties.get("policyType"),
+            mode=properties.get("mode"),
+            display_name=properties.get("displayName"),
+            description=properties.get("description"),
+            policy_rule=properties.get("policyRule"),
+            parameters=properties.get("parameters"),
+        )
+
+        name = properties.get("displayName")
+
+        return client.policy_definitions.create_or_update_at_management_group(
+            policy_definition_name=name,
+            parameters=definition,
+            management_group_id=management_group_id,
+        )
 
     def create_tenant(self, payload: TenantCSPPayload):
         sp_token = self._get_sp_token(payload.creds)
@@ -1112,9 +1219,7 @@ class AzureCloudProvider(CloudProviderInterface):
             return sub_id_match.group(1)
 
     def _get_sp_token(self, creds):
-        home_tenant_id = creds.get(
-            "home_tenant_id"
-        )
+        home_tenant_id = creds.get("home_tenant_id")
         client_id = creds.get("client_id")
         secret_key = creds.get("secret_key")
 
@@ -1141,7 +1246,8 @@ class AzureCloudProvider(CloudProviderInterface):
             resource=resource,
             cloud_environment=self.sdk.cloud,
         )
-    def _get_client_secret_credential_obj():
+
+    def _get_client_secret_credential_obj(self, creds):
         return self.sdk.identity.ClientSecretCredential(
             tenant_id=creds.get("tenant_id"),
             client_id =creds.get("client_id"),

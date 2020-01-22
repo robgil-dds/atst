@@ -72,6 +72,7 @@ class MockAzureSDK(object):
 
         self.subscription = mock_subscription()
         self.authorization = mock_authorization()
+        self.policy = mock_policy()
         self.adal = mock_adal()
         self.managementgroups = mock_managementgroups()
         self.graphrbac = mock_graphrbac()
