@@ -28,7 +28,6 @@ body {
     position: relative;
     padding: 0 $spacing-large;
 
-
     @include media($medium-screen) {
       top: $usa-banner-height + $topbar-height;
     }

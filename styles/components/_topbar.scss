@@ -12,6 +12,7 @@
     flex-direction: row;
     align-items: stretch;
     justify-content: space-between;
+    max-width: 1180px;
 
     a {
       color: $color-white;
@@ -66,9 +67,9 @@
 }
 
 .login-topbar .topbar__navigation {
-    max-width: 100%;
+  max-width: 100%;
 }
 
 .login-topbar .topbar__context .topbar__link-icon {
-    margin: 0 0 0 0.8rem;
+  margin: 0 0 0 0.8rem;
 }
