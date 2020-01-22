@@ -31,5 +31,9 @@ body {
     @include media($medium-screen) {
       top: $usa-banner-height + $topbar-height;
     }
+
+    .user-edit {
+      max-width: $max-panel-width;
+    }
   }
 }
