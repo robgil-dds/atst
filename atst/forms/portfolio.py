@@ -4,6 +4,7 @@ from wtforms.fields import (
     TextAreaField,
 )
 from wtforms.validators import Length, InputRequired
+from atst.forms.validators import Name
 from wtforms.widgets import ListWidget, CheckboxInput
 
 from .forms import BaseForm
@@ -20,10 +21,13 @@ class PortfolioForm(BaseForm):
                 min=4,
                 max=100,
                 message=translate("forms.portfolio.name.length_validation_message"),
-            )
+            ),
+            Name(),
         ],
     )
-    description = TextAreaField(translate("forms.portfolio.description.label"),)
+    description = TextAreaField(
+        translate("forms.portfolio.description.label"), validators=[Length(max=1_000)]
+    )
 
 
 class PortfolioCreationForm(PortfolioForm):

@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms.fields import FormField, FieldList, HiddenField, BooleanField
+from wtforms.validators import UUID
 from wtforms import Form
 
 from .member import NewForm as BaseNewMemberForm
@@ -7,11 +8,13 @@ from .data import ENV_ROLES, ENV_ROLE_NO_ACCESS as NO_ACCESS
 from atst.forms.fields import SelectField
 from atst.domain.permission_sets import PermissionSets
 from atst.utils.localization import translate
+from atst.forms.validators import AlphaNumeric
+from wtforms.validators import Length
 
 
 class EnvironmentForm(Form):
-    environment_id = HiddenField()
-    environment_name = HiddenField()
+    environment_id = HiddenField(validators=[UUID()])
+    environment_name = HiddenField(validators=[AlphaNumeric(), Length(max=100)])
     role = SelectField(
         environment_name,
         choices=ENV_ROLES,

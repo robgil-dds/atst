@@ -26,14 +26,14 @@
       {{ form.csrf_token }}
       <div class="form-row">
         <div class="form-col">
-          {{ TextInput(form.name, optional=False) }}
+          {{ TextInput(form.name, validation="name", optional=False) }}
           {{ ('portfolios.applications.new.step_1_form_help_text.name' | translate | safe) }}
         </div>
       </div>
       <hr>
       <div class="form-row">
         <div class="form-col form-col--two-thirds">
-          {{ TextInput(form.description, paragraph=True, optional=True) }}
+          {{ TextInput(form.description, validation="defaultTextAreaField", paragraph=True, optional=True) }}
           {{ ('portfolios.applications.new.step_1_form_help_text.description' | translate | safe) }}
         </div>
       </div>

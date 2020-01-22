@@ -4,16 +4,16 @@ import pytest
 from atst.forms.validators import *
 
 
-class TestIsNumber:
+class TestNumber:
     @pytest.mark.parametrize("valid", ["0", "12", "-12"])
-    def test_IsNumber_accepts_integers(self, valid, dummy_form, dummy_field):
-        validator = IsNumber()
+    def test_Number_accepts_integers(self, valid, dummy_form, dummy_field):
+        validator = Number()
         dummy_field.data = valid
         validator(dummy_form, dummy_field)
 
-    @pytest.mark.parametrize("invalid", ["12.1", "two", "", None])
-    def test_IsNumber_rejects_anything_else(self, invalid, dummy_form, dummy_field):
-        validator = IsNumber()
+    @pytest.mark.parametrize("invalid", ["12.1", "two"])
+    def test_Number_rejects_anything_else(self, invalid, dummy_form, dummy_field):
+        validator = Number()
         dummy_field.data = invalid
         with pytest.raises(ValidationError):
             validator(dummy_form, dummy_field)

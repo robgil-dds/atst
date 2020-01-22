@@ -21,13 +21,13 @@
         {{ form.csrf_token }}
         <div class="form-row form-row--bordered">
           <div class="form-col">
-            {{ TextInput(form.name, optional=False, classes="form-col") }}
+            {{ TextInput(form.name, validation="name", optional=False, classes="form-col") }}
             {{"forms.portfolio.name.help_text" | translate | safe }}
           </div>
         </div>
         <div class="form-row form-row--bordered">
           <div class="form-col">
-            {{ TextInput(form.description, paragraph=True) }}
+            {{ TextInput(form.description, validation="defaultTextAreaField", paragraph=True) }}
             {{"forms.portfolio.description.help_text" | translate | safe }}
           </div>
         </div>
