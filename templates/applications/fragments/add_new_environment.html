@@ -13,7 +13,7 @@
         ) }}
         <div class="accordion-table__item-content new-env">
           <div class="h4">{{ "portfolios.applications.enter_env_name" | translate }}</div>
-            {{ TextInput(new_env_form.name, label="", validation="requiredField", optional=False) }}
+            {{ TextInput(new_env_form.name, label="", validation="defaultStringField", optional=False) }}
           <div class="action-group">
             {{ SaveButton(text=('common.save' | translate), element="input", form="add-new-env") }}
             <a class='action-group__action icon-link icon-link--default' v-on:click="toggle">

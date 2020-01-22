@@ -20,7 +20,7 @@
           <form method="POST" action="{{ url_for('portfolios.edit', portfolio_id=portfolio.id) }}" autocomplete="false">
             {{ portfolio_form.csrf_token }}
             {{ TextInput(portfolio_form.name, validation="portfolioName", optional=False) }}
-            {{ TextInput(portfolio_form.description, paragraph=True) }}
+            {{ TextInput(portfolio_form.description, validation="defaultTextAreaField", paragraph=True) }}
             <div class='edit-portfolio-name action-group'>
               {{ SaveButton(text='Save Changes') }}
             </div>
