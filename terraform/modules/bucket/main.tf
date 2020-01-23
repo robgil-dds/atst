@@ -1,3 +1,11 @@
+#locals {
+#  whitelist = [
+#    for cidr in values(var.whitelist): {
+#      ip = cidrhost(cidr, 0)
+#    }
+#  ]
+#}
+
 resource "azurerm_resource_group" "bucket" {
   name     = "${var.name}-${var.environment}-${var.service_name}"
   location = var.region
@@ -9,12 +17,20 @@ resource "azurerm_storage_account" "bucket" {
   location                 = azurerm_resource_group.bucket.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+}
 
-  network_rules {
-    default_action             = var.policy
-    virtual_network_subnet_ids = var.subnet_ids
-    ip_rules                   = values(var.whitelist)
-  }
+resource "azurerm_storage_account_network_rules" "acls" {
+  resource_group_name  = azurerm_resource_group.bucket.name
+  storage_account_name = azurerm_storage_account.bucket.name
+
+  default_action = var.policy
+  # Azure Storage CIDR ACLs do not accept /32 CIDR ranges, so
+  # it must be stripped to just the IP (no CIDR)
+  ip_rules = [
+    for cidr in values(var.whitelist) : cidrhost(cidr, 0)
+  ]
+  virtual_network_subnet_ids = var.subnet_ids
+  bypass                     = ["AzureServices"]
 }
 
 resource "azurerm_storage_container" "bucket" {

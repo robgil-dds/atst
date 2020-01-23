@@ -91,8 +91,8 @@ variable "admin_users" {
 variable "admin_user_whitelist" {
   type = map
   default = {
-    "Rob Gil"           = "66.220.238.246"
-    "Dan Corrigan Work" = "108.16.207.173"
+    "Rob Gil"           = "66.220.238.246/32"
+    "Dan Corrigan Work" = "108.16.207.173/32"
   }
 }
 
