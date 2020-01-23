@@ -10,5 +10,6 @@ module "vpc" {
   name              = var.name
   dns_servers       = var.dns_servers
   service_endpoints = var.service_endpoints
+  vpn_client_cidr   = var.vpn_client_cidr
 }
 

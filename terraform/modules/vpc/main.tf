@@ -110,7 +110,7 @@ resource "azurerm_virtual_network_gateway" "vnet_gateway" {
   }
 
   vpn_client_configuration {
-    address_space        = ["172.16.1.0/24"]
+    address_space        = var.vpn_client_cidr
     vpn_client_protocols = ["OpenVPN"]
   }
 }

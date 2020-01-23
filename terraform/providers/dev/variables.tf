@@ -91,6 +91,12 @@ variable "admin_users" {
 variable "admin_user_whitelist" {
   type = map
   default = {
-    "Rob Gil" = "66.220.238.246"
+    "Rob Gil"           = "66.220.238.246"
+    "Dan Corrigan Work" = "108.16.207.173"
   }
+}
+
+variable "vpn_client_cidr" {
+  type    = list
+  default = ["172.16.255.0/24"]
 }
