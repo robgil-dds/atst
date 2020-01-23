@@ -281,3 +281,4 @@ secrets-tool secrets --keyvault https://ops-jedidev-keyvault.vault.azure.net/ cr
 
 `terraform apply`
 
+*[Configure AD for MFA](https://docs.microsoft.com/en-us/azure/vpn-gateway/openvpn-azure-ad-mfa)*
