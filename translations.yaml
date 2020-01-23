@@ -127,6 +127,9 @@ flash:
     deleted:
       title: "{environment_name} deleted"
       message: The environment "{environment_name}" has been deleted
+    subscription_failure:
+      title: Environment subscription error
+      message: An unexpected problem occurred with your request, please try again. If the problem persists, contact an administrator.
   form:
     errors:
       title: There were some errors

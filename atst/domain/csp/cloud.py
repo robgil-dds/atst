@@ -341,6 +341,12 @@ class CloudProviderInterface:
         """
         raise NotImplementedError()
 
+    def create_subscription(self, environment):
+        """Returns True if a new subscription has been created or raises an
+        exception if an error occurs while creating a subscription.
+        """
+        raise NotImplementedError()
+
 
 class MockCloudProvider(CloudProviderInterface):
 
@@ -507,6 +513,11 @@ class MockCloudProvider(CloudProviderInterface):
         )
 
         return self._maybe(12)
+
+    def create_subscription(self, environment):
+        self._maybe_raise(self.UNAUTHORIZED_RATE, GeneralCSPException)
+
+        return True
 
     def get_calculator_url(self):
         return "https://www.rackspace.com/en-us/calculator"
