@@ -46,6 +46,7 @@ common:
   delete_confirm: "Please type the word {word} to confirm:"
   dod_id: DoD ID
   disable: Disable
+  edit: Edit
   email: Email
   lorem: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
   name: Name
@@ -409,9 +410,13 @@ portfolios:
     create_new_env_info: Creating an environment gives you access to the Cloud Service Provider. This environment will function within the constraints of the task order, and any costs will be billed against the portfolio.
     csp_link: Cloud Service Provider Link
     enter_env_name: "Enter environment name:"
+    environments:
+      add_subscription: Add new subscription
+      blank_slate: This Application has no environments
+      disabled: ": Access Suspended"
     environments_heading: Application Environments
     existing_application_title: "{application_name} Application Settings"
-    member_count: "{count} members"
+    member_count: "{count} Members"
     new_application_title: New Application
     settings:
       name_description: Application name and description
