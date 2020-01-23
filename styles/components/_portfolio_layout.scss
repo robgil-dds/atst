@@ -95,7 +95,7 @@
 }
 
 .portfolio-admin {
-  margin: $spacing-large 0;
+  margin: $large-spacing 0;
   max-width: $max-panel-width;
 }
 
@@ -311,7 +311,7 @@
 
 .portfolio-funding {
   max-width: $max-panel-width;
-  margin: $spacing-large 0;
+  margin: $large-spacing 0;
 
   .panel {
     @include shadow-panel;

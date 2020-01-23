@@ -26,7 +26,7 @@ body {
     -ms-flex-negative: 1;
     top: $usa-banner-height + $topbar-height;
     position: relative;
-    padding: 0 $spacing-large;
+    padding: 0 $large-spacing;
 
     @include media($medium-screen) {
       top: $usa-banner-height + $topbar-height;
