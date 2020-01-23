@@ -39,8 +39,8 @@ variable "networks" {
 variable "service_endpoints" {
   type = map
   default = {
-    public  = ""
-    private = "Microsoft.Storage,Microsoft.KeyVault"
+    public  = "Microsoft.ContainerRegistry" # Not necessary but added to avoid infinite state loop
+    private = "Microsoft.Storage,Microsoft.KeyVault,Microsoft.ContainerRegistry,Microsoft.Sql"
   }
 }
 
@@ -93,6 +93,14 @@ variable "admin_user_whitelist" {
   default = {
     "Rob Gil"           = "66.220.238.246/32"
     "Dan Corrigan Work" = "108.16.207.173/32"
+  }
+}
+
+variable "storage_admin_whitelist" {
+  type = map
+  default = {
+    "Rob Gil"           = "66.220.238.246"
+    "Dan Corrigan Work" = "108.16.207.173"
   }
 }
 

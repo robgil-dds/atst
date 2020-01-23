@@ -24,10 +24,10 @@ resource "azurerm_storage_account_network_rules" "acls" {
   storage_account_name = azurerm_storage_account.bucket.name
 
   default_action = var.policy
-  # Azure Storage CIDR ACLs do not accept /32 CIDR ranges, so
-  # it must be stripped to just the IP (no CIDR)
+
+  # Azure Storage CIDR ACLs do not accept /32 CIDR ranges.
   ip_rules = [
-    for cidr in values(var.whitelist) : cidrhost(cidr, 0)
+    for cidr in values(var.whitelist) : cidr
   ]
   virtual_network_subnet_ids = var.subnet_ids
   bypass                     = ["AzureServices"]

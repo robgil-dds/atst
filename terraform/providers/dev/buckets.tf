@@ -9,7 +9,7 @@ module "task_order_bucket" {
   region       = var.region
   policy       = "Allow"
   subnet_ids   = [module.vpc.subnets]
-  whitelist    = var.admin_user_whitelist
+  whitelist    = var.storage_admin_whitelist
 }
 
 # TF State should be restricted to admins only, but IP protected
@@ -25,5 +25,5 @@ module "tf_state" {
   region       = var.region
   policy       = "Deny"
   subnet_ids   = []
-  whitelist    = var.admin_user_whitelist
+  whitelist    = var.storage_admin_whitelist
 }
