@@ -87,3 +87,10 @@ variable "admin_users" {
     "Dan Corrigan" = "7e852ceb-eb0d-49b1-b71e-e9dcd1082ffc"
   }
 }
+
+variable "admin_user_whitelist" {
+  type = map
+  default = {
+    "Rob Gil" = "66.220.238.246"
+  }
+}

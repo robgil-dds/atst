@@ -13,7 +13,7 @@ resource "azurerm_storage_account" "bucket" {
   network_rules {
     default_action             = var.policy
     virtual_network_subnet_ids = var.subnet_ids
-    #ip_rules = ["66.220.238.246/30"]
+    ip_rules                   = values(var.whitelist)
   }
 }
 

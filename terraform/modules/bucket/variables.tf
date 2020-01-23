@@ -40,3 +40,9 @@ variable "policy" {
   default     = "Deny"
   type        = string
 }
+
+variable "whitelist" {
+  type        = map
+  description = "A map of whitelisted IPs and CIDR ranges. For single IPs, Azure expects just the IP, NOT a /32."
+  default     = {}
+}
