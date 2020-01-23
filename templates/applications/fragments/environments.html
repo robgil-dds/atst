@@ -79,14 +79,17 @@
                       <ul>
                         <li class="accordion-table__item-toggle-content__expanded">
                           <base-form inline-template>
-                            <form action="{{ url_for('applications.update_environment', environment_id=env['id']) }}" method="post" v-on:submit="handleSubmit">
+                            <form action="{{ url_for('applications.update_environment', environment_id=env['id']) }}" method="post" v-on:submit="handleSubmit" class="col col--half">
                               {{ edit_form.csrf_token }}
                               {{ TextInput(edit_form.name, validation='defaultStringField', optional=False) }}
-                              {{
-                                SaveButton(
-                                  text=("common.save_changes" | translate)
-                                )
-                              }}
+                              <div class="action-group action-group--tight">
+                                {{
+                                  SaveButton(
+                                    text=("common.save_changes" | translate)
+                                  )
+                                }}
+                              </div>
+                              <button type="submit" formaction="{{ url_for('applications.create_subscription', environment_id=env.id)}}" class="usa-button usa-button-secondary">Add new subscription</button>
                             </form>
                           </base-form>
                         </li>
