@@ -46,3 +46,9 @@ variable "gateway_subnet" {
   type        = string
   description = "The Subnet CIDR that we'll use for the virtual_network_gateway 'GatewaySubnet'"
 }
+
+variable "service_endpoints" {
+  type        = map
+  description = "A map of the service endpoints and its mapping to subnets"
+
+}

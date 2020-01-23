@@ -39,6 +39,8 @@ resource "azurerm_subnet" "subnet" {
   lifecycle {
     ignore_changes = [route_table_id]
   }
+
+  service_endpoints = split(",", var.service_endpoints[each.key])
   #delegation {
   #  name = "acctestdelegation"
   #
