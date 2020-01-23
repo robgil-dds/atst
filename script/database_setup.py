@@ -1,13 +1,11 @@
 # Add root application dir to the python path
 import os
 import sys
-from contextlib import contextmanager
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(parent_dir)
 
 import sqlalchemy
-from alembic import config as alembic_config
 import yaml
 
 from atst.app import make_config, make_app
@@ -25,7 +23,6 @@ def database_setup(username, password, dbname, ccpo_users):
     try:
         _create_database_user(username, password, dbname)
     except sqlalchemy.exc.ProgrammingError as err:
-        raise err
         print(f"Postgres user role '{username}' already exists.")
 
     print("Applying schema and seeding roles and permissions.")
