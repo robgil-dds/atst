@@ -663,7 +663,7 @@ def test_task_orders_new_get_routes(get_url_assert_status):
 def test_task_orders_new_post_routes(post_url_assert_status):
     post_routes = [
         ("task_orders.submit_form_step_one_add_pdf", {"pdf": ""}),
-        ("task_orders.submit_form_step_two_add_number", {"number": "1234567890"}),
+        ("task_orders.submit_form_step_two_add_number", {"number": "1234567890123"}),
         (
             "task_orders.submit_form_step_three_add_clins",
             {
