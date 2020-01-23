@@ -29,3 +29,14 @@ variable "service_name" {
   description = "Name of the service using this bucket"
   type        = string
 }
+
+variable "subnet_ids" {
+  description = "List of subnet_ids that will have access to this service"
+  type        = list
+}
+
+variable "policy" {
+  description = "The default policy for the network access rules (Allow/Deny)"
+  default     = "Deny"
+  type        = string
+}

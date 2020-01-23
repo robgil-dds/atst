@@ -36,6 +36,14 @@ variable "networks" {
   }
 }
 
+variable "service_endpoints" {
+  type = map
+  default = {
+    public  = ""
+    private = "Microsoft.Storage,Microsoft.KeyVault"
+  }
+}
+
 variable "gateway_subnet" {
   type    = string
   default = "10.1.20.0/24"

@@ -9,6 +9,12 @@ resource "azurerm_storage_account" "bucket" {
   location                 = azurerm_resource_group.bucket.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+
+  network_rules {
+    default_action             = var.policy
+    virtual_network_subnet_ids = var.subnet_ids
+    #ip_rules = ["66.220.238.246/30"]
+  }
 }
 
 resource "azurerm_storage_container" "bucket" {
