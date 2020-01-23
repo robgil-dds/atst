@@ -131,6 +131,9 @@ flash:
     subscription_failure:
       title: Environment subscription error
       message: An unexpected problem occurred with your request, please try again. If the problem persists, contact an administrator.
+    subscription_success:
+      title: Success!
+      message: "A subscription has been added to {name} environment"
   form:
     errors:
       title: There were some errors

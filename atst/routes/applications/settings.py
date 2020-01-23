@@ -528,13 +528,13 @@ def resend_invite(application_id, application_role_id):
 @applications_bp.route(
     "/environments/<environment_id>/add_subscription", methods=["POST"]
 )
-# TODO: decide what perms are needed to create a subscription
 @user_can(Permissions.EDIT_ENVIRONMENT, message="create new environment subscription")
 def create_subscription(environment_id):
     environment = Environments.get(environment_id)
 
     try:
         app.csp.cloud.create_subscription(environment)
+        flash("environment_subscription_success", name=environment.displayname)
 
     except GeneralCSPException:
         flash("environment_subscription_failure")

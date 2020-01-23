@@ -88,6 +88,11 @@ MESSAGES = {
         "message": "flash.environment.subscription_failure.message",
         "category": "error",
     },
+    "environment_subscription_success": {
+        "title": "flash.environment.subscription_success.title",
+        "message": "flash.environment.subscription_success.message",
+        "category": "success",
+    },
     "form_errors": {
         "title": "flash.form.errors.title",
         "message": "flash.form.errors.message",
