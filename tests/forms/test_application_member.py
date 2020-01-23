@@ -43,10 +43,8 @@ def test_update_member_form():
     form_data = {
         "perms_team_mgmt": True,
         "perms_env_mgmt": False,
-        "perms_del_env": False,
     }
     form = UpdateMemberForm(data=form_data)
     assert form.validate()
     assert form.perms_team_mgmt.data
     assert not form.perms_env_mgmt.data
-    assert not form.perms_del_env.data

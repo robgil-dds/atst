@@ -64,9 +64,6 @@ def filter_perm_sets_data(member):
         "perms_env_mgmt": bool(
             member.has_permission_set(PermissionSets.EDIT_APPLICATION_ENVIRONMENTS)
         ),
-        "perms_del_env": bool(
-            member.has_permission_set(PermissionSets.DELETE_APPLICATION_ENVIRONMENTS)
-        ),
     }
 
     return perm_sets_data

@@ -206,7 +206,6 @@ def test_get_members_data(app, client, user_session):
         assert member["permission_sets"] == {
             "perms_team_mgmt": False,
             "perms_env_mgmt": False,
-            "perms_del_env": False,
         }
         assert member["environment_roles"] == [
             {
@@ -409,7 +408,6 @@ def test_create_member(monkeypatch, client, user_session, session):
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
             "perms_team_mgmt": True,
-            "perms_del_env": True,
         },
     )
 
@@ -538,7 +536,6 @@ def test_update_member(client, user_session, session):
             "environment_roles-2-environment_name": env_2.name,
             "perms_env_mgmt": True,
             "perms_team_mgmt": True,
-            "perms_del_env": True,
         },
     )
 
@@ -557,9 +554,6 @@ def test_update_member(client, user_session, session):
     assert bool(app_role.has_permission_set(PermissionSets.EDIT_APPLICATION_TEAM))
     assert bool(
         app_role.has_permission_set(PermissionSets.EDIT_APPLICATION_ENVIRONMENTS)
-    )
-    assert bool(
-        app_role.has_permission_set(PermissionSets.DELETE_APPLICATION_ENVIRONMENTS)
     )
 
     environment_roles = application.roles[0].environment_roles
@@ -702,7 +696,6 @@ def test_handle_create_member(monkeypatch, set_g, session):
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
             "perms_team_mgmt": True,
-            "perms_del_env": True,
         }
     )
     handle_create_member(application.id, form_data)
@@ -739,7 +732,6 @@ def test_handle_update_member_success(set_g):
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
             "perms_team_mgmt": True,
-            "perms_del_env": True,
         }
     )
 
@@ -780,7 +772,6 @@ def test_handle_update_member_with_error(set_g, monkeypatch, mock_logger):
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
             "perms_team_mgmt": True,
-            "perms_del_env": True,
         }
     )
     handle_update_member(application.id, app_role.id, form_data)
