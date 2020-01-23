@@ -35,6 +35,7 @@ class TaskOrderPdfForm(Form):
 
 class TaskOrderForm(Form):
     pdf = FormField(TaskOrderPdfForm, label="task_order_pdf")
+    number = StringField(label="task_order_number", default="number")
 
 
 @pytest.fixture
@@ -61,6 +62,12 @@ def checkbox_input_macro(env):
 def multi_checkbox_input_macro(env):
     multi_checkbox_template = env.get_template("components/multi_checkbox_input.html")
     return getattr(multi_checkbox_template.module, "MultiCheckboxInput")
+
+
+@pytest.fixture
+def text_input_macro(env):
+    text_input_template = env.get_template("components/text_input.html")
+    return getattr(text_input_template.module, "TextInput")
 
 
 @pytest.fixture
@@ -170,3 +177,10 @@ def test_make_pop_date_range(env, app):
         index=1,
     )
     write_template(pop_date_range, "pop_date_range.html")
+
+
+def test_make_text_input_template(text_input_macro, task_order_form):
+    text_input_to_number = text_input_macro(
+        task_order_form.number, validation="taskOrderNumber"
+    )
+    write_template(text_input_to_number, "text_input_to_number.html")
