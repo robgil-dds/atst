@@ -26,7 +26,7 @@ def has_portfolio_applications(_user, portfolio=None, **_kwargs):
 def portfolio_applications(portfolio_id):
     user_env_roles = EnvironmentRoles.for_user(g.current_user.id, portfolio_id)
     environment_access = {
-        env_role.environment_id: env_role.role for env_role in user_env_roles
+        env_role.environment_id: env_role.role.value for env_role in user_env_roles
     }
 
     return render_template(
