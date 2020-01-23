@@ -64,6 +64,10 @@ class PortfolioStateMachine(
         db.session.add(self)
         db.session.commit()
 
+    def __repr__(self):
+        return f"<PortfolioStateMachine(state='{self.current_state.name}', portfolio='{self.portfolio.name}'"
+
+
     @reconstructor
     def attach_machine(self):
         """
@@ -108,6 +112,7 @@ class PortfolioStateMachine(
                 if create_trigger:
                     self.trigger(create_trigger, **kwargs)
                 else:
+                    app.logger.info(f"could not locate 'create trigger' for {self.__repr__()}")
                     self.fail_stage(stage)
 
         elif state_obj.is_CREATED:
@@ -133,15 +138,14 @@ class PortfolioStateMachine(
 
         payload_data_cls = get_stage_csp_class(stage, "payload")
         if not payload_data_cls:
-            print("could not resolve payload data class")
+            app.logger.info(f"could not resolve payload data class for stage {stage}")
             self.fail_stage(stage)
         try:
             payload_data = payload_data_cls(**payload)
         except PydanticValidationError as exc:
-            print("Payload Validation Error:")
-            print(exc.json())
-            print("got")
-            print(payload)
+            app.logger.error(f"Payload Validation Error in {self.__repr__()}:", exc_info=1)
+            app.logger.info(exc.json())
+            app.logger.info(payload)
             self.fail_stage(stage)
 
         # TODO: Determine best place to do this, maybe @reconstructor
@@ -151,18 +155,19 @@ class PortfolioStateMachine(
         else:
             self.csp = MockCSP(app).cloud
 
-        for attempt in range(5):
+        attempts_count = 5
+        for attempt in range(attempts_count):
             try:
                 func_name = f"create_{stage}"
                 response = getattr(self.csp, func_name)(payload_data)
             except (ConnectionException, UnknownServerException) as exc:
-                print("caught exception. retry", attempt)
+                app.logger.error(f"CSP api call. Caught exception for {self.__repr__()}. Retry attempt {attempt}", exc_info=1)
                 continue
             else:
                 break
         else:
             # failed all attempts
-            print("failed")
+            logger.info(f"CSP api call failed after {attempts_count} attempts.")
             self.fail_stage(stage)
 
         if self.portfolio.csp_data is None:
@@ -177,7 +182,6 @@ class PortfolioStateMachine(
 
     def is_csp_data_valid(self, event):
         # check portfolio csp details json field for fields
-
         if self.portfolio.csp_data is None or not isinstance(
             self.portfolio.csp_data, dict
         ):
@@ -199,9 +203,10 @@ class PortfolioStateMachine(
                 # self.store_creds(self.portfolio, new_creds)
 
         except PydanticValidationError as exc:
-            print("is_csp_data_valid: False")
-            print(cls)
-            print(exc.json())
+            app.logger.error(f"Payload Validation Error in {self.__repr__()}:", exc_info=1)
+            app.logger.info(exc.json())
+            app.logger.info(payload)
+
             return False
 
         return True

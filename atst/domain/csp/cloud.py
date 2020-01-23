@@ -4,6 +4,8 @@ from uuid import uuid4
 
 from pydantic import BaseModel, validator
 
+from flask import current_app as app
+
 from atst.models.user import User
 from atst.models.application import Application
 from atst.models.environment import Environment
@@ -754,6 +756,7 @@ class AzureSDKProvider(object):
         self.graphrbac = graphrbac
         self.credentials = credentials
         self.identity = identity
+        self.exceptions = exceptions
         self.secrets = secrets
         self.requests = requests
         # may change to a JEDI cloud
@@ -781,14 +784,21 @@ class AzureCloudProvider(CloudProviderInterface):
         secret_client = self.secrets.SecretClient(
             vault_url=self.vault_url, credential=credential,
         )
-        return secret_client.set_secret(secret_key, secret_value)
+        try:
+            return secret_client.set_secret(secret_key, secret_value)
+        except self.exceptions.HttpResponseError as exc:
+            app.logger.error(f"Could not SET secret in Azure keyvault for key {secret_key}.", exc_info=1)
+
 
     def get_secret(secret_key):
         credential = self._get_client_secret_credential_obj()
         secret_client = self.secrets.SecretClient(
             vault_url=self.vault_url, credential=credential,
         )
-        return secret_client.get_secret(secret_key).value
+        try:
+            return secret_client.get_secret(secret_key).value
+        except self.exceptions.HttpResponseError as exc:
+            app.logger.error(f"Could not GET secret in Azure keyvault for key {secret_key}.", exc_info=1)
 
     def create_environment(
         self, auth_credentials: Dict, user: User, environment: Environment

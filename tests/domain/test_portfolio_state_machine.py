@@ -40,13 +40,6 @@ def test_state_machine_compose_state(portfolio):
     )
 
 
-def test_state_machine_first_stage_create_trigger(portfolio):
-    sm = PortfolioStateMachineFactory.create(portfolio=portfolio)
-    first_stage_create_trigger = sm._get_first_stage_create_trigger()
-    first_stage_name = list(AzureStages)[0].name.lower()
-    assert "create_" + first_stage_name == first_stage_create_trigger
-
-
 def test_state_machine_valid_data_classes_for_stages(portfolio):
     sm = PortfolioStateMachineFactory.create(portfolio=portfolio)
     for stage in AzureStages:
@@ -74,8 +67,14 @@ def test_state_machine_initialization(portfolio):
         ] == in_progress_triggers
 
         started_triggers = sm.machine.get_triggers("STARTED")
-        first_stage_create_trigger = sm._get_first_stage_create_trigger()
-        assert ["reset", "fail", first_stage_create_trigger] == started_triggers
+        create_trigger = next(
+            filter(
+                lambda trigger: trigger.startswith("create_"),
+                sm.machine.get_triggers(FSMStates.STARTED.name),
+            ),
+            None,
+        )
+        assert ["reset", "fail", create_trigger] == started_triggers
 
 
 def test_fsm_transition_start(portfolio):
@@ -96,18 +95,19 @@ def test_fsm_transition_start(portfolio):
     else:
         csp_data = {}
 
-    ppoc = portfolio.owner
-    user_id = f"{ppoc.first_name[0]}{ppoc.last_name}".lower()
+    # ppoc = portfolio.owner
+    # user_id = f"{ppoc.first_name[0]}{ppoc.last_name}".lower()
+    user_id = "abcdefg"
     domain_name = re.sub("[^0-9a-zA-Z]+", "", portfolio.name).lower()
 
     portfolio_data = {
         "user_id": user_id,
         "password": "jklfsdNCVD83nklds2#202",
         "domain_name": domain_name,
-        "first_name": ppoc.first_name,
-        "last_name": ppoc.last_name,
+        "first_name": "john",  # ppoc.first_name,
+        "last_name": "doe",  # ppoc.last_name,
         "country_code": "US",
-        "password_recovery_email_address": ppoc.email,
+        "password_recovery_email_address": "email@example.com",  # ppoc.email,
         "address": {
             "company_name": "",
             "address_line_1": "",
@@ -128,7 +128,7 @@ def test_fsm_transition_start(portfolio):
 
     assert sm.state == FSMStates.TENANT_CREATED
     assert portfolio.csp_data.get("tenant_id", None) is not None
-    print(portfolio.csp_data.keys())
+    #print(portfolio.csp_data.keys())
     if portfolio.csp_data is not None:
         csp_data = portfolio.csp_data
     else:
@@ -137,6 +137,6 @@ def test_fsm_transition_start(portfolio):
         list(csp_data.items()) + list(portfolio_data.items()) + list(config.items())
     )
     sm.trigger_next_transition(creds=creds, csp_data=collected_data)
-    assert sm.state == FSMStates.BILLING_PROFILE_CREATED
+    assert sm.state == FSMStates.BILLING_PROFILE_CREATION_CREATED
 
-    print(portfolio.csp_data.keys())
+    #print(portfolio.csp_data.keys())

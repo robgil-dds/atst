@@ -1,5 +1,7 @@
 from enum import Enum
 
+from flask import current_app as app
+
 
 class StageStates(Enum):
     CREATED = "created"
@@ -107,10 +109,12 @@ class FSMMixin:
         fail_trigger = "fail" + stage
         if fail_trigger in self.machine.get_triggers(self.current_state.name):
             self.trigger(fail_trigger)
+            app.logger.info(f"calling fail trigger '{fail_trigger}' for '{self.__repr__()}'")
 
     def finish_stage(self, stage):
         finish_trigger = "finish_" + stage
         if finish_trigger in self.machine.get_triggers(self.current_state.name):
+            app.logger.info(f"calling finish trigger '{finish_trigger}' for '{self.__repr__()}'")
             self.trigger(finish_trigger)
 
     def prepare_init(self, event):
