@@ -32,3 +32,20 @@ variable "admin_principals" {
   type        = map
   description = "A list of user principals who need access to manage the keyvault"
 }
+
+variable "subnet_ids" {
+  description = "List of subnet_ids that will have access to this service"
+  type        = list
+}
+
+variable "policy" {
+  description = "The default policy for the network access rules (Allow/Deny)"
+  default     = "Deny"
+  type        = string
+}
+
+variable "whitelist" {
+  type        = map
+  description = "A map of whitelisted IPs and CIDR ranges. For single IPs, Azure expects just the IP, NOT a /32."
+  default     = {}
+}
