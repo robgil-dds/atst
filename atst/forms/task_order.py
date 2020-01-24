@@ -63,17 +63,11 @@ def validate_date_in_range(form, field):
 
 
 def remove_dashes(value):
-    if value:
-        return value.replace("-", "")
-    else:
-        return None
+    return value.replace("-", "") if value else None
 
 
 def coerce_upper(value):
-    if value:
-        return value.upper()
-    else:
-        return None
+    return value.upper() if value else None
 
 
 class CLINForm(FlaskForm):
