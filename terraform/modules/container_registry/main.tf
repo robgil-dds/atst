@@ -14,6 +14,7 @@ resource "azurerm_container_registry" "acr" {
   sku                 = var.sku
   admin_enabled       = var.admin_enabled
   #georeplication_locations = [azurerm_resource_group.acr.location, var.backup_region]
+
   network_rule_set {
     default_action = var.policy
 
@@ -38,9 +39,5 @@ resource "azurerm_container_registry" "acr" {
         subnet_id = subnet.value
       }
     ]
-    #virtual_network {
-    #  action = "Allow"
-    #  subnet_id = var.subnet_ids
-    #}
   }
 }
