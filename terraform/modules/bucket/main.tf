@@ -1,11 +1,3 @@
-#locals {
-#  whitelist = [
-#    for cidr in values(var.whitelist): {
-#      ip = cidrhost(cidr, 0)
-#    }
-#  ]
-#}
-
 resource "azurerm_resource_group" "bucket" {
   name     = "${var.name}-${var.environment}-${var.service_name}"
   location = var.region
