@@ -39,6 +39,8 @@ resource "azurerm_subnet" "subnet" {
   lifecycle {
     ignore_changes = [route_table_id]
   }
+
+  service_endpoints = split(",", var.service_endpoints[each.key])
   #delegation {
   #  name = "acctestdelegation"
   #
@@ -108,7 +110,7 @@ resource "azurerm_virtual_network_gateway" "vnet_gateway" {
   }
 
   vpn_client_configuration {
-    address_space        = ["172.16.1.0/24"]
+    address_space        = var.vpn_client_cidr
     vpn_client_protocols = ["OpenVPN"]
   }
 }

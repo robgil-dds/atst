@@ -2,7 +2,7 @@ from datetime import datetime
 import re
 
 from werkzeug.datastructures import FileStorage
-from wtforms.validators import ValidationError
+from wtforms.validators import ValidationError, Regexp
 import pendulum
 
 from atst.utils.localization import translate
@@ -31,12 +31,13 @@ def DateRange(lower_bound=None, upper_bound=None, message=None):
     return _date_range
 
 
-def IsNumber(message=translate("forms.validators.is_number_message")):
+def Number(message=translate("forms.validators.is_number_message")):
     def _is_number(form, field):
-        try:
-            int(field.data)
-        except (ValueError, TypeError):
-            raise ValidationError(message)
+        if field.data:
+            try:
+                int(field.data)
+            except (ValueError, TypeError):
+                raise ValidationError(message)
 
     return _is_number
 
@@ -97,3 +98,7 @@ def FileLength(max_length=50000000, message=None):
             field.data.seek(0)
 
     return _file_length
+
+
+def AlphaNumeric(message=translate("forms.validators.alpha_numeric_message")):
+    return Regexp(regex=r"^[A-Za-z0-9\-_ \.]*$", message=message)

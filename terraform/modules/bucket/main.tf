@@ -11,6 +11,20 @@ resource "azurerm_storage_account" "bucket" {
   account_replication_type = "LRS"
 }
 
+resource "azurerm_storage_account_network_rules" "acls" {
+  resource_group_name  = azurerm_resource_group.bucket.name
+  storage_account_name = azurerm_storage_account.bucket.name
+
+  default_action = var.policy
+
+  # Azure Storage CIDR ACLs do not accept /32 CIDR ranges.
+  ip_rules = [
+    for cidr in values(var.whitelist) : cidr
+  ]
+  virtual_network_subnet_ids = var.subnet_ids
+  bypass                     = ["AzureServices"]
+}
+
 resource "azurerm_storage_container" "bucket" {
   name                  = "content"
   storage_account_name  = azurerm_storage_account.bucket.name

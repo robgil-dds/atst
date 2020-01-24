@@ -101,7 +101,7 @@ export default {
       if (!!this.clinNumber) {
         return `CLIN ${this.clinNumber}`
       } else {
-        return `CLIN`
+        return `New CLIN`
       }
     },
     percentObligated: function() {

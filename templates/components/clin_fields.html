@@ -41,7 +41,7 @@
         <div class="form-row">
           <div class="form-col">
             {% if fields %}
-              {{ TextInput(fields.number, optional=False) }}
+              {{ TextInput(fields.number, validation='clinNumber', optional=False) }}
             {% else %}
               <textinput :name="'clins-' + clinIndex + '-number'" inline-template>
                 <div v-bind:class="['usa-input usa-input--validation--' + validation, { 'usa-input--error': showError, 'usa-input--success': showValid, 'usa-input--validation--paragraph': paragraph, 'no-max-width': noMaxWidth }]">
@@ -68,7 +68,7 @@
                   <input type='hidden' v-bind:value='rawValue' :name='name' />
 
                   <template v-if='showError'>
-                    <span class='usa-input__message' v-html='validationError'></span>
+                    <span class='usa-input__message' v-text='validationError'></span>
                   </template>
                   <template v-else>
                     <span class='usa-input__message'></span>
@@ -118,7 +118,7 @@
         {{ CLINDollarAmount("obligated", funding_validation=True) }}
         {% endif %}
 
-        <div class="h5 clin-card__title">Percent Obligated</div>
+        <div class="h5 clin-card__title">{{ "task_orders.form.step_3.percent_obligated" | translate }}</div>
         <p id="percent-obligated" v-text='percentObligated'></p>
 
         <hr>

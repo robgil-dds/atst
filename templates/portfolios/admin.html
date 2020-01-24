@@ -20,7 +20,7 @@
           <form method="POST" action="{{ url_for('portfolios.edit', portfolio_id=portfolio.id) }}" autocomplete="false">
             {{ portfolio_form.csrf_token }}
             {{ TextInput(portfolio_form.name, validation="portfolioName", optional=False) }}
-            {{ TextInput(portfolio_form.description, paragraph=True) }}
+            {{ TextInput(portfolio_form.description, validation="defaultTextAreaField", paragraph=True) }}
             <div class='edit-portfolio-name action-group'>
               {{ SaveButton(text='Save Changes', additional_classes='usa-button-big') }}
             </div>
@@ -58,10 +58,6 @@
     </section>
 
     <hr>
-
-    {% if user_can(permissions.VIEW_PORTFOLIO_POC) %}
-      {% include "portfolios/fragments/primary_point_of_contact.html" %}
-    {% endif %}
 
     {% if user_can(permissions.VIEW_PORTFOLIO_USERS) %}
       {% include "portfolios/fragments/portfolio_members.html" %}

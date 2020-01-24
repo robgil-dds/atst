@@ -9,6 +9,12 @@ export default {
     unmask: [],
     validationError: 'Please enter a response',
   },
+  clinNumber: {
+    mask: false,
+    match: /^\d{4}$/,
+    unmask: [],
+    validationError: 'Please enter a 4-digit CLIN number',
+  },
   date: {
     mask: [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/],
     match: /(0[1-9]|1[012])[- \/.](0[1-9]|[12][0-9]|3[01])[- \/.](19|20)\d\d/,
@@ -34,6 +40,20 @@ export default {
     unmask: ['$', ','],
     validationError: 'Please enter a dollar amount',
   },
+  defaultStringField: {
+    mask: false,
+    match: /^[A-Za-z0-9\-_ \.]{1,100}$/,
+    unmask: [],
+    validationError:
+      'Please enter a response of no more than 100 alphanumeric characters',
+  },
+  defaultTextAreaField: {
+    mask: false,
+    match: /^[A-Za-z0-9\-_ \.]{1,1000}$/,
+    unmask: [],
+    validationError:
+      'Please enter a response of no more than 1000 alphanumeric characters',
+  },
   clinDollars: {
     mask: createNumberMask({ prefix: '$', allowDecimal: true }),
     match: /^-?\d+\.?\d*$/,
@@ -53,6 +73,13 @@ export default {
     unmask: [','],
     validationError: 'Please enter a number',
   },
+  name: {
+    mask: false,
+    match: /.{1,100}/,
+    unmask: [],
+    validationError:
+      'This field accepts letters, numbers, commas, apostrophes, hyphens, and periods.',
+  },
   phoneExt: {
     mask: createNumberMask({
       prefix: '',
@@ -71,7 +98,7 @@ export default {
     unmask: [],
     validationError: 'Portfolio names can be between 4-100 characters',
   },
-  requiredField: {
+  required: {
     mask: false,
     match: /.+/,
     unmask: [],
@@ -103,5 +130,12 @@ export default {
     match: /^\d{10}$/,
     unmask: ['(', ')', '-', ' '],
     validationError: 'Please enter a 10-digit phone number',
+  },
+  restrictedFileName: {
+    mask: false,
+    match: /^[A-Za-z0-9\-_ \.]+$/,
+    unmask: [],
+    validationError:
+      'File names can only contain the characters A-Z, 0-9, space, hyphen, underscore, and period.',
   },
 }

@@ -17,7 +17,7 @@
     {% if 0 == environments_obj | length -%}
       <div class="empty-state panel__content">
         <p class="empty-state__message">
-          This Application has no environments
+          {{ 'portfolios.applications.environments.blank_slate' | translate }}
         </p>
       </div>
     {% else %}
@@ -31,8 +31,23 @@
                   <div class="accordion-table__item-content">
                     <div class="environment-list__item">
                       <span>
-                        {{ env['name'] }}
+                        <a
+                          href='{{ url_for("applications.access_environment", environment_id=env.id)}}'
+                          target='_blank'
+                          rel='noopener noreferrer'>
+                          {{ env['name'] }} {{ Icon('link', classes='icon--medium icon--primary') }}
+                        </a>
                       </span>
+                      {% if user_can(permissions.EDIT_ENVIRONMENT) -%}
+                        {{
+                        ToggleButton(
+                          open_html="common.edit"|translate,
+                          close_html="common.close"|translate,
+                          section_name="edit"
+                          )
+                        }}
+                      {%- endif %}
+                      <br>
                       {% set members_button = "portfolios.applications.member_count" | translate({'count': env['member_count']}) %}
                       {{
                         ToggleButton(
@@ -42,23 +57,9 @@
                           classes="environment-list__item__members"
                         )
                       }}
-                      {% if user_can(permissions.EDIT_ENVIRONMENT) -%}
-                        {% set edit_environment_button = "Edit" %}
-                        {{
-                        ToggleButton(
-                          open_html=edit_environment_button,
-                          close_html=edit_environment_button,
-                          section_name="edit"
-                          )
-                        }}
-                      {%- endif %}
                       <br>
                       {% if env['pending'] -%}
                         {{ Label(type="changes_pending", classes='label--below')}}
-                      {% else %}
-                        <a href='{{ url_for("applications.access_environment", environment_id=env.id)}}' target='_blank' rel='noopener noreferrer' class='application-list-item__environment__csp_link'>
-                          <span>{{ "portfolios.applications.csp_link" | translate }} {{ Icon('link', classes="icon--tiny") }}</span>
-                        </a>
                       {%- endif %}
                     </div>
                   </div>
@@ -66,7 +67,7 @@
                   {% call ToggleSection(section_name="members") %}
                     <ul>
                       {% for member in env['members'] %}
-                      {% set status = ": Access Suspended" if member['status'] == 'disabled' %}
+                      {% set status = "portfolios.applications.environments.disabled"|translate if member['status'] == 'disabled' %}
                       <li class="accordion-table__item-toggle-content__expanded">
                         {{ member['user_name'] }}{{ status }}
                       </li>
@@ -77,16 +78,28 @@
                   {% if user_can(permissions.EDIT_ENVIRONMENT) -%}
                     {% call ToggleSection(section_name="edit") %}
                       <ul>
-                        <li class="accordion-table__item-toggle-content__expanded">
+                        <li class="accordion-table__item-toggle-content__expanded environment-list__edit">
                           <base-form inline-template>
-                            <form action="{{ url_for('applications.update_environment', environment_id=env['id']) }}" method="post" v-on:submit="handleSubmit">
+                            <form
+                              action="{{ url_for('applications.update_environment', environment_id=env['id']) }}"
+                              method="post"
+                              v-on:submit="handleSubmit"
+                              class="col col--half">
                               {{ edit_form.csrf_token }}
-                              {{ TextInput(edit_form.name, validation='requiredField', optional=False) }}
-                              {{
-                                SaveButton(
-                                  text=("common.save" | translate)
-                                )
-                              }}
+                              {{ TextInput(edit_form.name, validation='defaultStringField', optional=False) }}
+                              <div class="action-group action-group--tight">
+                                {{
+                                  SaveButton(
+                                    text=("common.save_changes" | translate)
+                                  )
+                                }}
+                              </div>
+                              <button
+                                type="submit"
+                                formaction="{{ url_for('applications.create_subscription', environment_id=env.id)}}"
+                                class="usa-button usa-button-secondary">
+                                {{ "portfolios.applications.environments.add_subscription" | translate }}
+                              </button>
                             </form>
                           </base-form>
                         </li>

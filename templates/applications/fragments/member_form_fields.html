@@ -21,7 +21,7 @@
               {{ sub_form.environment_name.data }}
             </div>
             <div class="usa-input__help">
-              {{ role }}
+              {{ "portfolios.applications.members.roles.{}".format(role) | translate }}
             </div>
           </div>
           <div class="form-col form-col--third">
@@ -89,16 +89,13 @@
     {% if new %}
       {% set team_mgmt = form.perms_team_mgmt.name %}
       {% set env_mgmt = form.perms_env_mgmt.name %}
-      {% set del_env = form.perms_del_env.name %}
     {% else %}
       {% set team_mgmt = "perms_team_mgmt-{}".format(member_role_id) %}
       {% set env_mgmt = "perms_env_mgmt-{}".format(member_role_id) %}
-      {% set del_env = "perms_del_env-{}".format(member_role_id) %}
     {% endif %}
 
     {{ CheckboxInput(form.perms_team_mgmt, classes="input__inline-fields", key=team_mgmt, id=team_mgmt, optional=True) }}
     {{ CheckboxInput(form.perms_env_mgmt, classes="input__inline-fields", key=env_mgmt, id=env_mgmt, optional=True) }}
-    {{ CheckboxInput(form.perms_del_env, classes="input__inline-fields", key=del_env, id=del_env, optional=True) }}
   </div>
   <hr class="full-width">
   <div class="environment_roles environment-roles-new">
@@ -119,11 +116,11 @@
 
 {% macro InfoFields(member_form) %}
   <div class="user-info">
-    {{ TextInput(member_form.first_name, validation='requiredField', optional=False) }}
-    {{ TextInput(member_form.last_name, validation='requiredField', optional=False) }}
+    {{ TextInput(member_form.first_name, validation='name', optional=False) }}
+    {{ TextInput(member_form.last_name, validation='name', optional=False) }}
     {{ TextInput(member_form.email, validation='email', optional=False) }}
     {{ PhoneInput(member_form.phone_number, member_form.phone_ext)}}
     {{ TextInput(member_form.dod_id, validation='dodId', optional=False) }}
-    <a href="#">How do I find the DoD ID?</a>
+    <a href="#">{{ "forms.new_member.dod_help" | translate }}</a>
   </div>
 {% endmacro %}

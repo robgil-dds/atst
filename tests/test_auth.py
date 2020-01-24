@@ -97,25 +97,12 @@ def test_protected_routes_redirect_to_login(client, app):
 def test_unprotected_routes_set_user_if_logged_in(client, app, user_session):
     user = UserFactory.create()
 
-    resp = client.get(url_for("atst.helpdocs"))
+    resp = client.get(url_for("atst.about"))
     assert resp.status_code == 200
     assert user.full_name not in resp.data.decode()
 
     user_session(user)
-    resp = client.get(url_for("atst.helpdocs"))
-    assert resp.status_code == 200
-    assert user.full_name in resp.data.decode()
-
-
-def test_unprotected_routes_set_user_if_logged_in(client, app, user_session):
-    user = UserFactory.create()
-
-    resp = client.get(url_for("atst.helpdocs"))
-    assert resp.status_code == 200
-    assert user.full_name not in resp.data.decode()
-
-    user_session(user)
-    resp = client.get(url_for("atst.helpdocs"))
+    resp = client.get(url_for("atst.about"))
     assert resp.status_code == 200
     assert user.full_name in resp.data.decode()
 

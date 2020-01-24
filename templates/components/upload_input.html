@@ -49,6 +49,9 @@
       <template v-if="sizeError">
         <span class="usa-input__message">{{ "forms.task_order.size_error" | translate }}</span>
       </template>
+      <template v-if="filenameError">
+        <span class="usa-input__message">{{ "forms.task_order.filename_error" | translate }}</span>
+      </template>
       {% for error, error_messages in field.errors.items() %}
         <span class="usa-input__message">{{error_messages[0]}}</span>
       {% endfor %}

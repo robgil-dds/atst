@@ -75,13 +75,11 @@ variable "storage_auto_grow" {
 variable "administrator_login" {
   type        = string
   description = "Administrator login"
-  default     = "atat_master" # FIXME - Remove with wrapper using KeyVault
 }
 
 variable "administrator_login_password" {
   type        = string
   description = "Administrator password"
-  default     = "eI0l7yswwtuhHpwzoVjwRKdAcuGNsg" # FIXME - Remove with wrapper using KeyVault
 }
 
 variable "postgres_version" {
@@ -95,4 +93,3 @@ variable "ssl_enforcement" {
   description = "Enforce SSL (Enabled/Disable)"
   default     = "Enabled"
 }
-

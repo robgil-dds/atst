@@ -1,9 +1,10 @@
 from flask import (
+    current_app as app,
+    g,
     redirect,
     render_template,
     request as http_request,
     url_for,
-    g,
 )
 
 from .blueprint import applications_bp
@@ -63,9 +64,6 @@ def filter_perm_sets_data(member):
         ),
         "perms_env_mgmt": bool(
             member.has_permission_set(PermissionSets.EDIT_APPLICATION_ENVIRONMENTS)
-        ),
-        "perms_del_env": bool(
-            member.has_permission_set(PermissionSets.DELETE_APPLICATION_ENVIRONMENTS)
         ),
     }
 
@@ -509,11 +507,7 @@ def resend_invite(application_id, application_role_id):
             token=new_invite.token,
         )
 
-        flash(
-            "application_invite_resent",
-            user_name=new_invite.user_name,
-            application_name=app_role.application.name,
-        )
+        flash("application_invite_resent", email=new_invite.email)
     else:
         flash(
             "application_invite_error",
@@ -527,5 +521,33 @@ def resend_invite(application_id, application_role_id):
             application_id=application_id,
             fragment="application-members",
             _anchor="application-members",
+        )
+    )
+
+
+@applications_bp.route(
+    "/environments/<environment_id>/add_subscription", methods=["POST"]
+)
+@user_can(Permissions.EDIT_ENVIRONMENT, message="create new environment subscription")
+def create_subscription(environment_id):
+    environment = Environments.get(environment_id)
+
+    try:
+        app.csp.cloud.create_subscription(environment)
+        flash("environment_subscription_success", name=environment.displayname)
+
+    except GeneralCSPException:
+        flash("environment_subscription_failure")
+        return (
+            render_settings_page(application=environment.application, show_flash=True),
+            400,
+        )
+
+    return redirect(
+        url_for(
+            "applications.settings",
+            application_id=environment.application.id,
+            fragment="application-environments",
+            _anchor="application-environments",
         )
     )

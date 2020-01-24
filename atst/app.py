@@ -159,6 +159,7 @@ def map_config(config):
         "ENV": config["default"]["ENVIRONMENT"],
         "BROKER_URL": config["default"]["REDIS_URI"],
         "DEBUG": config["default"].getboolean("DEBUG"),
+        "DEBUG_MAILER": config["default"].getboolean("DEBUG_MAILER"),
         "SQLALCHEMY_ECHO": config["default"].getboolean("SQLALCHEMY_ECHO"),
         "PORT": int(config["default"]["PORT"]),
         "SQLALCHEMY_DATABASE_URI": config["default"]["DATABASE_URI"],
@@ -221,7 +222,7 @@ def make_config(direct_config=None):
         config.read_dict({"default": direct_config})
 
     # Assemble DATABASE_URI value
-    database_uri = "postgres://{}:{}@{}:{}/{}".format(  # pragma: allowlist secret
+    database_uri = "postgresql://{}:{}@{}:{}/{}".format(  # pragma: allowlist secret
         config.get("default", "PGUSER"),
         config.get("default", "PGPASSWORD"),
         config.get("default", "PGHOST"),
@@ -289,7 +290,7 @@ def make_crl_validator(app):
 
 
 def make_mailer(app):
-    if app.config["DEBUG"]:
+    if app.config["DEBUG"] or app.config["DEBUG_MAILER"]:
         mailer_connection = mailer.RedisConnection(app.redis)
     else:
         mailer_connection = mailer.SMTPConnection(

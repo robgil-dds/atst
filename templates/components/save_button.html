@@ -2,7 +2,7 @@
   {% set class = "usa-button usa-button-primary " + additional_classes %}
 
   {% if element == "button" %}
-    <button type="submit" class="{{ class }}" tabindex="0" v-bind:disabled="!canSave" {{ form_attr }} >
+    <button type="submit" class="{{ class }}" tabindex="0" v-bind:disabled="!canSave">
       {{ text }}
     </button>
   {% elif element == 'input' %}

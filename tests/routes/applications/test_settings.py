@@ -206,7 +206,6 @@ def test_get_members_data(app, client, user_session):
         assert member["permission_sets"] == {
             "perms_team_mgmt": False,
             "perms_env_mgmt": False,
-            "perms_del_env": False,
         }
         assert member["environment_roles"] == [
             {
@@ -401,15 +400,14 @@ def test_create_member(monkeypatch, client, user_session, session):
             "user_data-last_name": user.last_name,
             "user_data-dod_id": user.dod_id,
             "user_data-email": user.email,
-            "environment_roles-0-environment_id": env.id,
+            "environment_roles-0-environment_id": str(env.id),
             "environment_roles-0-role": "ADMIN",
             "environment_roles-0-environment_name": env.name,
-            "environment_roles-1-environment_id": env_1.id,
+            "environment_roles-1-environment_id": str(env_1.id),
             "environment_roles-1-role": NO_ACCESS,
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
             "perms_team_mgmt": True,
-            "perms_del_env": True,
         },
     )
 
@@ -527,18 +525,17 @@ def test_update_member(client, user_session, session):
             application_role_id=app_role.id,
         ),
         data={
-            "environment_roles-0-environment_id": env.id,
+            "environment_roles-0-environment_id": str(env.id),
             "environment_roles-0-role": "CONTRIBUTOR",
             "environment_roles-0-environment_name": env.name,
-            "environment_roles-1-environment_id": env_1.id,
+            "environment_roles-1-environment_id": str(env_1.id),
             "environment_roles-1-environment_name": env_1.name,
             "environment_roles-1-disabled": "True",
-            "environment_roles-2-environment_id": env_2.id,
+            "environment_roles-2-environment_id": str(env_2.id),
             "environment_roles-2-role": "BILLING_READ",
             "environment_roles-2-environment_name": env_2.name,
             "perms_env_mgmt": True,
             "perms_team_mgmt": True,
-            "perms_del_env": True,
         },
     )
 
@@ -557,9 +554,6 @@ def test_update_member(client, user_session, session):
     assert bool(app_role.has_permission_set(PermissionSets.EDIT_APPLICATION_TEAM))
     assert bool(
         app_role.has_permission_set(PermissionSets.EDIT_APPLICATION_ENVIRONMENTS)
-    )
-    assert bool(
-        app_role.has_permission_set(PermissionSets.DELETE_APPLICATION_ENVIRONMENTS)
     )
 
     environment_roles = application.roles[0].environment_roles
@@ -694,15 +688,14 @@ def test_handle_create_member(monkeypatch, set_g, session):
             "user_data-last_name": user.last_name,
             "user_data-dod_id": user.dod_id,
             "user_data-email": user.email,
-            "environment_roles-0-environment_id": env.id,
+            "environment_roles-0-environment_id": str(env.id),
             "environment_roles-0-role": "ADMIN",
             "environment_roles-0-environment_name": env.name,
-            "environment_roles-1-environment_id": env_1.id,
+            "environment_roles-1-environment_id": str(env_1.id),
             "environment_roles-1-role": NO_ACCESS,
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
             "perms_team_mgmt": True,
-            "perms_del_env": True,
         }
     )
     handle_create_member(application.id, form_data)
@@ -731,17 +724,17 @@ def test_handle_update_member_success(set_g):
 
     form_data = ImmutableMultiDict(
         {
-            "environment_roles-0-environment_id": env.id,
+            "environment_roles-0-environment_id": str(env.id),
             "environment_roles-0-role": "ADMIN",
             "environment_roles-0-environment_name": env.name,
-            "environment_roles-1-environment_id": env_1.id,
+            "environment_roles-1-environment_id": str(env_1.id),
             "environment_roles-1-role": NO_ACCESS,
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
             "perms_team_mgmt": True,
-            "perms_del_env": True,
         }
     )
+
     handle_update_member(application.id, app_role.id, form_data)
 
     assert len(application.roles) == 1
@@ -771,17 +764,53 @@ def test_handle_update_member_with_error(set_g, monkeypatch, mock_logger):
 
     form_data = ImmutableMultiDict(
         {
-            "environment_roles-0-environment_id": env.id,
+            "environment_roles-0-environment_id": str(env.id),
             "environment_roles-0-role": "ADMIN",
             "environment_roles-0-environment_name": env.name,
-            "environment_roles-1-environment_id": env_1.id,
+            "environment_roles-1-environment_id": str(env_1.id),
             "environment_roles-1-role": NO_ACCESS,
             "environment_roles-1-environment_name": env_1.name,
             "perms_env_mgmt": True,
             "perms_team_mgmt": True,
-            "perms_del_env": True,
         }
     )
     handle_update_member(application.id, app_role.id, form_data)
 
     assert mock_logger.messages[-1] == exception
+
+
+def test_create_subscription_success(client, user_session):
+    environment = EnvironmentFactory.create()
+
+    user_session(environment.portfolio.owner)
+    response = client.post(
+        url_for("applications.create_subscription", environment_id=environment.id),
+    )
+
+    assert response.status_code == 302
+    assert response.location == url_for(
+        "applications.settings",
+        application_id=environment.application.id,
+        _external=True,
+        fragment="application-environments",
+        _anchor="application-environments",
+    )
+
+
+def test_create_subscription_failure(client, user_session, monkeypatch):
+    environment = EnvironmentFactory.create()
+
+    def _raise_csp_exception(*args, **kwargs):
+        raise GeneralCSPException("An error occurred.")
+
+    monkeypatch.setattr(
+        "atst.domain.csp.cloud.MockCloudProvider.create_subscription",
+        _raise_csp_exception,
+    )
+
+    user_session(environment.portfolio.owner)
+    response = client.post(
+        url_for("applications.create_subscription", environment_id=environment.id),
+    )
+
+    assert response.status_code == 400

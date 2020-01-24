@@ -130,10 +130,6 @@
       &--th {
         width: 50%;
       }
-
-      &--td {
-        position: relative;
-      }
     }
 
     .row {
@@ -152,55 +148,6 @@
         white-space: nowrap;
         display: inline-block;
         margin-right: $gap * 6;
-      }
-    }
-
-    .app-member-menu {
-      position: absolute;
-      top: $gap;
-      right: $gap * 2;
-
-      .accordion-table__item__toggler {
-        padding: $gap / 3;
-        border: 1px solid $color-gray-lighter;
-        border-radius: 3px;
-        cursor: pointer;
-
-        &:hover,
-        &--active {
-          background-color: $color-aqua-lightest;
-        }
-
-        .icon {
-          margin: $gap / 2;
-        }
-      }
-
-      &__toggle {
-        position: absolute;
-        right: 0;
-        top: 30px;
-        background-color: $color-white;
-        border: 1px solid $color-gray-light;
-        z-index: 1;
-        margin-top: 0;
-
-        a {
-          display: block;
-          padding: $gap;
-          border-bottom: 1px solid $color-gray-lighter;
-          text-decoration: none;
-          color: $color-black;
-          cursor: pointer;
-
-          &:last-child {
-            border-bottom: 0;
-          }
-
-          &:hover {
-            background-color: $color-aqua-lightest;
-          }
-        }
       }
     }
   }
@@ -275,12 +222,19 @@
 
     span.accordion-table__item__toggler {
       font-weight: $font-normal;
+      text-decoration: underline;
+      font-size: $small-font-size;
 
       &.environment-list__item__members {
         float: unset;
-        font-size: $small-font-size;
+        margin-left: -$gap;
       }
     }
+  }
+
+  li.environment-list__edit {
+    border: 1px solid $color-gray-lighter;
+    padding: 0 $gap * 3 $gap * 2;
   }
 
   .activity-log {

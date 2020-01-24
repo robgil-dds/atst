@@ -10,6 +10,7 @@ data:
     callable = app
     module = app
     socket = /var/run/uwsgi/uwsgi.socket
+    plugins-dir = /usr/lib/uwsgi
     plugin = python3
     plugin = logfile
     virtualenv = /opt/atat/atst/.venv

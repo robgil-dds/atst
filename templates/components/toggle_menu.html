@@ -1,0 +1,17 @@
+{% from "components/icon.html" import Icon %}
+
+{% macro ToggleMenu() %}
+<toggle-menu inline-template v-cloak>
+  <div class="toggle-menu">
+    <span v-if="isVisible" class="accordion-table__item__toggler accordion-table__item__toggler--active">
+      {{ Icon('ellipsis')}}
+    </span>
+    <span v-else class="accordion-table__item__toggler">
+      {{ Icon('ellipsis')}}
+    </span>
+    <div v-show="isVisible" class="accordion-table__item-toggle-content toggle-menu__toggle">
+      {{ caller() }}
+    </div>
+  </div>
+</toggle-menu>
+{% endmacro %}

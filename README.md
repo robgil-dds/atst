@@ -255,6 +255,7 @@ To generate coverage reports for the Javascript tests:
 - `SERVER_NAME`: Hostname for ATAT. Only needs to be specified in contexts where the hostname cannot be inferred from the request, such as Celery workers. https://flask.palletsprojects.com/en/1.1.x/config/#SERVER_NAME
 - `SESSION_COOKIE_NAME`: String value specifying the name to use for the session cookie. https://flask.palletsprojects.com/en/1.1.x/config/#SESSION_COOKIE_NAME
 - `SESSION_COOKIE_DOMAIN`: String value specifying the name to use for the session cookie. This should be set to the root domain so that it is valid for both the main site and the authentication subdomain. https://flask.palletsprojects.com/en/1.1.x/config/#SESSION_COOKIE_DOMAIN
+- `SESSION_KEY_PREFIX`: A prefix that is added before all session keys: https://pythonhosted.org/Flask-Session/#configuration
 - `SESSION_TYPE`: String value specifying the cookie storage backend. https://pythonhosted.org/Flask-Session/
 - `SESSION_USE_SIGNER`: Boolean value specifying if the cookie sid should be signed.
 - `SQLALCHEMY_ECHO`: Boolean value specifying if SQLAlchemy should log queries to stdout.
@@ -362,50 +363,3 @@ fi
 
 Also note that if the line number of a previously whitelisted secret changes, the whitelist file, `.secrets.baseline`, will be updated and needs to be committed.
 
-## Local Kubernetes Setup
-
-A modified version of the Kubernetes cluster can be deployed locally for
-testing and development purposes.
-
-It is strongly recommended that you backup your local K8s config (usually
-`~/.kube/config`) before launching Minikube for the first time.
-
-Before beginning:
-
-- install the [Docker CLI](https://docs.docker.com/v17.12/install/)
-- install [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
-  (this will also require installing a Hypervisor, such as VirtualBox)
-
-### Setup
-
-Run
-
-```
-script/minikube_setup
-```
-
-Once the script exits successfully, run
-
-```
-minikube service list
-```
-
-### Access the site
-
-One of the two URLs given for the `atat-auth` service will load an HTTP version
-of the application.
-
-For HTTP basic auth, the username and password are both `minikube`.
-
-### Differences from the main config
-
-As of the time of writing, this setup does not include the following:
-
-- SSL/TLS or the complete DoD PKI
-- the cronjob for syncing CRLs and the peristent storage
-- production configuration
-
-In order for the application to run, the K8s config for Minikube includes an
-additional deployment resource called `datastores`. This includes Postgres
-and Redis containers. It also includes hard-coded versions of the K8s secrets
-used in the regular clusters.

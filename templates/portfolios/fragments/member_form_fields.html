@@ -27,11 +27,11 @@
 
 {% macro InfoFields(member_form) %}
   <div class="user-info">
-    {{ TextInput(member_form.first_name, validation='requiredField', optional=False) }}
-    {{ TextInput(member_form.last_name, validation='requiredField', optional=False) }}
+    {{ TextInput(member_form.first_name, validation='name', optional=False) }}
+    {{ TextInput(member_form.last_name, validation='name', optional=False) }}
     {{ TextInput(member_form.email, validation='email', optional=False) }}
     {{ PhoneInput(member_form.phone_number, member_form.phone_ext)}}
     {{ TextInput(member_form.dod_id, validation='dodId', optional=False) }}
-    <a href="#">How do I find the DoD ID?</a>
+    <a href="#">{{ "forms.new_member.dod_help" | translate }}</a>
   </div>
 {% endmacro %}

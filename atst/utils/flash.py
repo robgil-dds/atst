@@ -29,7 +29,7 @@ MESSAGES = {
         "category": "error",
     },
     "application_invite_resent": {
-        "title": "flash.application_invite.resent.title",
+        "title": None,
         "message": "flash.application_invite.resent.message",
         "category": "success",
     },
@@ -83,6 +83,16 @@ MESSAGES = {
         "message": "flash.environment.deleted.message",
         "category": "success",
     },
+    "environment_subscription_failure": {
+        "title": "flash.environment.subscription_failure.title",
+        "message": "flash.environment.subscription_failure.message",
+        "category": "error",
+    },
+    "environment_subscription_success": {
+        "title": "flash.environment.subscription_success.title",
+        "message": "flash.environment.subscription_success.message",
+        "category": "success",
+    },
     "form_errors": {
         "title": "flash.form.errors.title",
         "message": "flash.form.errors.message",
@@ -90,7 +100,7 @@ MESSAGES = {
     },
     "insufficient_funds": {
         "title": "flash.task_order.insufficient_funds.title",
-        "message": "",
+        "message": None,
         "category": "warning",
     },
     "logged_out": {
@@ -109,8 +119,8 @@ MESSAGES = {
         "category": "success",
     },
     "new_portfolio_member": {
-        "title": "flash.success",
-        "message": "flash.new_portfolio_member",
+        "title": "flash.new_portfolio_member.title",
+        "message": "flash.new_portfolio_member.message",
         "category": "success",
     },
     "portfolio_member_removed": {
@@ -124,9 +134,14 @@ MESSAGES = {
         "category": "success",
     },
     "resend_portfolio_invitation": {
-        "title": "flash.portfolio_invite.resent.title",
+        "title": None,
         "message": "flash.portfolio_invite.resent.message",
         "category": "success",
+    },
+    "resend_portfolio_invitation_error": {
+        "title": "flash.portfolio_invite.error.title",
+        "message": "flash.portfolio_invite.error.message",
+        "category": "error",
     },
     "revoked_portfolio_access": {
         "title": "flash.portfolio_member.revoked.title",
@@ -152,6 +167,16 @@ MESSAGES = {
         "title": "flash.task_order.submitted.title",
         "message": "flash.task_order.submitted.message",
         "category": "success",
+    },
+    "update_portfolio_member": {
+        "title": "flash.portfolio_member.update.title",
+        "message": "flash.portfolio_member.update.message",
+        "category": "success",
+    },
+    "update_portfolio_member_error": {
+        "title": "flash.portfolio_member.update_error.title",
+        "message": "flash.portfolio_member.update_error.message",
+        "category": "error",
     },
     "updated_application_team_settings": {
         "title": "flash.success",

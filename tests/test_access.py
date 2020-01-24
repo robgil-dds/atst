@@ -373,6 +373,24 @@ def test_portfolios_edit_access(post_url_assert_status):
     post_url_assert_status(rando, url, 404)
 
 
+# portfolios.update_member
+def test_portfolios_update_member_access(post_url_assert_status):
+    ccpo = user_with(PermissionSets.EDIT_PORTFOLIO_ADMIN)
+    owner = user_with()
+    rando = user_with()
+    portfolio = PortfolioFactory.create(owner=owner)
+    portfolio_role = PortfolioRoleFactory.create(portfolio=portfolio)
+
+    url = url_for(
+        "portfolios.update_member",
+        portfolio_id=portfolio.id,
+        portfolio_role_id=portfolio_role.id,
+    )
+    post_url_assert_status(ccpo, url, 302)
+    post_url_assert_status(owner, url, 302)
+    post_url_assert_status(rando, url, 404)
+
+
 # applications.new
 def test_applications_new_access(get_url_assert_status):
     ccpo = user_with(PermissionSets.EDIT_PORTFOLIO_APPLICATION_MANAGEMENT)
@@ -650,7 +668,7 @@ def test_task_orders_new_post_routes(post_url_assert_status):
             "task_orders.submit_form_step_three_add_clins",
             {
                 "clins-0-jedi_clin_type": "JEDI_CLIN_1",
-                "clins-0-clin_number": "12312",
+                "clins-0-number": "1212",
                 "clins-0-start_date": "01/01/2020",
                 "clins-0-end_date": "01/01/2021",
                 "clins-0-obligated_amount": "5000",

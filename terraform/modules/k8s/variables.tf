@@ -52,3 +52,13 @@ variable "min_count" {
   type        = string
   description = "Minimum number of nodes to use in autoscaling. This requires `enable_auto_scaling` to be set to true"
 }
+
+variable "client_id" {
+  type        = string
+  description = "The client ID for the Service Principal associated with the AKS cluster."
+}
+
+variable "client_secret" {
+  type        = string
+  description = "The client secret for the Service Principal associated with the AKS cluster."
+}
