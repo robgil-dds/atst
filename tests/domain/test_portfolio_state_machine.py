@@ -152,4 +152,3 @@ def test_fsm_transition_start(portfolio: Portfolio):
             csp_data = portfolio.csp_data
         else:
             csp_data = {}
-

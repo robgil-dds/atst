@@ -662,60 +662,70 @@ class MockCloudProvider(CloudProviderInterface):
             }
         ).dict()
 
-    def create_task_order_billing_creation(self, payload: TaskOrderBillingCreationCSPPayload):
+    def create_task_order_billing_creation(
+        self, payload: TaskOrderBillingCreationCSPPayload
+    ):
         self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
         self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
         self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
 
-        return TaskOrderBillingCreationCSPResult(**{"Location": "https://somelocation", "Retry-After": "10"}).dict()
+        return TaskOrderBillingCreationCSPResult(
+            **{"Location": "https://somelocation", "Retry-After": "10"}
+        ).dict()
 
-    def create_task_order_billing_verification(self, payload: TaskOrderBillingVerificationCSPPayload):
+    def create_task_order_billing_verification(
+        self, payload: TaskOrderBillingVerificationCSPPayload
+    ):
         self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
         self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
         self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
 
-        return TaskOrderBillingVerificationCSPResult(**{
-            "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/XC36-GRNZ-BG7-TGB",
-            "name": "XC36-GRNZ-BG7-TGB",
-            "properties": {
-                "address": {
-                    "addressLine1": "123 S Broad Street, Suite 2400",
-                    "city": "Philadelphia",
-                    "companyName": "Promptworks",
-                    "country": "US",
-                    "postalCode": "19109",
-                    "region": "PA"
+        return TaskOrderBillingVerificationCSPResult(
+            **{
+                "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/XC36-GRNZ-BG7-TGB",
+                "name": "XC36-GRNZ-BG7-TGB",
+                "properties": {
+                    "address": {
+                        "addressLine1": "123 S Broad Street, Suite 2400",
+                        "city": "Philadelphia",
+                        "companyName": "Promptworks",
+                        "country": "US",
+                        "postalCode": "19109",
+                        "region": "PA",
+                    },
+                    "currency": "USD",
+                    "displayName": "First Portfolio Billing Profile",
+                    "enabledAzurePlans": [
+                        {
+                            "productId": "DZH318Z0BPS6",
+                            "skuId": "0001",
+                            "skuDescription": "Microsoft Azure Plan",
+                        }
+                    ],
+                    "hasReadAccess": True,
+                    "invoiceDay": 5,
+                    "invoiceEmailOptIn": False,
                 },
-                "currency": "USD",
-                "displayName": "First Portfolio Billing Profile",
-                "enabledAzurePlans": [
-                    {
-                        "productId": "DZH318Z0BPS6",
-                        "skuId": "0001",
-                        "skuDescription": "Microsoft Azure Plan"
-                    }
-                ],
-                "hasReadAccess": True,
-                "invoiceDay": 5,
-                "invoiceEmailOptIn": False
-            },
-            "type": "Microsoft.Billing/billingAccounts/billingProfiles"
-        }).dict()
+                "type": "Microsoft.Billing/billingAccounts/billingProfiles",
+            }
+        ).dict()
 
     def create_billing_instruction(self, payload: BillingInstructionCSPPayload):
         self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
         self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
         self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
 
-        return BillingInstructionCSPResult(**{
-            "name": "TO1:CLIN001",
-            "properties": {
-                "amount": 1000.0,
-                "endDate": "2020-03-01T00:00:00+00:00",
-                "startDate": "2020-01-01T00:00:00+00:00"
-            },
-            "type": "Microsoft.Billing/billingAccounts/billingProfiles/billingInstructions"
-        }).dict()
+        return BillingInstructionCSPResult(
+            **{
+                "name": "TO1:CLIN001",
+                "properties": {
+                    "amount": 1000.0,
+                    "endDate": "2020-03-01T00:00:00+00:00",
+                    "startDate": "2020-01-01T00:00:00+00:00",
+                },
+                "type": "Microsoft.Billing/billingAccounts/billingProfiles/billingInstructions",
+            }
+        ).dict()
 
     def create_or_update_user(self, auth_credentials, user_info, csp_role_id):
         self._authorize(auth_credentials)
@@ -844,8 +854,10 @@ class AzureCloudProvider(CloudProviderInterface):
         try:
             return secret_client.set_secret(secret_key, secret_value)
         except self.exceptions.HttpResponseError as exc:
-            app.logger.error(f"Could not SET secret in Azure keyvault for key {secret_key}.", exc_info=1)
-
+            app.logger.error(
+                f"Could not SET secret in Azure keyvault for key {secret_key}.",
+                exc_info=1,
+            )
 
     def get_secret(secret_key):
         credential = self._get_client_secret_credential_obj()
@@ -855,7 +867,10 @@ class AzureCloudProvider(CloudProviderInterface):
         try:
             return secret_client.get_secret(secret_key).value
         except self.exceptions.HttpResponseError as exc:
-            app.logger.error(f"Could not GET secret in Azure keyvault for key {secret_key}.", exc_info=1)
+            app.logger.error(
+                f"Could not GET secret in Azure keyvault for key {secret_key}.",
+                exc_info=1,
+            )
 
     def create_environment(
         self, auth_credentials: Dict, user: User, environment: Environment
