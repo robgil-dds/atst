@@ -32,7 +32,8 @@ variable "networks" {
     #format
     #name         = "CIDR, route table, Security Group Name"
     public  = "10.1.1.0/24,public"  # LBs
-    private = "10.1.2.0/24,private" # k8s, postgres, redis, dns, ad
+    private = "10.1.2.0/24,private" # k8s, postgres, keyvault
+    redis   = "10.1.3.0/24,private" # Redis
   }
 }
 
@@ -41,6 +42,7 @@ variable "service_endpoints" {
   default = {
     public  = "Microsoft.ContainerRegistry" # Not necessary but added to avoid infinite state loop
     private = "Microsoft.Storage,Microsoft.KeyVault,Microsoft.ContainerRegistry,Microsoft.Sql"
+    redis   = "Microsoft.Storage,Microsoft.Sql" # FIXME: There is no Microsoft.Redis
   }
 }
 
@@ -56,6 +58,7 @@ variable "route_tables" {
   default = {
     public  = "Internet"
     private = "Internet"
+    redis   = "VnetLocal"
     #private = "VnetLocal"
   }
 }
