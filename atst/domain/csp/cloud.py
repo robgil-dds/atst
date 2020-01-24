@@ -799,7 +799,7 @@ class MockCloudProvider(CloudProviderInterface):
 
     @property
     def _auth_credentials(self):
-        return {"username": "mock-cloud", "password": "shh"}
+        return {"username": "mock-cloud", "password": "shh"}  # pragma: allowlist secret
 
     def _authorize(self, credentials):
         self._delay(1, 5)
@@ -864,26 +864,26 @@ class AzureCloudProvider(CloudProviderInterface):
         self.policy_manager = AzurePolicyManager(config["AZURE_POLICY_LOCATION"])
 
     def set_secret(self, secret_key, secret_value):
-        credential = self._get_client_secret_credential_obj()
+        credential = self._get_client_secret_credential_obj({})
         secret_client = self.secrets.SecretClient(
             vault_url=self.vault_url, credential=credential,
         )
         try:
             return secret_client.set_secret(secret_key, secret_value)
-        except self.exceptions.HttpResponseError as exc:
+        except self.exceptions.HttpResponseError:
             app.logger.error(
                 f"Could not SET secret in Azure keyvault for key {secret_key}.",
                 exc_info=1,
             )
 
     def get_secret(self, secret_key):
-        credential = self._get_client_secret_credential_obj()
+        credential = self._get_client_secret_credential_obj({})
         secret_client = self.secrets.SecretClient(
             vault_url=self.vault_url, credential=credential,
         )
         try:
             return secret_client.get_secret(secret_key).value
-        except self.exceptions.HttpResponseError as exc:
+        except self.exceptions.HttpResponseError:
             app.logger.error(
                 f"Could not GET secret in Azure keyvault for key {secret_key}.",
                 exc_info=1,

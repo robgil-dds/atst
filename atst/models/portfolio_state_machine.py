@@ -1,6 +1,3 @@
-from random import choice, choices
-import string
-
 from sqlalchemy import Column, ForeignKey, Enum as SQLAEnum
 from sqlalchemy.orm import relationship, reconstructor
 from sqlalchemy.dialects.postgresql import UUID
@@ -18,16 +15,6 @@ from atst.models.types import Id
 from atst.models.base import Base
 import atst.models.mixins as mixins
 from atst.models.mixins.state_machines import FSMStates, AzureStages, _build_transitions
-
-
-def make_password():
-    return choice(string.ascii_letters) + "".join(
-        choices(string.ascii_letters + string.digits + string.punctuation, k=15)
-    )
-
-
-def fetch_portfolio_creds(portfolio):
-    return dict(username="mock-cloud", password="shh")
 
 
 @add_state_features(Tags)
