@@ -67,7 +67,6 @@ class PortfolioStateMachine(
     def __repr__(self):
         return f"<PortfolioStateMachine(state='{self.current_state.name}', portfolio='{self.portfolio.name}'"
 
-
     @reconstructor
     def attach_machine(self):
         """
@@ -112,7 +111,9 @@ class PortfolioStateMachine(
                 if create_trigger:
                     self.trigger(create_trigger, **kwargs)
                 else:
-                    app.logger.info(f"could not locate 'create trigger' for {self.__repr__()}")
+                    app.logger.info(
+                        f"could not locate 'create trigger' for {self.__repr__()}"
+                    )
                     self.fail_stage(stage)
 
         elif state_obj.is_CREATED:
@@ -143,8 +144,11 @@ class PortfolioStateMachine(
         try:
             payload_data = payload_data_cls(**payload)
         except PydanticValidationError as exc:
-            app.logger.error(f"Payload Validation Error in {self.__repr__()}:", exc_info=1)
+            app.logger.error(
+                f"Payload Validation Error in {self.__repr__()}:", exc_info=1
+            )
             app.logger.info(exc.json())
+            print(exc.json())
             app.logger.info(payload)
             self.fail_stage(stage)
 
@@ -161,7 +165,10 @@ class PortfolioStateMachine(
                 func_name = f"create_{stage}"
                 response = getattr(self.csp, func_name)(payload_data)
             except (ConnectionException, UnknownServerException) as exc:
-                app.logger.error(f"CSP api call. Caught exception for {self.__repr__()}. Retry attempt {attempt}", exc_info=1)
+                app.logger.error(
+                    f"CSP api call. Caught exception for {self.__repr__()}. Retry attempt {attempt}",
+                    exc_info=1,
+                )
                 continue
             else:
                 break
@@ -198,12 +205,16 @@ class PortfolioStateMachine(
             dc = cls(**stage_data)
             if getattr(dc, "get_creds", None) is not None:
                 new_creds = dc.get_creds()
+                print("creds to report")
+                print(new_creds)
                 # TODO: how/where to store these
                 # TODO: credential schema
                 # self.store_creds(self.portfolio, new_creds)
 
         except PydanticValidationError as exc:
-            app.logger.error(f"Payload Validation Error in {self.__repr__()}:", exc_info=1)
+            app.logger.error(
+                f"Payload Validation Error in {self.__repr__()}:", exc_info=1
+            )
             app.logger.info(exc.json())
             app.logger.info(payload)
 

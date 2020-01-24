@@ -36,6 +36,7 @@ transitions = "*"
 azure-mgmt-consumption = "*"
 adal = "*"
 azure-identity = "*"
+azure-keyvault = "*"
 
 [dev-packages]
 bandit = "*"

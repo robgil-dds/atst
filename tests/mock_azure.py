@@ -66,6 +66,12 @@ def mock_requests():
     return Mock(spec=requests)
 
 
+def mock_secrets():
+    from azure.keyvault import secrets
+
+    return Mock(spec=secrets)
+
+
 class MockAzureSDK(object):
     def __init__(self):
         from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
@@ -78,6 +84,7 @@ class MockAzureSDK(object):
         self.graphrbac = mock_graphrbac()
         self.credentials = mock_credentials()
         self.policy = mock_policy()
+        self.secrets = mock_secrets()
         self.requests = mock_requests()
         # may change to a JEDI cloud
         self.cloud = AZURE_PUBLIC_CLOUD

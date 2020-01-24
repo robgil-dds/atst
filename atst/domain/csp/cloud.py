@@ -327,12 +327,12 @@ class TaskOrderBillingCreationCSPPayload(BaseCSPPayload):
 
 class TaskOrderBillingCreationCSPResult(AliasModel):
     task_order_billing_verify_url: str
-    retry_after: int
+    task_order_retry_after: int
 
     class Config:
         fields = {
             "task_order_billing_verify_url": "Location",
-            "retry_after": "Retry-After",
+            "task_order_retry_after": "Retry-After",
         }
 
 
@@ -358,11 +358,11 @@ class TaskOrderBillingVerificationCSPResult(AliasModel):
 
 
 class BillingInstructionCSPPayload(BaseCSPPayload):
-    amount: float
-    start_date: str
-    end_date: str
-    clin_type: str
-    task_order_id: str
+    initial_clin_amount: float
+    initial_clin_start_date: str
+    initial_clin_end_date: str
+    initial_clin_type: str
+    initial_task_order_id: str
     billing_account_name: str
     billing_profile_name: str
 
@@ -646,19 +646,76 @@ class MockCloudProvider(CloudProviderInterface):
         self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
         self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
 
-        return {
-            "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB/billingRoleAssignments/40000000-aaaa-bbbb-cccc-100000000000_0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
-            "name": "40000000-aaaa-bbbb-cccc-100000000000_0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
+        return BillingProfileTenantAccessCSPResult(
+            **{
+                "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB/billingRoleAssignments/40000000-aaaa-bbbb-cccc-100000000000_0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
+                "name": "40000000-aaaa-bbbb-cccc-100000000000_0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
+                "properties": {
+                    "createdOn": "2020-01-14T14:39:26.3342192+00:00",
+                    "createdByPrincipalId": "82e2b376-3297-4096-8743-ed65b3be0b03",
+                    "principalId": "0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
+                    "principalTenantId": "60ff9d34-82bf-4f21-b565-308ef0533435",
+                    "roleDefinitionId": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB/billingRoleDefinitions/40000000-aaaa-bbbb-cccc-100000000000",
+                    "scope": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB",
+                },
+                "type": "Microsoft.Billing/billingRoleAssignments",
+            }
+        ).dict()
+
+    def create_task_order_billing_creation(self, payload: TaskOrderBillingCreationCSPPayload):
+        self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
+        self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
+        self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
+
+        return TaskOrderBillingCreationCSPResult(**{"Location": "https://somelocation", "Retry-After": "10"}).dict()
+
+    def create_task_order_billing_verification(self, payload: TaskOrderBillingVerificationCSPPayload):
+        self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
+        self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
+        self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
+
+        return TaskOrderBillingVerificationCSPResult(**{
+            "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/XC36-GRNZ-BG7-TGB",
+            "name": "XC36-GRNZ-BG7-TGB",
             "properties": {
-                "createdOn": "2020-01-14T14:39:26.3342192+00:00",
-                "createdByPrincipalId": "82e2b376-3297-4096-8743-ed65b3be0b03",
-                "principalId": "0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
-                "principalTenantId": "60ff9d34-82bf-4f21-b565-308ef0533435",
-                "roleDefinitionId": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB/billingRoleDefinitions/40000000-aaaa-bbbb-cccc-100000000000",
-                "scope": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB",
+                "address": {
+                    "addressLine1": "123 S Broad Street, Suite 2400",
+                    "city": "Philadelphia",
+                    "companyName": "Promptworks",
+                    "country": "US",
+                    "postalCode": "19109",
+                    "region": "PA"
+                },
+                "currency": "USD",
+                "displayName": "First Portfolio Billing Profile",
+                "enabledAzurePlans": [
+                    {
+                        "productId": "DZH318Z0BPS6",
+                        "skuId": "0001",
+                        "skuDescription": "Microsoft Azure Plan"
+                    }
+                ],
+                "hasReadAccess": True,
+                "invoiceDay": 5,
+                "invoiceEmailOptIn": False
             },
-            "type": "Microsoft.Billing/billingRoleAssignments",
-        }
+            "type": "Microsoft.Billing/billingAccounts/billingProfiles"
+        }).dict()
+
+    def create_billing_instruction(self, payload: BillingInstructionCSPPayload):
+        self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
+        self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
+        self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
+
+        return BillingInstructionCSPResult(**{
+            "name": "TO1:CLIN001",
+            "properties": {
+                "amount": 1000.0,
+                "endDate": "2020-03-01T00:00:00+00:00",
+                "startDate": "2020-01-01T00:00:00+00:00"
+            },
+            "type": "Microsoft.Billing/billingAccounts/billingProfiles/billingInstructions"
+        }).dict()
 
     def create_or_update_user(self, auth_credentials, user_info, csp_role_id):
         self._authorize(auth_credentials)
@@ -1150,13 +1207,13 @@ class AzureCloudProvider(CloudProviderInterface):
 
         request_body = {
             "properties": {
-                "amount": payload.amount,
-                "startDate": payload.start_date,
-                "endDate": payload.end_date,
+                "amount": payload.initial_clin_amount,
+                "startDate": payload.initial_clin_start_date,
+                "endDate": payload.initial_clin_end_date,
             }
         }
 
-        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/instructions/{payload.task_order_id}:CLIN00{payload.clin_type}?api-version=2019-10-01-preview"
+        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/instructions/{payload.initial_task_order_id}:CLIN00{payload.initial_clin_type}?api-version=2019-10-01-preview"
 
         auth_header = {
             "Authorization": f"Bearer {sp_token}",

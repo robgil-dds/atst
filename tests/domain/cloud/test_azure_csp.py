@@ -404,11 +404,11 @@ def test_create_billing_instruction(mock_azure: AzureCloudProvider):
     payload = BillingInstructionCSPPayload(
         **dict(
             creds=creds,
-            amount=1000.00,
-            start_date="2020/1/1",
-            end_date="2020/3/1",
-            clin_type="1",
-            task_order_id="TO1",
+            initial_clin_amount=1000.00,
+            initial_clin_start_date="2020/1/1",
+            initial_clin_end_date="2020/3/1",
+            initial_clin_type="1",
+            initial_task_order_id="TO1",
             billing_account_name="7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31",
             billing_profile_name="KQWI-W2SU-BG7-TGB",
         )
