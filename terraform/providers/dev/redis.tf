@@ -4,4 +4,7 @@ module "redis" {
   environment = var.environment
   region      = var.region
   name        = var.name
+  subnet_id   = module.vpc.subnets
+  sku_name    = "Premium"
+  family      = "P"
 }
