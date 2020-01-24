@@ -529,8 +529,8 @@ class MockCloudProvider(CloudProviderInterface):
     def set_secret(self, secret_key: str, secret_value: str):
         pass
 
-    def get_secret(self, secret_key: str):
-        return {}
+    def get_secret(self, secret_key: str, default=dict()):
+        return default
 
     def create_environment(self, auth_credentials, user, environment):
         self._authorize(auth_credentials)
@@ -598,7 +598,7 @@ class MockCloudProvider(CloudProviderInterface):
                 "tenant_admin_username": "test",
                 "tenant_admin_password": "test",
             }
-        ).dict()
+        )
 
     def create_billing_profile_creation(
         self, payload: BillingProfileCreationCSPPayload
@@ -613,7 +613,7 @@ class MockCloudProvider(CloudProviderInterface):
                 billing_profile_verify_url="https://zombo.com",
                 billing_profile_retry_after=10,
             )
-        ).dict()
+        )
 
     def create_billing_profile_verification(
         self, payload: BillingProfileVerificationCSPPayload
@@ -651,7 +651,7 @@ class MockCloudProvider(CloudProviderInterface):
                 },
                 "type": "Microsoft.Billing/billingAccounts/billingProfiles",
             }
-        ).dict()
+        )
 
     def create_billing_profile_tenant_access(self, payload):
         self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
@@ -672,7 +672,7 @@ class MockCloudProvider(CloudProviderInterface):
                 },
                 "type": "Microsoft.Billing/billingRoleAssignments",
             }
-        ).dict()
+        )
 
     def create_task_order_billing_creation(
         self, payload: TaskOrderBillingCreationCSPPayload
@@ -683,7 +683,7 @@ class MockCloudProvider(CloudProviderInterface):
 
         return TaskOrderBillingCreationCSPResult(
             **{"Location": "https://somelocation", "Retry-After": "10"}
-        ).dict()
+        )
 
     def create_task_order_billing_verification(
         self, payload: TaskOrderBillingVerificationCSPPayload
@@ -720,7 +720,7 @@ class MockCloudProvider(CloudProviderInterface):
                 },
                 "type": "Microsoft.Billing/billingAccounts/billingProfiles",
             }
-        ).dict()
+        )
 
     def create_billing_instruction(self, payload: BillingInstructionCSPPayload):
         self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
@@ -737,7 +737,7 @@ class MockCloudProvider(CloudProviderInterface):
                 },
                 "type": "Microsoft.Billing/billingAccounts/billingProfiles/billingInstructions",
             }
-        ).dict()
+        )
 
     def create_or_update_user(self, auth_credentials, user_info, csp_role_id):
         self._authorize(auth_credentials)

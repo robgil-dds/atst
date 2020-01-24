@@ -11,6 +11,8 @@ from atst.models.mixins.state_machines import AzureStages, StageStates, compose_
 from atst.models.portfolio import Portfolio
 from atst.domain.csp import get_stage_csp_class
 
+# TODO: Write failure case tests
+
 
 @pytest.fixture(scope="function")
 def portfolio():
@@ -122,7 +124,7 @@ def test_fsm_transition_start(portfolio: Portfolio):
         "last_name": ppoc.last_name,
         "country_code": "US",
         "password_recovery_email_address": ppoc.email,
-        "address": {
+        "address": {  # TODO: TBD if we're sourcing this from data or config
             "company_name": "",
             "address_line_1": "",
             "city": "",
