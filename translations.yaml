@@ -509,7 +509,7 @@ task_orders:
     tooltip:
       obligated_funds: Funds committed to fund your portfolio. This may represent 100% of your total Task Order value, or a portion of it.
       total_value: All obligated and projected funds for the Task Order’s Base and Option CLINs.
-      expended_funds: All funds spend from the Task Order so far.
+      expended_funds: All funds spent from the Task Order so far.
   form:
     add_clin: Add Another CLIN
     add_to_header: Enter the Task Order number
