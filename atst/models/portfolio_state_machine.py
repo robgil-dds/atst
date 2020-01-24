@@ -1,5 +1,4 @@
 from random import choice, choices
-import re
 import string
 
 from sqlalchemy import Column, ForeignKey, Enum as SQLAEnum
@@ -119,7 +118,6 @@ class PortfolioStateMachine(
         elif state_obj.is_CREATED:
             # the create trigger for the next stage should be in the available
             # triggers for the current state
-            triggers = self.machine.get_triggers(state_obj.name)
             create_trigger = next(
                 filter(
                     lambda trigger: trigger.startswith("create_"),
@@ -205,11 +203,10 @@ class PortfolioStateMachine(
             dc = cls(**stage_data)
             if getattr(dc, "get_creds", None) is not None:
                 new_creds = dc.get_creds()
-                print("creds to report")
-                print(new_creds)
-                # TODO: how/where to store these
-                # TODO: credential schema
-                # self.store_creds(self.portfolio, new_creds)
+                tenant_id = new_creds.get("tenant_id")
+                secret = self.csp.get_secret(tenant_id)
+                secret.update(new_creds)
+                self.csp.set_secret(tenant_id, secret)
 
         except PydanticValidationError as exc:
             app.logger.error(

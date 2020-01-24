@@ -380,7 +380,7 @@ class CloudProviderInterface:
     def set_secret(self, secret_key: str, secret_value: str):
         raise NotImplementedError()
 
-    def get_secret(self, secret_key: str, secret_value: str):
+    def get_secret(self, secret_key: str):
         raise NotImplementedError()
 
     def root_creds(self) -> Dict:
@@ -519,6 +519,12 @@ class MockCloudProvider(CloudProviderInterface):
 
     def root_creds(self):
         return self._auth_credentials
+
+    def set_secret(self, secret_key: str, secret_value: str):
+        pass
+
+    def get_secret(self, secret_key: str):
+        return {}
 
     def create_environment(self, auth_credentials, user, environment):
         self._authorize(auth_credentials)
@@ -846,7 +852,7 @@ class AzureCloudProvider(CloudProviderInterface):
 
         self.policy_manager = AzurePolicyManager(config["AZURE_POLICY_LOCATION"])
 
-    def set_secret(secret_key, secret_value):
+    def set_secret(self, secret_key, secret_value):
         credential = self._get_client_secret_credential_obj()
         secret_client = self.secrets.SecretClient(
             vault_url=self.vault_url, credential=credential,
@@ -859,7 +865,7 @@ class AzureCloudProvider(CloudProviderInterface):
                 exc_info=1,
             )
 
-    def get_secret(secret_key):
+    def get_secret(self, secret_key):
         credential = self._get_client_secret_credential_obj()
         secret_client = self.secrets.SecretClient(
             vault_url=self.vault_url, credential=credential,

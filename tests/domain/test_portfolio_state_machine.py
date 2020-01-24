@@ -2,7 +2,6 @@ import pytest
 import re
 
 from tests.factories import (
-    PortfolioFactory,
     PortfolioStateMachineFactory,
     TaskOrderFactory,
     CLINFactory,
@@ -36,7 +35,7 @@ def test_state_machine_trigger_next_transition(portfolio):
 
 
 def test_state_machine_compose_state(portfolio):
-    sm = PortfolioStateMachineFactory.create(portfolio=portfolio)
+    PortfolioStateMachineFactory.create(portfolio=portfolio)
     assert (
         compose_state(AzureStages.TENANT, StageStates.CREATED)
         == FSMStates.TENANT_CREATED
@@ -44,7 +43,7 @@ def test_state_machine_compose_state(portfolio):
 
 
 def test_state_machine_valid_data_classes_for_stages(portfolio):
-    sm = PortfolioStateMachineFactory.create(portfolio=portfolio)
+    PortfolioStateMachineFactory.create(portfolio=portfolio)
     for stage in AzureStages:
         assert get_stage_csp_class(stage.name.lower(), "payload") is not None
         assert get_stage_csp_class(stage.name.lower(), "result") is not None
