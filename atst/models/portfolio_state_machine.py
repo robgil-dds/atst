@@ -50,6 +50,9 @@ class PortfolioStateMachine(
         db.session.add(self)
         db.session.commit()
 
+    def __repr__(self):
+        return f"<PortfolioStateMachine(state='{self.current_state.name}', portfolio='{self.portfolio.name}'"
+
     @reconstructor
     def attach_machine(self):
         """
@@ -73,103 +76,132 @@ class PortfolioStateMachine(
             return getattr(FSMStates, self.state)
         return self.state
 
-    def trigger_next_transition(self):
+    def trigger_next_transition(self, **kwargs):
         state_obj = self.machine.get_state(self.state)
 
         if state_obj.is_system:
             if self.current_state in (FSMStates.UNSTARTED, FSMStates.STARTING):
                 # call the first trigger availabe for these two system states
                 trigger_name = self.machine.get_triggers(self.current_state.name)[0]
-                self.trigger(trigger_name)
+                self.trigger(trigger_name, **kwargs)
 
             elif self.current_state == FSMStates.STARTED:
                 # get the first trigger that starts with 'create_'
-                create_trigger = list(
+                create_trigger = next(
                     filter(
                         lambda trigger: trigger.startswith("create_"),
                         self.machine.get_triggers(FSMStates.STARTED.name),
+                    ),
+                    None,
+                )
+                if create_trigger:
+                    self.trigger(create_trigger, **kwargs)
+                else:
+                    app.logger.info(
+                        f"could not locate 'create trigger' for {self.__repr__()}"
                     )
-                )[0]
-                self.trigger(create_trigger)
+                    self.fail_stage(stage)
 
-        elif state_obj.is_IN_PROGRESS:
-            pass
+        elif state_obj.is_CREATED:
+            # the create trigger for the next stage should be in the available
+            # triggers for the current state
+            create_trigger = next(
+                filter(
+                    lambda trigger: trigger.startswith("create_"),
+                    self.machine.get_triggers(self.state.name),
+                ),
+                None,
+            )
+            if create_trigger is not None:
+                self.trigger(create_trigger, **kwargs)
 
-        # elif state_obj.is_TENANT:
-        #    pass
-        # elif state_obj.is_BILLING_PROFILE:
-        #    pass
-
-    # @with_payload
     def after_in_progress_callback(self, event):
         stage = self.current_state.name.split("_IN_PROGRESS")[0].lower()
-        if stage == "tenant":
-            payload = dict(  # nosec
-                creds={"username": "mock-cloud", "pass": "shh"},
-                user_id="123",
-                password="123",
-                domain_name="123",
-                first_name="john",
-                last_name="doe",
-                country_code="US",
-                password_recovery_email_address="password@email.com",
-            )
-        elif stage == "billing_profile":
-            payload = dict(creds={"username": "mock-cloud", "pass": "shh"},)
+
+        # Accumulate payload w/ creds
+        payload = event.kwargs.get("csp_data")
+        payload["creds"] = event.kwargs.get("creds")
 
         payload_data_cls = get_stage_csp_class(stage, "payload")
         if not payload_data_cls:
+            app.logger.info(f"could not resolve payload data class for stage {stage}")
             self.fail_stage(stage)
         try:
             payload_data = payload_data_cls(**payload)
         except PydanticValidationError as exc:
+            app.logger.error(
+                f"Payload Validation Error in {self.__repr__()}:", exc_info=1
+            )
+            app.logger.info(exc.json())
             print(exc.json())
+            app.logger.info(payload)
             self.fail_stage(stage)
 
+        # TODO: Determine best place to do this, maybe @reconstructor
         csp = event.kwargs.get("csp")
         if csp is not None:
             self.csp = AzureCSP(app).cloud
         else:
             self.csp = MockCSP(app).cloud
 
-        for attempt in range(5):
+        attempts_count = 5
+        for attempt in range(attempts_count):
             try:
-                response = getattr(self.csp, "create_" + stage)(payload_data)
+                func_name = f"create_{stage}"
+                response = getattr(self.csp, func_name)(payload_data)
             except (ConnectionException, UnknownServerException) as exc:
-                print("caught exception. retry", attempt)
+                app.logger.error(
+                    f"CSP api call. Caught exception for {self.__repr__()}. Retry attempt {attempt}",
+                    exc_info=1,
+                )
                 continue
             else:
                 break
         else:
             # failed all attempts
+            logger.info(f"CSP api call failed after {attempts_count} attempts.")
             self.fail_stage(stage)
 
         if self.portfolio.csp_data is None:
             self.portfolio.csp_data = {}
-        self.portfolio.csp_data[stage + "_data"] = response
+        self.portfolio.csp_data.update(response)
         db.session.add(self.portfolio)
         db.session.commit()
+
+        # store any updated creds, if necessary
 
         self.finish_stage(stage)
 
     def is_csp_data_valid(self, event):
         # check portfolio csp details json field for fields
-
         if self.portfolio.csp_data is None or not isinstance(
             self.portfolio.csp_data, dict
         ):
+            print("no csp data")
             return False
 
         stage = self.current_state.name.split("_IN_PROGRESS")[0].lower()
-        stage_data = self.portfolio.csp_data.get(stage + "_data")
+        stage_data = self.portfolio.csp_data
         cls = get_stage_csp_class(stage, "result")
         if not cls:
             return False
 
         try:
-            cls(**stage_data)
+            dc = cls(**stage_data)
+            if getattr(dc, "get_creds", None) is not None:
+                new_creds = dc.get_creds()
+                tenant_id = new_creds.get("tenant_id")
+                secret = self.csp.get_secret(tenant_id)
+                secret.update(new_creds)
+                self.csp.set_secret(tenant_id, secret)
+
         except PydanticValidationError as exc:
-            print(exc.json())
+            app.logger.error(
+                f"Payload Validation Error in {self.__repr__()}:", exc_info=1
+            )
+            app.logger.info(exc.json())
+            app.logger.info(payload)
+
             return False
 
         return True

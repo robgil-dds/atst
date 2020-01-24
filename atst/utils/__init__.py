@@ -25,6 +25,11 @@ def camel_to_snake(camel_cased):
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
 
 
+def snake_to_camel(snake_cased):
+    parts = snake_cased.split("_")
+    return f"{parts[0]}{''.join([w.capitalize() for w in parts[1:]])}"
+
+
 def pick(keys, dct):
     _keys = set(keys)
     return {k: v for (k, v) in dct.items() if k in _keys}

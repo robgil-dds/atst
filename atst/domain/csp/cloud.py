@@ -1,12 +1,17 @@
 import re
-from typing import Dict
+from typing import Dict, List, Optional
 from uuid import uuid4
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
+
+from flask import current_app as app
 
 from atst.models.user import User
+from atst.models.application import Application
 from atst.models.environment import Environment
 from atst.models.environment_role import EnvironmentRole
+from atst.utils import snake_to_camel
+from .policy import AzurePolicyManager
 
 
 class GeneralCSPException(Exception):
@@ -142,9 +147,32 @@ class BaselineProvisionException(GeneralCSPException):
         )
 
 
-class BaseCSPPayload(BaseModel):
+class AliasModel(BaseModel):
+    """
+    This provides automatic camel <-> snake conversion for serializing to/from json
+    You can override the alias generation in subclasses by providing a Config that defines
+    a fields property with a dict mapping variables to their cast names, for cases like:
+    * some_url:someURL
+    * user_object_id:objectId
+    """
+
+    class Config:
+        alias_generator = snake_to_camel
+        allow_population_by_field_name = True
+
+
+class BaseCSPPayload(AliasModel):
     # {"username": "mock-cloud", "pass": "shh"}
     creds: Dict
+
+    def dict(self, *args, **kwargs):
+        exclude = {"creds"}
+        if "exclude" not in kwargs:
+            kwargs["exclude"] = exclude
+        else:
+            kwargs["exclude"].update(exclude)
+
+        return super().dict(*args, **kwargs)
 
 
 class TenantCSPPayload(BaseCSPPayload):
@@ -157,32 +185,47 @@ class TenantCSPPayload(BaseCSPPayload):
     password_recovery_email_address: str
 
 
-class TenantCSPResult(BaseModel):
+class TenantCSPResult(AliasModel):
     user_id: str
     tenant_id: str
     user_object_id: str
 
+    tenant_admin_username: Optional[str]
+    tenant_admin_password: Optional[str]
 
-class BillingProfileAddress(BaseModel):
-    address: Dict
-    """
-    "address": {
-        "firstName": "string",
-        "lastName": "string",
-        "companyName": "string",
-        "addressLine1": "string",
-        "addressLine2": "string",
-        "addressLine3": "string",
-        "city": "string",
-        "region": "string",
-        "country": "string",
-        "postalCode": "string"
-    },
-    """
+    class Config:
+        fields = {
+            "user_object_id": "objectId",
+        }
+
+    def dict(self, *args, **kwargs):
+        exclude = {"tenant_admin_username", "tenant_admin_password"}
+        if "exclude" not in kwargs:
+            kwargs["exclude"] = exclude
+        else:
+            kwargs["exclude"].update(exclude)
+
+        return super().dict(*args, **kwargs)
+
+    def get_creds(self):
+        return {
+            "tenant_admin_username": self.tenant_admin_username,
+            "tenant_admin_password": self.tenant_admin_password,
+            "tenant_id": self.tenant_id,
+        }
 
 
-class BillingProfileCLINBudget(BaseModel):
-    clinBudget: Dict
+class BillingProfileAddress(AliasModel):
+    company_name: str
+    address_line_1: str
+    city: str
+    region: str
+    country: str
+    postal_code: str
+
+
+class BillingProfileCLINBudget(AliasModel):
+    clin_budget: Dict
     """
         "clinBudget": {
             "amount": 0,
@@ -193,47 +236,153 @@ class BillingProfileCLINBudget(BaseModel):
     """
 
 
-class BillingProfileCSPPayload(
-    BaseCSPPayload, BillingProfileAddress, BillingProfileCLINBudget
-):
-    displayName: str
-    poNumber: str
-    invoiceEmailOptIn: str
+class BillingProfileCreationCSPPayload(BaseCSPPayload):
+    tenant_id: str
+    billing_profile_display_name: str
+    billing_account_name: str
+    enabled_azure_plans: Optional[List[str]]
+    address: BillingProfileAddress
 
-    """
-    {
-        "displayName": "string",
-        "poNumber": "string",
-        "address": {
-            "firstName": "string",
-            "lastName": "string",
-            "companyName": "string",
-            "addressLine1": "string",
-            "addressLine2": "string",
-            "addressLine3": "string",
-            "city": "string",
-            "region": "string",
-            "country": "string",
-            "postalCode": "string"
-        },
-        "invoiceEmailOptIn": true,
-        Note: These last 2 are also the body for adding/updating new TOs/clins
-        "enabledAzurePlans": [
-            {
-            "skuId": "string"
-            }
-        ],
-        "clinBudget": {
-            "amount": 0,
-            "startDate": "2019-12-18T16:47:40.909Z",
-            "endDate": "2019-12-18T16:47:40.909Z",
-            "externalReferenceId": "string"
+    @validator("enabled_azure_plans", pre=True, always=True)
+    def default_enabled_azure_plans(cls, v):
+        """
+        Normally you'd implement this by setting the field with a value of:
+            dataclasses.field(default_factory=list)
+        but that prevents the object from being correctly pickled, so instead we need
+        to rely on a validator to ensure this has an empty value when not specified
+        """
+        return v or []
+
+    class Config:
+        fields = {"billing_profile_display_name": "displayName"}
+
+
+class BillingProfileCreationCSPResult(AliasModel):
+    billing_profile_verify_url: str
+    billing_profile_retry_after: int
+
+    class Config:
+        fields = {
+            "billing_profile_verify_url": "Location",
+            "billing_profile_retry_after": "Retry-After",
         }
-    }
-    """
+
+
+class BillingProfileVerificationCSPPayload(BaseCSPPayload):
+    billing_profile_verify_url: str
+
+
+class BillingInvoiceSection(AliasModel):
+    invoice_section_id: str
+    invoice_section_name: str
+
+    class Config:
+        fields = {"invoice_section_id": "id", "invoice_section_name": "name"}
+
+
+class BillingProfileProperties(AliasModel):
+    address: BillingProfileAddress
+    billing_profile_display_name: str
+    invoice_sections: List[BillingInvoiceSection]
+
+    class Config:
+        fields = {"billing_profile_display_name": "displayName"}
+
+
+class BillingProfileVerificationCSPResult(AliasModel):
+    billing_profile_id: str
+    billing_profile_name: str
+    billing_profile_properties: BillingProfileProperties
+
+    class Config:
+        fields = {
+            "billing_profile_id": "id",
+            "billing_profile_name": "name",
+            "billing_profile_properties": "properties",
+        }
+
+
+class BillingProfileTenantAccessCSPPayload(BaseCSPPayload):
+    tenant_id: str
+    user_object_id: str
+    billing_account_name: str
+    billing_profile_name: str
+
+
+class BillingProfileTenantAccessCSPResult(AliasModel):
+    billing_role_assignment_id: str
+    billing_role_assignment_name: str
+
+    class Config:
+        fields = {
+            "billing_role_assignment_id": "id",
+            "billing_role_assignment_name": "name",
+        }
+
+
+class TaskOrderBillingCreationCSPPayload(BaseCSPPayload):
+    billing_account_name: str
+    billing_profile_name: str
+
+
+class TaskOrderBillingCreationCSPResult(AliasModel):
+    task_order_billing_verify_url: str
+    task_order_retry_after: int
+
+    class Config:
+        fields = {
+            "task_order_billing_verify_url": "Location",
+            "task_order_retry_after": "Retry-After",
+        }
+
+
+class TaskOrderBillingVerificationCSPPayload(BaseCSPPayload):
+    task_order_billing_verify_url: str
+
+
+class BillingProfileEnabledPlanDetails(AliasModel):
+    enabled_azure_plans: List[Dict]
+
+
+class TaskOrderBillingVerificationCSPResult(AliasModel):
+    billing_profile_id: str
+    billing_profile_name: str
+    billing_profile_enabled_plan_details: BillingProfileEnabledPlanDetails
+
+    class Config:
+        fields = {
+            "billing_profile_id": "id",
+            "billing_profile_name": "name",
+            "billing_profile_enabled_plan_details": "properties",
+        }
+
+
+class BillingInstructionCSPPayload(BaseCSPPayload):
+    initial_clin_amount: float
+    initial_clin_start_date: str
+    initial_clin_end_date: str
+    initial_clin_type: str
+    initial_task_order_id: str
+    billing_account_name: str
+    billing_profile_name: str
+
+
+class BillingInstructionCSPResult(AliasModel):
+    reported_clin_name: str
+
+    class Config:
+        fields = {
+            "reported_clin_name": "name",
+        }
 
 
 class CloudProviderInterface:
+    def set_secret(self, secret_key: str, secret_value: str):
+        raise NotImplementedError()
+
+    def get_secret(self, secret_key: str):
+        raise NotImplementedError()
+
     def root_creds(self) -> Dict:
         raise NotImplementedError()
 
@@ -377,6 +526,12 @@ class MockCloudProvider(CloudProviderInterface):
     def root_creds(self):
         return self._auth_credentials
 
+    def set_secret(self, secret_key: str, secret_value: str):
+        pass
+
+    def get_secret(self, secret_key: str):
+        return {}
+
     def create_environment(self, auth_credentials, user, environment):
         self._authorize(auth_credentials)
 
@@ -422,7 +577,7 @@ class MockCloudProvider(CloudProviderInterface):
 
         return {"id": self._id(), "credentials": self._auth_credentials}
 
-    def create_tenant(self, payload):
+    def create_tenant(self, payload: TenantCSPPayload):
         """
         payload is an instance of TenantCSPPayload data class
         """
@@ -434,55 +589,155 @@ class MockCloudProvider(CloudProviderInterface):
         self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
         self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
         self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
-        # return tenant id, tenant owner id and tenant owner object id from:
-        response = {"tenantId": "string", "userId": "string", "objectId": "string"}
-        return {
-            "tenant_id": response["tenantId"],
-            "user_id": response["userId"],
-            "user_object_id": response["objectId"],
-        }
 
-    def create_billing_profile(self, creds, tenant_admin_details, billing_owner_id):
-        # call billing profile creation endpoint, specifying owner
-        # Payload:
-        """
-        {
-            "displayName": "string",
-            "poNumber": "string",
-            "address": {
-                "firstName": "string",
-                "lastName": "string",
-                "companyName": "string",
-                "addressLine1": "string",
-                "addressLine2": "string",
-                "addressLine3": "string",
-                "city": "string",
-                "region": "string",
-                "country": "string",
-                "postalCode": "string"
-            },
-            "invoiceEmailOptIn": true,
-            Note: These last 2 are also the body for adding/updating new TOs/clins
-            "enabledAzurePlans": [
-                {
-                "skuId": "string"
-                }
-            ],
-            "clinBudget": {
-                "amount": 0,
-                "startDate": "2019-12-18T16:47:40.909Z",
-                "endDate": "2019-12-18T16:47:40.909Z",
-                "externalReferenceId": "string"
+        return TenantCSPResult(
+            **{
+                "tenant_id": "",
+                "user_id": "",
+                "user_object_id": "",
+                "tenant_admin_username": "test",
+                "tenant_admin_password": "test",
             }
-        }
-        """
+        ).dict()
+
+    def create_billing_profile_creation(
+        self, payload: BillingProfileCreationCSPPayload
+    ):
         # response will be mostly the same as the body, but we only really care about the id
         self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
         self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
         self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
 
-        response = {"id": "string"}
-        return {"billing_profile_id": response["id"]}
+        return BillingProfileCreationCSPResult(
+            **dict(
+                billing_profile_verify_url="https://zombo.com",
+                billing_profile_retry_after=10,
+            )
+        ).dict()
+
+    def create_billing_profile_verification(
+        self, payload: BillingProfileVerificationCSPPayload
+    ):
+        self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
+        self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
+        self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
+        return BillingProfileVerificationCSPResult(
+            **{
+                "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB",
+                "name": "KQWI-W2SU-BG7-TGB",
+                "properties": {
+                    "address": {
+                        "addressLine1": "123 S Broad Street, Suite 2400",
+                        "city": "Philadelphia",
+                        "companyName": "Promptworks",
+                        "country": "US",
+                        "postalCode": "19109",
+                        "region": "PA",
+                    },
+                    "currency": "USD",
+                    "displayName": "Test Billing Profile",
+                    "enabledAzurePlans": [],
+                    "hasReadAccess": True,
+                    "invoiceDay": 5,
+                    "invoiceEmailOptIn": False,
+                    "invoiceSections": [
+                        {
+                            "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB/invoiceSections/CHCO-BAAR-PJA-TGB",
+                            "name": "CHCO-BAAR-PJA-TGB",
+                            "properties": {"displayName": "Test Billing Profile"},
+                            "type": "Microsoft.Billing/billingAccounts/billingProfiles/invoiceSections",
+                        }
+                    ],
+                },
+                "type": "Microsoft.Billing/billingAccounts/billingProfiles",
+            }
+        ).dict()
+
+    def create_billing_profile_tenant_access(self, payload):
+        self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
+        self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
+        self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
+
+        return BillingProfileTenantAccessCSPResult(
+            **{
+                "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB/billingRoleAssignments/40000000-aaaa-bbbb-cccc-100000000000_0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
+                "name": "40000000-aaaa-bbbb-cccc-100000000000_0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
+                "properties": {
+                    "createdOn": "2020-01-14T14:39:26.3342192+00:00",
+                    "createdByPrincipalId": "82e2b376-3297-4096-8743-ed65b3be0b03",
+                    "principalId": "0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
+                    "principalTenantId": "60ff9d34-82bf-4f21-b565-308ef0533435",
+                    "roleDefinitionId": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB/billingRoleDefinitions/40000000-aaaa-bbbb-cccc-100000000000",
+                    "scope": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/KQWI-W2SU-BG7-TGB",
+                },
+                "type": "Microsoft.Billing/billingRoleAssignments",
+            }
+        ).dict()
+
+    def create_task_order_billing_creation(
+        self, payload: TaskOrderBillingCreationCSPPayload
+    ):
+        self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
+        self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
+        self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
+
+        return TaskOrderBillingCreationCSPResult(
+            **{"Location": "https://somelocation", "Retry-After": "10"}
+        ).dict()
+
+    def create_task_order_billing_verification(
+        self, payload: TaskOrderBillingVerificationCSPPayload
+    ):
+        self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
+        self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
+        self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
+
+        return TaskOrderBillingVerificationCSPResult(
+            **{
+                "id": "/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/billingProfiles/XC36-GRNZ-BG7-TGB",
+                "name": "XC36-GRNZ-BG7-TGB",
+                "properties": {
+                    "address": {
+                        "addressLine1": "123 S Broad Street, Suite 2400",
+                        "city": "Philadelphia",
+                        "companyName": "Promptworks",
+                        "country": "US",
+                        "postalCode": "19109",
+                        "region": "PA",
+                    },
+                    "currency": "USD",
+                    "displayName": "First Portfolio Billing Profile",
+                    "enabledAzurePlans": [
+                        {
+                            "productId": "DZH318Z0BPS6",
+                            "skuId": "0001",
+                            "skuDescription": "Microsoft Azure Plan",
+                        }
+                    ],
+                    "hasReadAccess": True,
+                    "invoiceDay": 5,
+                    "invoiceEmailOptIn": False,
+                },
+                "type": "Microsoft.Billing/billingAccounts/billingProfiles",
+            }
+        ).dict()
+
+    def create_billing_instruction(self, payload: BillingInstructionCSPPayload):
+        self._maybe_raise(self.NETWORK_FAILURE_PCT, self.NETWORK_EXCEPTION)
+        self._maybe_raise(self.SERVER_FAILURE_PCT, self.SERVER_EXCEPTION)
+        self._maybe_raise(self.UNAUTHORIZED_RATE, self.AUTHORIZATION_EXCEPTION)
+
+        return BillingInstructionCSPResult(
+            **{
+                "name": "TO1:CLIN001",
+                "properties": {
+                    "amount": 1000.0,
+                    "endDate": "2020-03-01T00:00:00+00:00",
+                    "startDate": "2020-01-01T00:00:00+00:00",
+                },
+                "type": "Microsoft.Billing/billingAccounts/billingProfiles/billingInstructions",
+            }
+        ).dict()
 
     def create_or_update_user(self, auth_credentials, user_info, csp_role_id):
         self._authorize(auth_credentials)
@@ -544,7 +799,7 @@ class MockCloudProvider(CloudProviderInterface):
 
     @property
     def _auth_credentials(self):
-        return {"username": "mock-cloud", "pass": "shh"}
+        return {"username": "mock-cloud", "password": "shh"}  # pragma: allowlist secret
 
     def _authorize(self, credentials):
         self._delay(1, 5)
@@ -561,19 +816,33 @@ SUBSCRIPTION_ID_REGEX = re.compile(
 
 # This needs to be a fully pathed role definition identifier, not just a UUID
 REMOTE_ROOT_ROLE_DEF_ID = "/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-4000-8000-000000000000"
+AZURE_MANAGEMENT_API = "https://management.azure.com"
 
 
 class AzureSDKProvider(object):
     def __init__(self):
-        from azure.mgmt import subscription, authorization
+        from azure.mgmt import subscription, authorization, managementgroups
+        from azure.mgmt.resource import policy
         import azure.graphrbac as graphrbac
         import azure.common.credentials as credentials
+        import azure.identity as identity
+        from azure.keyvault import secrets
+
         from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
+        import adal
+        import requests
 
         self.subscription = subscription
+        self.policy = policy
+        self.managementgroups = managementgroups
         self.authorization = authorization
+        self.adal = adal
         self.graphrbac = graphrbac
         self.credentials = credentials
+        self.identity = identity
+        self.exceptions = exceptions
+        self.secrets = secrets
+        self.requests = requests
         # may change to a JEDI cloud
         self.cloud = AZURE_PUBLIC_CLOUD
 
@@ -585,51 +854,61 @@ class AzureCloudProvider(CloudProviderInterface):
         self.client_id = config["AZURE_CLIENT_ID"]
         self.secret_key = config["AZURE_SECRET_KEY"]
         self.tenant_id = config["AZURE_TENANT_ID"]
+        self.vault_url = config["AZURE_VAULT_URL"]
 
         if azure_sdk_provider is None:
             self.sdk = AzureSDKProvider()
         else:
             self.sdk = azure_sdk_provider
 
+        self.policy_manager = AzurePolicyManager(config["AZURE_POLICY_LOCATION"])
+
+    def set_secret(self, secret_key, secret_value):
+        credential = self._get_client_secret_credential_obj({})
+        secret_client = self.secrets.SecretClient(
+            vault_url=self.vault_url, credential=credential,
+        )
+        try:
+            return secret_client.set_secret(secret_key, secret_value)
+        except self.exceptions.HttpResponseError:
+            app.logger.error(
+                f"Could not SET secret in Azure keyvault for key {secret_key}.",
+                exc_info=1,
+            )
+
+    def get_secret(self, secret_key):
+        credential = self._get_client_secret_credential_obj({})
+        secret_client = self.secrets.SecretClient(
+            vault_url=self.vault_url, credential=credential,
+        )
+        try:
+            return secret_client.get_secret(secret_key).value
+        except self.exceptions.HttpResponseError:
+            app.logger.error(
+                f"Could not GET secret in Azure keyvault for key {secret_key}.",
+                exc_info=1,
+            )
+
     def create_environment(
         self, auth_credentials: Dict, user: User, environment: Environment
     ):
+        # since this operation would only occur within a tenant, should we source the tenant
+        # via lookup from environment once we've created the portfolio csp data schema
+        # something like this:
+        # environment_tenant = environment.application.portfolio.csp_data.get('tenant_id', None)
+        # though we'd probably source the whole credentials for these calls from the portfolio csp
+        # data, as it would have to be where we store the creds for the at-at user within the portfolio tenant
+        # credentials = self._get_credential_obj(environment.application.portfolio.csp_data.get_creds())
         credentials = self._get_credential_obj(self._root_creds)
-        sub_client = self.sdk.subscription.SubscriptionClient(credentials)
-
         display_name = f"{environment.application.name}_{environment.name}_{environment.id}"  # proposed format
+        management_group_id = "?"  # management group id chained from environment
+        parent_id = "?"  # from environment.application
 
-        billing_profile_id = "?"  # something chained from environment?
-        sku_id = AZURE_SKU_ID
-        # we want to set AT-AT as an owner here
-        # we could potentially associate subscriptions with "management groups" per DOD component
-        body = self.sdk.subscription.models.ModernSubscriptionCreationParameters(
-            display_name,
-            billing_profile_id,
-            sku_id,
-            # owner=<AdPrincipal: for AT-AT user>
+        management_group = self._create_management_group(
+            credentials, management_group_id, display_name, parent_id,
         )
 
-        # These 2 seem like something that might be worthwhile to allow tiebacks to
-        # TOs filed for the environment
-        billing_account_name = "?"
-        invoice_section_name = "?"
-        # We may also want to create billing sections in the enrollment account
-        sub_creation_operation = sub_client.subscription_factory.create_subscription(
-            billing_account_name, invoice_section_name, body
-        )
-
-        # the resulting object from this process is a link to the new subscription
-        # not a subscription model, so we'll have to unpack the ID
-        new_sub = sub_creation_operation.result()
-
-        subscription_id = self._extract_subscription_id(new_sub.subscription_link)
-        if subscription_id:
-            return subscription_id
-        else:
-            # troublesome error, subscription should exist at this point
-            # but we just don't have a valid ID
-            pass
+        return management_group
 
     def create_atat_admin_user(
         self, auth_credentials: Dict, csp_environment_id: str
@@ -668,102 +947,316 @@ class AzureCloudProvider(CloudProviderInterface):
             "role_name": role_assignment_id,
         }
 
-    def create_tenant(self, payload):
-        # auth as SP that is allowed to create tenant? (tenant creation sp creds)
-        # create tenant with owner details (populated from portfolio point of contact, pw is generated)
+    def _create_application(self, auth_credentials: Dict, application: Application):
+        management_group_name = str(uuid4())  # can be anything, not just uuid
+        display_name = application.name  # Does this need to be unique?
+        credentials = self._get_credential_obj(auth_credentials)
+        parent_id = "?"  # application.portfolio.csp_details.management_group_id
 
-        # return tenant id, tenant owner id and tenant owner object id from:
-        response = {"tenantId": "string", "userId": "string", "objectId": "string"}
-        return self._ok(
-            {
-                "tenant_id": response["tenantId"],
-                "user_id": response["userId"],
-                "user_object_id": response["objectId"],
-            }
+        return self._create_management_group(
+            credentials, management_group_name, display_name, parent_id,
         )
 
-    def create_billing_owner(self, creds, tenant_admin_details):
-        # authenticate as tenant_admin
-        # create billing owner identity
+    def _create_management_group(
+        self, credentials, management_group_id, display_name, parent_id=None,
+    ):
+        mgmgt_group_client = self.sdk.managementgroups.ManagementGroupsAPI(credentials)
+        create_parent_grp_info = self.sdk.managementgroups.models.CreateParentGroupInfo(
+            id=parent_id
+        )
+        create_mgmt_grp_details = self.sdk.managementgroups.models.CreateManagementGroupDetails(
+            parent=create_parent_grp_info
+        )
+        mgmt_grp_create = self.sdk.managementgroups.models.CreateManagementGroupRequest(
+            name=management_group_id,
+            display_name=display_name,
+            details=create_mgmt_grp_details,
+        )
+        create_request = mgmgt_group_client.management_groups.create_or_update(
+            management_group_id, mgmt_grp_create
+        )
 
-        # TODO: Lookup response format
-        # Managed service identity?
-        response = {"id": "string"}
-        return self._ok({"billing_owner_id": response["id"]})
+        # result is a synchronous wait, might need to do a poll instead to handle first mgmt group create
+        # since we were told it could take 10+ minutes to complete, unless this handles that polling internally
+        return create_request.result()
 
-    def assign_billing_owner(self, creds, billing_owner_id, tenant_id):
-        # TODO: Do we source role definition ID from config, api or self-defined?
-        # TODO: If from api,
+    def _create_subscription(
+        self,
+        credentials,
+        display_name,
+        billing_profile_id,
+        sku_id,
+        management_group_id,
+        billing_account_name,
+        invoice_section_name,
+    ):
+        sub_client = self.sdk.subscription.SubscriptionClient(credentials)
+
+        billing_profile_id = "?"  # where do we source this?
+        sku_id = AZURE_SKU_ID
+        # These 2 seem like something that might be worthwhile to allow tiebacks to
+        # TOs filed for the environment
+        billing_account_name = "?"  # from TO?
+        invoice_section_name = "?"  # from TO?
+
+        body = self.sdk.subscription.models.ModernSubscriptionCreationParameters(
+            display_name=display_name,
+            billing_profile_id=billing_profile_id,
+            sku_id=sku_id,
+            management_group_id=management_group_id,
+        )
+
+        # We may also want to create billing sections in the enrollment account
+        sub_creation_operation = sub_client.subscription_factory.create_subscription(
+            billing_account_name, invoice_section_name, body
+        )
+
+        # the resulting object from this process is a link to the new subscription
+        # not a subscription model, so we'll have to unpack the ID
+        new_sub = sub_creation_operation.result()
+
+        subscription_id = self._extract_subscription_id(new_sub.subscription_link)
+        if subscription_id:
+            return subscription_id
+        else:
+            # troublesome error, subscription should exist at this point
+            # but we just don't have a valid ID
+            pass
+
+    def _create_policy_definition(
+        self, credentials, subscription_id, management_group_id, properties,
+    ):
         """
-        {
-            "principalId": "string",
-            "principalTenantId": "string",
-            "billingRoleDefinitionId": "string"
+        Requires credentials that have AZURE_MANAGEMENT_API
+        specified as the resource. The Service Principal
+        specified in the credentials must have the "Resource
+        Policy Contributor" role assigned with a scope at least
+        as high as the management group specified by
+        management_group_id.
+
+        Arguments:
+            credentials -- ServicePrincipalCredentials
+            subscription_id -- str, ID of the subscription (just the UUID, not the path)
+            management_group_id -- str, ID of the management group (just the UUID, not the path)
+            properties -- dictionary, the "properties" section of a valid Azure policy definition document
+
+        Returns:
+            azure.mgmt.resource.policy.[api version].models.PolicyDefinition: the PolicyDefinition object provided to Azure
+
+        Raises:
+            TBD
+        """
+        # TODO: which subscription would this be?
+        client = self.sdk.policy.PolicyClient(credentials, subscription_id)
+
+        definition = client.policy_definitions.models.PolicyDefinition(
+            policy_type=properties.get("policyType"),
+            mode=properties.get("mode"),
+            display_name=properties.get("displayName"),
+            description=properties.get("description"),
+            policy_rule=properties.get("policyRule"),
+            parameters=properties.get("parameters"),
+        )
+
+        name = properties.get("displayName")
+
+        return client.policy_definitions.create_or_update_at_management_group(
+            policy_definition_name=name,
+            parameters=definition,
+            management_group_id=management_group_id,
+        )
+
+    def create_tenant(self, payload: TenantCSPPayload):
+        sp_token = self._get_sp_token(payload.creds)
+        if sp_token is None:
+            raise AuthenticationException("Could not resolve token for tenant creation")
+
+        create_tenant_body = payload.dict(by_alias=True)
+
+        create_tenant_headers = {
+            "Authorization": f"Bearer {sp_token}",
         }
-        """
 
-        return self.ok()
+        result = self.sdk.requests.post(
+            "https://management.azure.com/providers/Microsoft.SignUp/createTenant?api-version=2020-01-01-preview",
+            json=create_tenant_body,
+            headers=create_tenant_headers,
+        )
 
-    def create_billing_profile(self, creds, tenant_admin_details, billing_owner_id):
-        # call billing profile creation endpoint, specifying owner
-        # Payload:
-        """
-        {
-            "displayName": "string",
-            "poNumber": "string",
-            "address": {
-                "firstName": "string",
-                "lastName": "string",
-                "companyName": "string",
-                "addressLine1": "string",
-                "addressLine2": "string",
-                "addressLine3": "string",
-                "city": "string",
-                "region": "string",
-                "country": "string",
-                "postalCode": "string"
-            },
-            "invoiceEmailOptIn": true,
-            Note: These last 2 are also the body for adding/updating new TOs/clins
-            "enabledAzurePlans": [
-                {
-                "skuId": "string"
-                }
-            ],
-            "clinBudget": {
-                "amount": 0,
-                "startDate": "2019-12-18T16:47:40.909Z",
-                "endDate": "2019-12-18T16:47:40.909Z",
-                "externalReferenceId": "string"
+        if result.status_code == 200:
+            return self._ok(
+                TenantCSPResult(
+                    **result.json(),
+                    tenant_admin_password=payload.password,
+                    tenant_admin_username=payload.user_id,
+                )
+            )
+        else:
+            return self._error(result.json())
+
+    def create_billing_profile_creation(
+        self, payload: BillingProfileCreationCSPPayload
+    ):
+        sp_token = self._get_sp_token(payload.creds)
+        if sp_token is None:
+            raise AuthenticationException(
+                "Could not resolve token for billing profile creation"
+            )
+
+        create_billing_account_body = payload.dict(by_alias=True)
+
+        create_billing_account_headers = {
+            "Authorization": f"Bearer {sp_token}",
+        }
+
+        billing_account_create_url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles?api-version=2019-10-01-preview"
+
+        result = self.sdk.requests.post(
+            billing_account_create_url,
+            json=create_billing_account_body,
+            headers=create_billing_account_headers,
+        )
+
+        if result.status_code == 202:
+            # 202 has location/retry after headers
+            return self._ok(BillingProfileCreationCSPResult(**result.headers))
+        elif result.status_code == 200:
+            # NB: Swagger docs imply call can sometimes resolve immediately
+            return self._ok(BillingProfileVerificationCSPResult(**result.json()))
+        else:
+            return self._error(result.json())
+
+    def create_billing_profile_verification(
+        self, payload: BillingProfileVerificationCSPPayload
+    ):
+        sp_token = self._get_sp_token(payload.creds)
+        if sp_token is None:
+            raise AuthenticationException(
+                "Could not resolve token for billing profile validation"
+            )
+
+        auth_header = {
+            "Authorization": f"Bearer {sp_token}",
+        }
+
+        result = self.sdk.requests.get(
+            payload.billing_profile_verify_url, headers=auth_header
+        )
+
+        if result.status_code == 202:
+            # 202 has location/retry after headers
+            return self._ok(BillingProfileCreationCSPResult(**result.headers))
+        elif result.status_code == 200:
+            return self._ok(BillingProfileVerificationCSPResult(**result.json()))
+        else:
+            return self._error(result.json())
+
+    def create_billing_profile_tenant_access(
+        self, payload: BillingProfileTenantAccessCSPPayload
+    ):
+        sp_token = self._get_sp_token(payload.creds)
+        request_body = {
+            "properties": {
+                "principalTenantId": payload.tenant_id,  # from tenant creation
+                "principalId": payload.user_object_id,  # from tenant creationn
+                "roleDefinitionId": f"/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/billingRoleDefinitions/40000000-aaaa-bbbb-cccc-100000000000",
             }
         }
-        """
 
-        # response will be mostly the same as the body, but we only really care about the id
-        response = {"id": "string"}
-        return self._ok({"billing_profile_id": response["id"]})
+        headers = {
+            "Authorization": f"Bearer {sp_token}",
+        }
 
-    def report_clin(self, creds, clin_id, clin_amount, clin_start, clin_end, clin_to):
-        # should consumer be responsible for reporting each clin or
-        # should this take a list and manage the sequential reporting?
-        """ Payload
-        {
-            "enabledAzurePlans": [
-                {
-                "skuId": "string"
-                }
-            ],
-            "clinBudget": {
-                "amount": 0,
-                "startDate": "2019-12-18T16:47:40.909Z",
-                "endDate": "2019-12-18T16:47:40.909Z",
-                "externalReferenceId": "string"
+        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/createBillingRoleAssignment?api-version=2019-10-01-preview"
+
+        result = self.sdk.requests.post(url, headers=headers, json=request_body)
+        if result.status_code == 201:
+            return self._ok(BillingProfileTenantAccessCSPResult(**result.json()))
+        else:
+            return self._error(result.json())
+
+    def create_task_order_billing_creation(
+        self, payload: TaskOrderBillingCreationCSPPayload
+    ):
+        sp_token = self._get_sp_token(payload.creds)
+        request_body = [
+            {
+                "op": "replace",
+                "path": "/enabledAzurePlans",
+                "value": [{"skuId": "0001"}],
+            }
+        ]
+
+        request_headers = {
+            "Authorization": f"Bearer {sp_token}",
+        }
+
+        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}?api-version=2019-10-01-preview"
+
+        result = self.sdk.requests.patch(
+            url, headers=request_headers, json=request_body
+        )
+
+        if result.status_code == 202:
+            # 202 has location/retry after headers
+            return self._ok(TaskOrderBillingCreationCSPResult(**result.headers))
+        elif result.status_code == 200:
+            return self._ok(TaskOrderBillingVerificationCSPResult(**result.json()))
+        else:
+            return self._error(result.json())
+
+    def create_task_order_billing_verification(
+        self, payload: TaskOrderBillingVerificationCSPPayload
+    ):
+        sp_token = self._get_sp_token(payload.creds)
+        if sp_token is None:
+            raise AuthenticationException(
+                "Could not resolve token for task order billing validation"
+            )
+
+        auth_header = {
+            "Authorization": f"Bearer {sp_token}",
+        }
+
+        result = self.sdk.requests.get(
+            payload.task_order_billing_verify_url, headers=auth_header
+        )
+
+        if result.status_code == 202:
+            # 202 has location/retry after headers
+            return self._ok(TaskOrderBillingCreationCSPResult(**result.headers))
+        elif result.status_code == 200:
+            return self._ok(TaskOrderBillingVerificationCSPResult(**result.json()))
+        else:
+            return self._error(result.json())
+
+    def create_billing_instruction(self, payload: BillingInstructionCSPPayload):
+        sp_token = self._get_sp_token(payload.creds)
+        if sp_token is None:
+            raise AuthenticationException(
+                "Could not resolve token for task order billing validation"
+            )
+
+        request_body = {
+            "properties": {
+                "amount": payload.initial_clin_amount,
+                "startDate": payload.initial_clin_start_date,
+                "endDate": payload.initial_clin_end_date,
             }
         }
-        """
 
-        # we don't need any of the returned info for this
-        return self._ok()
+        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/instructions/{payload.initial_task_order_id}:CLIN00{payload.initial_clin_type}?api-version=2019-10-01-preview"
+
+        auth_header = {
+            "Authorization": f"Bearer {sp_token}",
+        }
+
+        result = self.sdk.requests.put(url, headers=auth_header, json=request_body)
+
+        if result.status_code == 200:
+            return self._ok(BillingInstructionCSPResult(**result.json()))
+        else:
+            return self._error(result.json())
 
     def create_remote_admin(self, creds, tenant_details):
         # create app/service principal within tenant, with name constructed from tenant details
@@ -849,14 +1342,40 @@ class AzureCloudProvider(CloudProviderInterface):
         if sub_id_match:
             return sub_id_match.group(1)
 
-    def _get_credential_obj(self, creds, resource=None):
+    def _get_sp_token(self, creds):
+        home_tenant_id = creds.get("home_tenant_id")
+        client_id = creds.get("client_id")
+        secret_key = creds.get("secret_key")
 
+        # TODO: Make endpoints consts or configs
+        authentication_endpoint = "https://login.microsoftonline.com/"
+        resource = "https://management.azure.com/"
+
+        context = self.sdk.adal.AuthenticationContext(
+            authentication_endpoint + home_tenant_id
+        )
+
+        # TODO: handle failure states here
+        token_response = context.acquire_token_with_client_credentials(
+            resource, client_id, secret_key
+        )
+
+        return token_response.get("accessToken", None)
+
+    def _get_credential_obj(self, creds, resource=None):
         return self.sdk.credentials.ServicePrincipalCredentials(
             client_id=creds.get("client_id"),
             secret=creds.get("secret_key"),
             tenant=creds.get("tenant_id"),
             resource=resource,
             cloud_environment=self.sdk.cloud,
+        )
+
+    def _get_client_secret_credential_obj(self, creds):
+        return self.sdk.identity.ClientSecretCredential(
+            tenant_id=creds.get("tenant_id"),
+            client_id=creds.get("client_id"),
+            client_secret=creds.get("secret_key"),
         )
 
     def _make_tenant_admin_cred_obj(self, username, password):
