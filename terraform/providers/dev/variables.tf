@@ -96,6 +96,7 @@ variable "admin_user_whitelist" {
   default = {
     "Rob Gil"           = "66.220.238.246/32"
     "Dan Corrigan Work" = "108.16.207.173/32"
+    "Dan Corrigan Home" = "71.162.221.27/32"
   }
 }
 
@@ -104,6 +105,7 @@ variable "storage_admin_whitelist" {
   default = {
     "Rob Gil"           = "66.220.238.246"
     "Dan Corrigan Work" = "108.16.207.173"
+    "Dan Corrigan Home" = "71.162.221.27"
   }
 }
 
