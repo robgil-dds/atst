@@ -3,7 +3,6 @@ import re
 
 from tests.factories import (
     PortfolioStateMachineFactory,
-    TaskOrderFactory,
     CLINFactory,
 )
 
@@ -15,6 +14,7 @@ from atst.domain.csp import get_stage_csp_class
 
 @pytest.fixture(scope="function")
 def portfolio():
+    # TODO: setup clin/to as active/funded/ready
     portfolio = CLINFactory.create().task_order.portfolio
     return portfolio
 
