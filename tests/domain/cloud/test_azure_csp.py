@@ -18,6 +18,7 @@ from atst.domain.csp.cloud import (
     TaskOrderBillingVerificationCSPResult,
     TenantCSPPayload,
     TenantCSPResult,
+    ApplicationCSPPayload,
 )
 
 from tests.mock_azure import mock_azure, AUTH_CREDENTIALS
@@ -67,8 +68,8 @@ def test_create_subscription_succeeds(mock_azure: AzureCloudProvider):
 
 
 def mock_management_group_create(mock_azure, spec_dict):
-    mock_azure.sdk.managementgroups.ManagementGroupsAPI.return_value.management_groups.create_or_update.return_value.result.return_value = Mock(
-        **spec_dict
+    mock_azure.sdk.managementgroups.ManagementGroupsAPI.return_value.management_groups.create_or_update.return_value.result.return_value = (
+        spec_dict
     )
 
 
@@ -89,7 +90,10 @@ def test_create_application_succeeds(mock_azure: AzureCloudProvider):
 
     mock_management_group_create(mock_azure, {"id": "Test Id"})
 
-    result = mock_azure._create_application(AUTH_CREDENTIALS, application)
+    payload = ApplicationCSPPayload(
+        creds={}, display_name=application.name, parent_id=str(uuid4())
+    )
+    result = mock_azure.create_application(payload)
 
     assert result.id == "Test Id"
 
@@ -150,7 +154,7 @@ def test_create_tenant(mock_azure: AzureCloudProvider):
         **dict(
             creds=creds,
             user_id="admin",
-            password="JediJan13$coot",
+            password="JediJan13$coot",  # pragma: allowlist secret
             domain_name="jediccpospawnedtenant2",
             first_name="Tedry",
             last_name="Tenet",

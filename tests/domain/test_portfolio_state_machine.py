@@ -141,7 +141,6 @@ def test_fsm_transition_start(portfolio: Portfolio):
     config = {"billing_account_name": "billing_account_name"}
 
     for expected_state in expected_states:
-        print(expected_state)
         collected_data = dict(
             list(csp_data.items()) + list(portfolio_data.items()) + list(config.items())
         )

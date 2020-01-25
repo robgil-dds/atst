@@ -5,11 +5,13 @@ from atst.database import db
 from atst.queue import celery
 from atst.models import EnvironmentRole, JobFailure
 from atst.domain.csp.cloud import CloudProviderInterface, GeneralCSPException
+from atst.domain.applications import Applications
 from atst.domain.environments import Environments
 from atst.domain.portfolios import Portfolios
 from atst.domain.environment_roles import EnvironmentRoles
 from atst.models.utils import claim_for_update
 from atst.utils.localization import translate
+from atst.domain.csp.cloud import ApplicationCSPPayload
 
 
 class RecordFailure(celery.Task):
@@ -49,6 +51,28 @@ def send_notification_mail(recipients, subject, body):
         )
     )
     app.mailer.send(recipients, subject, body)
+
+
+def do_create_application(csp: CloudProviderInterface, application_id=None):
+    application = Applications.get(application_id)
+
+    with claim_for_update(application) as application:
+
+        if application.cloud_id is not None:
+            return
+
+        csp_details = application.portfolio.csp_data
+        parent_id = csp_details.get("root_management_group_id")
+        tenant_id = csp_details.get("tenant_id")
+        creds = csp.get_credentials(tenant_id)
+        payload = ApplicationCSPPayload(
+            creds=creds, display_name=application.name, parent_id=parent_id
+        )
+
+        app_result = csp.create_application(payload)
+        application.cloud_id = app_result.id
+        db.session.add(application)
+        db.session.commit()
 
 
 def do_create_environment(csp: CloudProviderInterface, environment_id=None):
@@ -138,6 +162,11 @@ def provision_portfolio(self, portfolio_id=None):
 
 
 @celery.task(bind=True, base=RecordFailure)
+def create_application(self, application_id=None):
+    do_work(do_create_application, self, app.csp.cloud, application_id=application_id)
+
+
+@celery.task(bind=True, base=RecordFailure)
 def create_environment(self, environment_id=None):
     do_work(do_create_environment, self, app.csp.cloud, environment_id=environment_id)
 
@@ -163,6 +192,12 @@ def dispatch_provision_portfolio(self):
     """
     for portfolio_id in Portfolios.get_portfolios_pending_provisioning():
         provision_portfolio.delay(portfolio_id=portfolio_id)
+
+
+@celery.task(bind=True)
+def dispatch_create_application(self):
+    for application_id in Applications.get_applications_pending_creation():
+        create_application.delay(application_id=application_id)
 
 
 @celery.task(bind=True)

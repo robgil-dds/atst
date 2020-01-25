@@ -7,7 +7,6 @@ from pydantic import BaseModel, validator
 from flask import current_app as app
 
 from atst.models.user import User
-from atst.models.application import Application
 from atst.models.environment import Environment
 from atst.models.environment_role import EnvironmentRole
 from atst.utils import snake_to_camel
@@ -374,6 +373,60 @@ class BillingInstructionCSPResult(AliasModel):
         fields = {
             "reported_clin_name": "name",
         }
+
+
+AZURE_MGMNT_PATH = "/providers/Microsoft.Management/managementGroups/"
+
+MANAGEMENT_GROUP_NAME_REGEX = "^[a-zA-Z0-9\-_\(\)\.]+$"
+
+
+class ManagementGroupCSPPayload(BaseCSPPayload):
+    """
+    :param: management_group_name: Just pass a UUID for this.
+    :param: display_name: This can contain any character and
+        spaces, but should be 90 characters or fewer long.
+    :param: parent_id: This should be the fully qualified Azure ID,
+        i.e. /providers/Microsoft.Management/managementGroups/[management group ID]
+    """
+
+    management_group_name: Optional[str]
+    display_name: str
+    parent_id: str
+
+    @validator("management_group_name", pre=True, always=True)
+    def supply_management_group_name_default(cls, name):
+        if name:
+            if re.match(MANAGEMENT_GROUP_NAME_REGEX, name) is None:
+                raise ValueError(
+                    f"Management group name must match {MANAGEMENT_GROUP_NAME_REGEX}"
+                )
+
+            return name[0:90]
+        else:
+            return str(uuid4())
+
+    @validator("display_name", pre=True, always=True)
+    def enforce_display_name_length(cls, name):
+        return name[0:90]
+
+    @validator("parent_id", pre=True, always=True)
+    def enforce_parent_id_pattern(cls, id_):
+        if AZURE_MGMNT_PATH not in id_:
+            return f"{AZURE_MGMNT_PATH}{id_}"
+        else:
+            return id_
+
+
+class ManagementGroupCSPResponse(AliasModel):
+    id: str
+
+
+class ApplicationCSPPayload(ManagementGroupCSPPayload):
+    pass
+
+
+class ApplicationCSPResult(ManagementGroupCSPResponse):
+    pass
 
 
 class CloudProviderInterface:
@@ -806,6 +859,15 @@ class MockCloudProvider(CloudProviderInterface):
         if self._with_authorization and credentials != self._auth_credentials:
             raise self.AUTHENTICATION_EXCEPTION
 
+    def create_application(self, payload: ApplicationCSPPayload):
+        self._maybe_raise(self.UNAUTHORIZED_RATE, GeneralCSPException)
+
+        id_ = f"{AZURE_MGMNT_PATH}{payload.management_group_name}"
+        return ApplicationCSPResult(id=id_)
+
+    def get_credentials(self, scope="portfolio", tenant_id=None):
+        return self.root_creds()
+
 
 AZURE_ENVIRONMENT = "AZURE_PUBLIC_CLOUD"  # TBD
 AZURE_SKU_ID = "?"  # probably a static sku specific to ATAT/JEDI
@@ -840,7 +902,7 @@ class AzureSDKProvider(object):
         self.graphrbac = graphrbac
         self.credentials = credentials
         self.identity = identity
-        self.exceptions = exceptions
+        # self.exceptions = exceptions
         self.secrets = secrets
         self.requests = requests
         # may change to a JEDI cloud
@@ -908,7 +970,7 @@ class AzureCloudProvider(CloudProviderInterface):
             credentials, management_group_id, display_name, parent_id,
         )
 
-        return management_group
+        return ManagementGroupCSPResponse(**management_group)
 
     def create_atat_admin_user(
         self, auth_credentials: Dict, csp_environment_id: str
@@ -947,15 +1009,18 @@ class AzureCloudProvider(CloudProviderInterface):
             "role_name": role_assignment_id,
         }
 
-    def _create_application(self, auth_credentials: Dict, application: Application):
-        management_group_name = str(uuid4())  # can be anything, not just uuid
-        display_name = application.name  # Does this need to be unique?
-        credentials = self._get_credential_obj(auth_credentials)
-        parent_id = "?"  # application.portfolio.csp_details.management_group_id
+    def create_application(self, payload: ApplicationCSPPayload):
+        creds = payload.creds
+        credentials = self._get_credential_obj(creds, resource=AZURE_MANAGEMENT_API)
 
-        return self._create_management_group(
-            credentials, management_group_name, display_name, parent_id,
+        response = self._create_management_group(
+            credentials,
+            payload.management_group_name,
+            payload.display_name,
+            payload.parent_id,
         )
+
+        return ApplicationCSPResult(**response)
 
     def _create_management_group(
         self, credentials, management_group_id, display_name, parent_id=None,
@@ -978,6 +1043,9 @@ class AzureCloudProvider(CloudProviderInterface):
 
         # result is a synchronous wait, might need to do a poll instead to handle first mgmt group create
         # since we were told it could take 10+ minutes to complete, unless this handles that polling internally
+        # TODO: what to do is status is not 'Succeeded' on the
+        # response object? Will it always raise its own error
+        # instead?
         return create_request.result()
 
     def _create_subscription(
@@ -1289,6 +1357,7 @@ class AzureCloudProvider(CloudProviderInterface):
 
         # we likely only want the budget ID, can be updated or replaced?
         response = {"id": "id"}
+
         return self._ok({"budget_id": response["id"]})
 
     def _get_management_service_principal(self):
@@ -1406,3 +1475,27 @@ class AzureCloudProvider(CloudProviderInterface):
             "secret_key": self.secret_key,
             "tenant_id": self.tenant_id,
         }
+
+    def get_credentials(self, scope="portfolio", tenant_id=None):
+        """
+        This could be implemented to determine, based on type, whether to return creds for:
+            - scope="atat": the ATAT main app registration in ATAT's home tenant
+            - scope="tenantadmin": the tenant administrator credentials
+            - scope="portfolio": the credentials for the ATAT SP in the portfolio tenant
+        """
+        if scope == "atat":
+            return self._root_creds
+        elif scope == "tenantadmin":
+            # magic with key vault happens
+            return {
+                "client_id": "some id",
+                "secret_key": "very secret",
+                "tenant_id": tenant_id,
+            }
+        elif scope == "portfolio":
+            # magic with key vault happens
+            return {
+                "client_id": "some id",
+                "secret_key": "very secret",
+                "tenant_id": tenant_id,
+            }
