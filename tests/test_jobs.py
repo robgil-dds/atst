@@ -8,8 +8,7 @@ from atst.domain.csp.cloud import MockCloudProvider
 from atst.domain.portfolios import Portfolios
 
 from atst.jobs import (
-    RecordEnvironmentFailure,
-    RecordEnvironmentRoleFailure,
+    RecordFailure,
     dispatch_create_environment,
     dispatch_create_atat_admin_user,
     dispatch_provision_portfolio,
@@ -29,7 +28,7 @@ from tests.factories import (
     PortfolioStateMachineFactory,
     ApplicationRoleFactory,
 )
-from atst.models import CSPRole, EnvironmentRole, ApplicationRoleStatus
+from atst.models import CSPRole, EnvironmentRole, ApplicationRoleStatus, JobFailure
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -43,8 +42,17 @@ def portfolio():
     return portfolio
 
 
-def test_environment_job_failure(celery_app, celery_worker):
-    @celery_app.task(bind=True, base=RecordEnvironmentFailure)
+def _find_failure(session, entity, id_):
+    return (
+        session.query(JobFailure)
+        .filter(JobFailure.entity == entity)
+        .filter(JobFailure.entity_id == id_)
+        .one()
+    )
+
+
+def test_environment_job_failure(session, celery_app, celery_worker):
+    @celery_app.task(bind=True, base=RecordFailure)
     def _fail_hard(self, environment_id=None):
         raise ValueError("something bad happened")
 
@@ -56,13 +64,12 @@ def test_environment_job_failure(celery_app, celery_worker):
     with pytest.raises(ValueError):
         task.get()
 
-    assert environment.job_failures
-    job_failure = environment.job_failures[0]
+    job_failure = _find_failure(session, "environment", str(environment.id))
     assert job_failure.task == task
 
 
-def test_environment_role_job_failure(celery_app, celery_worker):
-    @celery_app.task(bind=True, base=RecordEnvironmentRoleFailure)
+def test_environment_role_job_failure(session, celery_app, celery_worker):
+    @celery_app.task(bind=True, base=RecordFailure)
     def _fail_hard(self, environment_role_id=None):
         raise ValueError("something bad happened")
 
@@ -74,8 +81,7 @@ def test_environment_role_job_failure(celery_app, celery_worker):
     with pytest.raises(ValueError):
         task.get()
 
-    assert role.job_failures
-    job_failure = role.job_failures[0]
+    job_failure = _find_failure(session, "environment_role", str(role.id))
     assert job_failure.task == task
 
 

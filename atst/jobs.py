@@ -3,12 +3,7 @@ import pendulum
 
 from atst.database import db
 from atst.queue import celery
-from atst.models import (
-    EnvironmentJobFailure,
-    EnvironmentRoleJobFailure,
-    EnvironmentRole,
-    PortfolioJobFailure,
-)
+from atst.models import EnvironmentRole, JobFailure
 from atst.domain.csp.cloud import CloudProviderInterface, GeneralCSPException
 from atst.domain.environments import Environments
 from atst.domain.portfolios import Portfolios
@@ -17,32 +12,26 @@ from atst.models.utils import claim_for_update
 from atst.utils.localization import translate
 
 
-class RecordPortfolioFailure(celery.Task):
+class RecordFailure(celery.Task):
+    _ENTITIES = [
+        "portfolio_id",
+        "application_id",
+        "environment_id",
+        "environment_role_id",
+    ]
+
+    def _derive_entity_info(self, kwargs):
+        matches = [e for e in self._ENTITIES if e in kwargs.keys()]
+        if matches:
+            match = matches[0]
+            return {"entity": match.replace("_id", ""), "entity_id": kwargs[match]}
+        else:
+            return None
+
     def on_failure(self, exc, task_id, args, kwargs, einfo):
-        if "portfolio_id" in kwargs:
-            failure = PortfolioJobFailure(
-                portfolio_id=kwargs["portfolio_id"], task_id=task_id
-            )
-            db.session.add(failure)
-            db.session.commit()
-
-
-class RecordEnvironmentFailure(celery.Task):
-    def on_failure(self, exc, task_id, args, kwargs, einfo):
-        if "environment_id" in kwargs:
-            failure = EnvironmentJobFailure(
-                environment_id=kwargs["environment_id"], task_id=task_id
-            )
-            db.session.add(failure)
-            db.session.commit()
-
-
-class RecordEnvironmentRoleFailure(celery.Task):
-    def on_failure(self, exc, task_id, args, kwargs, einfo):
-        if "environment_role_id" in kwargs:
-            failure = EnvironmentRoleJobFailure(
-                environment_role_id=kwargs["environment_role_id"], task_id=task_id
-            )
+        info = self._derive_entity_info(kwargs)
+        if info:
+            failure = JobFailure(**info, task_id=task_id)
             db.session.add(failure)
             db.session.commit()
 
@@ -143,17 +132,17 @@ def do_provision_portfolio(csp: CloudProviderInterface, portfolio_id=None):
     fsm.trigger_next_transition()
 
 
-@celery.task(bind=True, base=RecordPortfolioFailure)
+@celery.task(bind=True, base=RecordFailure)
 def provision_portfolio(self, portfolio_id=None):
     do_work(do_provision_portfolio, self, app.csp.cloud, portfolio_id=portfolio_id)
 
 
-@celery.task(bind=True, base=RecordEnvironmentFailure)
+@celery.task(bind=True, base=RecordFailure)
 def create_environment(self, environment_id=None):
     do_work(do_create_environment, self, app.csp.cloud, environment_id=environment_id)
 
 
-@celery.task(bind=True, base=RecordEnvironmentFailure)
+@celery.task(bind=True, base=RecordFailure)
 def create_atat_admin_user(self, environment_id=None):
     do_work(
         do_create_atat_admin_user, self, app.csp.cloud, environment_id=environment_id
