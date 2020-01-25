@@ -7,3 +7,11 @@ output "subnet_list" {
     for k, id in azurerm_subnet.subnet : k => id
   }
 }
+
+output "resource_group_name" {
+  value = azurerm_resource_group.vpc.name
+}
+
+output "resource_group_location" {
+  value = azurerm_resource_group.vpc.location
+}
