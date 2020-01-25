@@ -1,0 +1,6 @@
+- for setting up the database:
+  - create database
+  - create postgres user password? could we do this as a key?
+  - create user secret in application key vault
+  - execute SQL to create user
+- we need an initial image to seed ACR with

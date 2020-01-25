@@ -116,19 +116,28 @@ def provision(
 
     logger.info("starting docker process")
 
-    cmd = (
-        f"docker run -e PGHOST={dbhost}"
-        +f" -e PGPASSWORD=\"{root_password}\""
+    create_database_cmd = (
+        f"docker run -e PGHOST='{dbhost}'"
+        +f" -e PGPASSWORD='{root_password}'"
         +f" -e PGUSER='{root_name}@{dbhost}'"
-        +f" -e PGDATABASE=\"{dbname}\""
-        +f" -e REDIS_HOST=host.docker.internal"
+        +f" -e PGDATABASE='{dbname}'"
+        +f" -e PGSSLMODE=require"
+        +f" {container}"
+        +f" .venv/bin/python script/create_database.py {dbname}"
+    )
+    _run_cmd(create_database_cmd)
+
+    seed_database_cmd = (
+        f"docker run -e PGHOST='{dbhost}'"
+        +f" -e PGPASSWORD='{root_password}'"
+        +f" -e PGUSER='{root_name}@{dbhost}'"
+        +f" -e PGDATABASE='{dbname}'"
         +f" -e PGSSLMODE=require"
         +f" -v {ccpo_users}:/opt/atat/atst/users.yml"
         +f" {container}"
         +f" .venv/bin/python script/database_setup.py {user_username} '{user_password}' users.yml"
     )
-    print(cmd)
-    _run_cmd(cmd)
+    _run_cmd(seed_database_cmd)
 
 
 database.add_command(provision)

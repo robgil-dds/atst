@@ -45,6 +45,17 @@ Requirements:
 - docker
 - A copy of the ATAT docker image. This can be built in the repo root with: `docker build . --build-arg CSP=azure -f ./Dockerfile -t atat:latest`
 - You need to know the hostname for the Postgres database. Your IP must either be whitelisted in its firewall rules or you must be behind the VPN.
+- You will need a YAML file listing all the CCPO users to be added to the database, with the format:
+
+```
+- dod_id: "2323232323"
+  first_name: "Luke"
+  last_name: "Skywalker"
+- dod_id: "5656565656"
+  first_name: "Han"
+  last_name: "Solo"
+```
+
 - There should be a password for the ATAT database user in the application Key Vault, preferably named `PGPASSWORD`. You can load this by running `secrets-tool --keyvault [operator key vault url] load -f postgres-user.yml` and supplying YAML like:
 
 ```
