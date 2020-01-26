@@ -6,9 +6,6 @@ from pydantic import BaseModel, validator
 
 from flask import current_app as app
 
-from atst.models.user import User
-from atst.models.environment import Environment
-from atst.models.environment_role import EnvironmentRole
 from atst.utils import snake_to_camel
 from .policy import AzurePolicyManager
 
@@ -439,9 +436,7 @@ class CloudProviderInterface:
     def root_creds(self) -> Dict:
         raise NotImplementedError()
 
-    def create_environment(
-        self, auth_credentials: Dict, user: User, environment: Environment
-    ) -> str:
+    def create_environment(self, auth_credentials: Dict, user, environment) -> str:
         """Create a new environment in the CSP.
 
         Arguments:
@@ -489,7 +484,7 @@ class CloudProviderInterface:
         raise NotImplementedError()
 
     def create_or_update_user(
-        self, auth_credentials: Dict, user_info: EnvironmentRole, csp_role_id: str
+        self, auth_credentials: Dict, user_info, csp_role_id: str
     ) -> str:
         """Creates a user or updates an existing user's role.
 
@@ -889,6 +884,7 @@ class AzureSDKProvider(object):
         import azure.common.credentials as credentials
         import azure.identity as identity
         from azure.keyvault import secrets
+        from azure.core import exceptions
 
         from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
         import adal
@@ -902,7 +898,7 @@ class AzureSDKProvider(object):
         self.graphrbac = graphrbac
         self.credentials = credentials
         self.identity = identity
-        # self.exceptions = exceptions
+        self.exceptions = exceptions
         self.secrets = secrets
         self.requests = requests
         # may change to a JEDI cloud
@@ -951,9 +947,7 @@ class AzureCloudProvider(CloudProviderInterface):
                 exc_info=1,
             )
 
-    def create_environment(
-        self, auth_credentials: Dict, user: User, environment: Environment
-    ):
+    def create_environment(self, auth_credentials: Dict, user, environment):
         # since this operation would only occur within a tenant, should we source the tenant
         # via lookup from environment once we've created the portfolio csp data schema
         # something like this:
