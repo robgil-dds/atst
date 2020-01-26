@@ -1,5 +1,6 @@
 import pytest
 import re
+from unittest import mock
 
 from tests.factories import (
     PortfolioStateMachineFactory,
@@ -9,7 +10,9 @@ from tests.factories import (
 from atst.models import FSMStates, PortfolioStateMachine, TaskOrder
 from atst.models.mixins.state_machines import AzureStages, StageStates, compose_state
 from atst.models.portfolio import Portfolio
-from atst.domain.csp import get_stage_csp_class
+from atst.models.portfolio_state_machine import get_stage_csp_class
+
+# TODO: Write failure case tests
 
 
 @pytest.fixture(scope="function")
@@ -79,7 +82,10 @@ def test_state_machine_initialization(portfolio):
         assert ["reset", "fail", create_trigger] == started_triggers
 
 
-def test_fsm_transition_start(portfolio: Portfolio):
+@mock.patch("atst.domain.csp.cloud.MockCloudProvider")
+def test_fsm_transition_start(mock_cloud_provider, portfolio: Portfolio):
+    mock_cloud_provider._authorize.return_value = None
+    mock_cloud_provider._maybe_raise.return_value = None
     sm: PortfolioStateMachine = PortfolioStateMachineFactory.create(portfolio=portfolio)
     assert sm.portfolio
     assert sm.state == FSMStates.UNSTARTED
@@ -101,7 +107,7 @@ def test_fsm_transition_start(portfolio: Portfolio):
     ]
 
     # Should source all creds for portfolio? might be easier to manage than per-step specific ones
-    creds = {"username": "mock-cloud", "password": "shh"}
+    creds = {"username": "mock-cloud", "password": "shh"}  # pragma: allowlist secret
     if portfolio.csp_data is not None:
         csp_data = portfolio.csp_data
     else:
@@ -116,13 +122,13 @@ def test_fsm_transition_start(portfolio: Portfolio):
 
     portfolio_data = {
         "user_id": user_id,
-        "password": "jklfsdNCVD83nklds2#202",
+        "password": "jklfsdNCVD83nklds2#202",  # pragma: allowlist secret
         "domain_name": domain_name,
         "first_name": ppoc.first_name,
         "last_name": ppoc.last_name,
         "country_code": "US",
         "password_recovery_email_address": ppoc.email,
-        "address": {
+        "address": {  # TODO: TBD if we're sourcing this from data or config
             "company_name": "",
             "address_line_1": "",
             "city": "",
@@ -141,7 +147,6 @@ def test_fsm_transition_start(portfolio: Portfolio):
     config = {"billing_account_name": "billing_account_name"}
 
     for expected_state in expected_states:
-        print(expected_state)
         collected_data = dict(
             list(csp_data.items()) + list(portfolio_data.items()) + list(config.items())
         )
