@@ -1,4 +1,5 @@
 import re
+from secrets import token_urlsafe
 from typing import Dict, List, Optional
 from uuid import uuid4
 
@@ -177,7 +178,7 @@ class BaseCSPPayload(AliasModel):
 
 class TenantCSPPayload(BaseCSPPayload):
     user_id: str
-    password: str
+    password: Optional[str]
     domain_name: str
     first_name: str
     last_name: str
@@ -1070,7 +1071,7 @@ class AzureCloudProvider(CloudProviderInterface):
         sp_token = self._get_sp_token(payload.creds)
         if sp_token is None:
             raise AuthenticationException("Could not resolve token for tenant creation")
-
+        payload.password = token_urlsafe(16)
         create_tenant_body = payload.dict(by_alias=True)
 
         create_tenant_headers = {
