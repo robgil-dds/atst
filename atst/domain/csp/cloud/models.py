@@ -37,7 +37,7 @@ class BaseCSPPayload(AliasModel):
 
 class TenantCSPPayload(BaseCSPPayload):
     user_id: str
-    password: str
+    password: Optional[str]
     domain_name: str
     first_name: str
     last_name: str

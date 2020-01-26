@@ -1,4 +1,5 @@
 import re
+from secrets import token_urlsafe
 from typing import Dict
 from uuid import uuid4
 
@@ -24,7 +25,6 @@ from .models import (
     TenantCSPResult,
 )
 from .policy import AzurePolicyManager
-
 
 AZURE_ENVIRONMENT = "AZURE_PUBLIC_CLOUD"  # TBD
 AZURE_SKU_ID = "?"  # probably a static sku specific to ATAT/JEDI
@@ -295,6 +295,7 @@ class AzureCloudProvider(CloudProviderInterface):
         if sp_token is None:
             raise AuthenticationException("Could not resolve token for tenant creation")
 
+        payload.password = token_urlsafe(16)
         create_tenant_body = payload.dict(by_alias=True)
 
         create_tenant_headers = {
@@ -513,7 +514,6 @@ class AzureCloudProvider(CloudProviderInterface):
 
         # we likely only want the budget ID, can be updated or replaced?
         response = {"id": "id"}
-
         return self._ok({"budget_id": response["id"]})
 
     def _get_management_service_principal(self):
