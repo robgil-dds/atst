@@ -1,17 +1,19 @@
 from unittest.mock import Mock
-
 from uuid import uuid4
 
-from atst.domain.csp.cloud import (
-    AzureCloudProvider,
-    BillingProfileCreationCSPResult,
+from tests.factories import ApplicationFactory, EnvironmentFactory
+from tests.mock_azure import AUTH_CREDENTIALS, mock_azure
+
+from atst.domain.csp.cloud import AzureCloudProvider
+from atst.domain.csp.cloud.models import (
+    BillingInstructionCSPPayload,
+    BillingInstructionCSPResult,
     BillingProfileCreationCSPPayload,
+    BillingProfileCreationCSPResult,
     BillingProfileTenantAccessCSPPayload,
     BillingProfileTenantAccessCSPResult,
     BillingProfileVerificationCSPPayload,
     BillingProfileVerificationCSPResult,
-    BillingInstructionCSPPayload,
-    BillingInstructionCSPResult,
     TaskOrderBillingCreationCSPPayload,
     TaskOrderBillingCreationCSPResult,
     TaskOrderBillingVerificationCSPPayload,
@@ -19,10 +21,6 @@ from atst.domain.csp.cloud import (
     TenantCSPPayload,
     TenantCSPResult,
 )
-
-from tests.mock_azure import mock_azure, AUTH_CREDENTIALS
-from tests.factories import EnvironmentFactory, ApplicationFactory
-
 
 creds = {
     "home_tenant_id": "tenant_id",
@@ -150,7 +148,7 @@ def test_create_tenant(mock_azure: AzureCloudProvider):
         **dict(
             creds=creds,
             user_id="admin",
-            password="JediJan13$coot",
+            password="JediJan13$coot",  # pragma: allowlist secret
             domain_name="jediccpospawnedtenant2",
             first_name="Tedry",
             last_name="Tenet",
