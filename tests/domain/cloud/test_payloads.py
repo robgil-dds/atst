@@ -2,7 +2,7 @@ import pytest
 
 from pydantic import ValidationError
 
-from atst.domain.csp.cloud import (
+from atst.domain.csp.cloud.models import (
     AZURE_MGMNT_PATH,
     ManagementGroupCSPPayload,
     ManagementGroupCSPResponse,

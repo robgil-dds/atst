@@ -13,7 +13,7 @@ from atst.domain.environments import Environments
 from atst.domain.applications import Applications
 from atst.domain.application_roles import ApplicationRoles
 from atst.domain.audit_log import AuditLog
-from atst.domain.csp.cloud import GeneralCSPException
+from atst.domain.csp.cloud.exceptions import GeneralCSPException
 from atst.domain.common import Paginator
 from atst.domain.environment_roles import EnvironmentRoles
 from atst.domain.invitations import ApplicationInvitations

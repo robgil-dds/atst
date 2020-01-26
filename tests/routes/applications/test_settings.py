@@ -12,7 +12,7 @@ from atst.domain.application_roles import ApplicationRoles
 from atst.domain.environment_roles import EnvironmentRoles
 from atst.domain.invitations import ApplicationInvitations
 from atst.domain.common import Paginator
-from atst.domain.csp.cloud import GeneralCSPException
+from atst.domain.csp.cloud.exceptions import GeneralCSPException
 from atst.domain.permission_sets import PermissionSets
 from atst.models.application_role import Status as ApplicationRoleStatus
 from atst.models.environment_role import CSPRole, EnvironmentRole

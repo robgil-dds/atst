@@ -45,6 +45,8 @@ def get_stage_csp_class(stage, class_type):
     """
     cls_name = f"{_stage_to_classname(stage)}CSP{class_type.capitalize()}"
     try:
-        return getattr(importlib.import_module("atst.domain.csp.cloud"), cls_name)
+        return getattr(
+            importlib.import_module("atst.domain.csp.cloud.models"), cls_name
+        )
     except AttributeError:
         print("could not import CSP Result class <%s>" % cls_name)

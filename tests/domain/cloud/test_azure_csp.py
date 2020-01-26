@@ -1,11 +1,17 @@
+from uuid import uuid4
 from unittest.mock import Mock
 
-from uuid import uuid4
+from tests.factories import ApplicationFactory, EnvironmentFactory
+from tests.mock_azure import AUTH_CREDENTIALS, mock_azure
 
-from atst.domain.csp.cloud import (
-    AzureCloudProvider,
-    BillingProfileCreationCSPResult,
+from atst.domain.csp.cloud import AzureCloudProvider
+from atst.domain.csp.cloud.models import (
+    ApplicationCSPPayload,
+    ApplicationCSPResult,
+    BillingInstructionCSPPayload,
+    BillingInstructionCSPResult,
     BillingProfileCreationCSPPayload,
+    BillingProfileCreationCSPResult,
     BillingProfileTenantAccessCSPPayload,
     BillingProfileTenantAccessCSPResult,
     BillingProfileVerificationCSPPayload,
@@ -18,11 +24,7 @@ from atst.domain.csp.cloud import (
     TaskOrderBillingVerificationCSPResult,
     TenantCSPPayload,
     TenantCSPResult,
-    ApplicationCSPPayload,
 )
-
-from tests.mock_azure import mock_azure, AUTH_CREDENTIALS
-from tests.factories import EnvironmentFactory, ApplicationFactory
 
 
 creds = {

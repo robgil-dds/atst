@@ -8,7 +8,7 @@ from transitions.extensions.states import add_state_features, Tags
 
 from flask import current_app as app
 
-from atst.domain.csp.cloud import ConnectionException, UnknownServerException
+from atst.domain.csp.cloud.exceptions import ConnectionException, UnknownServerException
 from atst.domain.csp import MockCSP, AzureCSP, get_stage_csp_class
 from atst.database import db
 from atst.models.types import Id
