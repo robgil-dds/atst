@@ -10,7 +10,7 @@ from tests.factories import (
 from atst.models import FSMStates, PortfolioStateMachine, TaskOrder
 from atst.models.mixins.state_machines import AzureStages, StageStates, compose_state
 from atst.models.portfolio import Portfolio
-from atst.domain.csp import get_stage_csp_class
+from atst.models.portfolio_state_machine import get_stage_csp_class
 
 # TODO: Write failure case tests
 

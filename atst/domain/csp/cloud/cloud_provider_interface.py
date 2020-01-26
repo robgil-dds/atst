@@ -124,3 +124,4 @@ class CloudProviderInterface:
         exception if an error occurs while creating a subscription.
         """
         raise NotImplementedError()
+

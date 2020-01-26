@@ -1,3 +1,5 @@
+import importlib
+
 from sqlalchemy import Column, ForeignKey, Enum as SQLAEnum
 from sqlalchemy.orm import relationship, reconstructor
 from sqlalchemy.dialects.postgresql import UUID
@@ -8,13 +10,31 @@ from transitions.extensions.states import add_state_features, Tags
 
 from flask import current_app as app
 
-from atst.domain.csp.cloud import ConnectionException, UnknownServerException
-from atst.domain.csp import MockCSP, AzureCSP, get_stage_csp_class
+from atst.domain.csp.cloud.exceptions import ConnectionException, UnknownServerException
 from atst.database import db
 from atst.models.types import Id
 from atst.models.base import Base
 import atst.models.mixins as mixins
 from atst.models.mixins.state_machines import FSMStates, AzureStages, _build_transitions
+
+
+def _stage_to_classname(stage):
+    return "".join(map(lambda word: word.capitalize(), stage.split("_")))
+
+
+def get_stage_csp_class(stage, class_type):
+    """
+    given a stage name and class_type return the class
+    class_type is either 'payload' or 'result'
+
+    """
+    cls_name = f"{_stage_to_classname(stage)}CSP{class_type.capitalize()}"
+    try:
+        return getattr(
+            importlib.import_module("atst.domain.csp.cloud.models"), cls_name
+        )
+    except AttributeError:
+        print("could not import CSP Result class <%s>" % cls_name)
 
 
 @add_state_features(Tags)
@@ -138,11 +158,7 @@ class PortfolioStateMachine(
             self.fail_stage(stage)
 
         # TODO: Determine best place to do this, maybe @reconstructor
-        csp = event.kwargs.get("csp")
-        if csp is not None:
-            self.csp = AzureCSP(app).cloud
-        else:
-            self.csp = MockCSP(app).cloud
+        self.csp = app.csp.cloud
 
         try:
             func_name = f"create_{stage}"
