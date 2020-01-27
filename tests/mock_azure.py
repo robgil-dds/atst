@@ -72,9 +72,14 @@ def mock_secrets():
     return Mock(spec=secrets)
 
 
+def mock_cloud_details():
+    from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
+
+    return AZURE_PUBLIC_CLOUD
+
+
 class MockAzureSDK(object):
     def __init__(self):
-        from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 
         self.subscription = mock_subscription()
         self.authorization = mock_authorization()
@@ -86,8 +91,7 @@ class MockAzureSDK(object):
         self.policy = mock_policy()
         self.secrets = mock_secrets()
         self.requests = mock_requests()
-        # may change to a JEDI cloud
-        self.cloud = AZURE_PUBLIC_CLOUD
+        self.cloud = mock_cloud_details()
 
 
 @pytest.fixture(scope="function")

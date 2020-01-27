@@ -27,16 +27,16 @@ from .models import (
 )
 from .policy import AzurePolicyManager
 
-AZURE_ENVIRONMENT = "AZURE_PUBLIC_CLOUD"  # TBD
-AZURE_SKU_ID = "?"  # probably a static sku specific to ATAT/JEDI
+
 SUBSCRIPTION_ID_REGEX = re.compile(
     "subscriptions\/([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})",
     re.I,
 )
 
 # This needs to be a fully pathed role definition identifier, not just a UUID
+# TODO: Extract these from sdk msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
+AZURE_SKU_ID = "0001"  # probably a static sku specific to ATAT/JEDI
 REMOTE_ROOT_ROLE_DEF_ID = "/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-4000-8000-000000000000"
-AZURE_MANAGEMENT_API = "https://management.azure.com"
 
 
 class AzureSDKProvider(object):
@@ -47,8 +47,6 @@ class AzureSDKProvider(object):
         import azure.common.credentials as credentials
         import azure.identity as identity
         from azure.keyvault import secrets
-
-        from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
         import adal
         import requests
 
@@ -63,7 +61,10 @@ class AzureSDKProvider(object):
         self.exceptions = exceptions
         self.secrets = secrets
         self.requests = requests
-        # may change to a JEDI cloud
+
+        # TODO: choose cloud type from config
+        from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
+
         self.cloud = AZURE_PUBLIC_CLOUD
 
 
@@ -298,7 +299,7 @@ class AzureCloudProvider(CloudProviderInterface):
         }
 
         result = self.sdk.requests.post(
-            "https://management.azure.com/providers/Microsoft.SignUp/createTenant?api-version=2020-01-01-preview",
+            f"{self.sdk.cloud.endpoints.resource_manager}/providers/Microsoft.SignUp/createTenant?api-version=2020-01-01-preview",
             json=create_tenant_body,
             headers=create_tenant_headers,
         )
@@ -329,7 +330,7 @@ class AzureCloudProvider(CloudProviderInterface):
             "Authorization": f"Bearer {sp_token}",
         }
 
-        billing_account_create_url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles?api-version=2019-10-01-preview"
+        billing_account_create_url = f"{self.sdk.cloud.endpoints.resource_manager}/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles?api-version=2019-10-01-preview"
 
         result = self.sdk.requests.post(
             billing_account_create_url,
@@ -387,7 +388,7 @@ class AzureCloudProvider(CloudProviderInterface):
             "Authorization": f"Bearer {sp_token}",
         }
 
-        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/createBillingRoleAssignment?api-version=2019-10-01-preview"
+        url = f"{self.sdk.cloud.endpoints.resource_manager}/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/createBillingRoleAssignment?api-version=2019-10-01-preview"
 
         result = self.sdk.requests.post(url, headers=headers, json=request_body)
         if result.status_code == 201:
@@ -403,7 +404,7 @@ class AzureCloudProvider(CloudProviderInterface):
             {
                 "op": "replace",
                 "path": "/enabledAzurePlans",
-                "value": [{"skuId": "0001"}],
+                "value": [{"skuId": AZURE_SKU_ID}],
             }
         ]
 
@@ -411,7 +412,7 @@ class AzureCloudProvider(CloudProviderInterface):
             "Authorization": f"Bearer {sp_token}",
         }
 
-        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}?api-version=2019-10-01-preview"
+        url = f"{self.sdk.cloud.endpoints.resource_manager}/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}?api-version=2019-10-01-preview"
 
         result = self.sdk.requests.patch(
             url, headers=request_headers, json=request_body
@@ -465,7 +466,7 @@ class AzureCloudProvider(CloudProviderInterface):
             }
         }
 
-        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/instructions/{payload.initial_task_order_id}:CLIN00{payload.initial_clin_type}?api-version=2019-10-01-preview"
+        url = f"{self.sdk.cloud.endpoints.resource_manager}/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/instructions/{payload.initial_task_order_id}:CLIN00{payload.initial_clin_type}?api-version=2019-10-01-preview"
 
         auth_header = {
             "Authorization": f"Bearer {sp_token}",
@@ -567,17 +568,13 @@ class AzureCloudProvider(CloudProviderInterface):
         client_id = creds.get("client_id")
         secret_key = creds.get("secret_key")
 
-        # TODO: Make endpoints consts or configs
-        authentication_endpoint = "https://login.microsoftonline.com/"
-        resource = "https://management.azure.com/"
-
         context = self.sdk.adal.AuthenticationContext(
-            authentication_endpoint + home_tenant_id
+            f"{self.sdk.cloud.endpoints.active_directory}/{home_tenant_id}"
         )
 
         # TODO: handle failure states here
         token_response = context.acquire_token_with_client_credentials(
-            resource, client_id, secret_key
+            self.sdk.cloud.endpoints.resource_manager, client_id, secret_key
         )
 
         return token_response.get("accessToken", None)
