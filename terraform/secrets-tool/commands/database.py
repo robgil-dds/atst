@@ -118,24 +118,24 @@ def provision(
 
     create_database_cmd = (
         f"docker run -e PGHOST='{dbhost}'"
-        +f" -e PGPASSWORD='{root_password}'"
-        +f" -e PGUSER='{root_name}@{dbhost}'"
-        +f" -e PGDATABASE='{dbname}'"
-        +f" -e PGSSLMODE=require"
-        +f" {container}"
-        +f" .venv/bin/python script/create_database.py {dbname}"
+        f" -e PGPASSWORD='{root_password}'"
+        f" -e PGUSER='{root_name}@{dbhost}'"
+        f" -e PGDATABASE='{dbname}'"
+        f" -e PGSSLMODE=require"
+        f" {container}"
+        f" .venv/bin/python script/create_database.py {dbname}"
     )
     _run_cmd(create_database_cmd)
 
     seed_database_cmd = (
         f"docker run -e PGHOST='{dbhost}'"
-        +f" -e PGPASSWORD='{root_password}'"
-        +f" -e PGUSER='{root_name}@{dbhost}'"
-        +f" -e PGDATABASE='{dbname}'"
-        +f" -e PGSSLMODE=require"
-        +f" -v {ccpo_users}:/opt/atat/atst/users.yml"
-        +f" {container}"
-        +f" .venv/bin/python script/database_setup.py {user_username} '{user_password}' users.yml"
+        f" -e PGPASSWORD='{root_password}'"
+        f" -e PGUSER='{root_name}@{dbhost}'"
+        f" -e PGDATABASE='{dbname}'"
+        f" -e PGSSLMODE=require"
+        f" -v {ccpo_users}:/opt/atat/atst/users.yml"
+        f" {container}"
+        f" .venv/bin/python script/database_setup.py {user_username} '{user_password}' users.yml"
     )
     _run_cmd(seed_database_cmd)
 

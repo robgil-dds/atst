@@ -16,7 +16,6 @@ from reset_database import reset_database
 
 
 def database_setup(username, password, dbname, ccpo_users):
-    """docstring for database_setup"""
     print(
         f"Creating Postgres user role for '{username}' and granting all privileges to database '{dbname}'."
     )
@@ -42,10 +41,10 @@ def _create_database_user(username, password, dbname):
 
     engine.execute(
         f"CREATE ROLE {username} WITH LOGIN NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION PASSWORD '{password}';\n"
-        + f"GRANT ALL PRIVILEGES ON DATABASE {dbname} TO {username};\n"
-        + f"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO {username}; \n"
-        + f"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO {username}; \n"
-        + f"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON FUNCTIONS TO {username}; \n"
+        f"GRANT ALL PRIVILEGES ON DATABASE {dbname} TO {username};\n"
+        f"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO {username}; \n"
+        f"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO {username}; \n"
+        f"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON FUNCTIONS TO {username}; \n"
     )
 
     trans.commit()
