@@ -39,9 +39,20 @@
           {% endblock %}
 
           {% if step != "1" %}
-            <a class="usa-button usa-button-secondary" href="{{ previous_button_link }}">
-              Previous
-            </a>
+            {% if step == "2" or step == "3" -%}
+              <button
+                type="submit"
+                class="usa-button usa-button-secondary"
+                formaction="{{ previous_button_link }}">
+                Previous
+              </button>
+            {% else -%}
+              <a
+                class="usa-button usa-button-secondary"
+                href="{{ previous_button_link }}">
+                Previous
+              </a>
+            {%- endif %}
           {% endif %}
 
           <a
