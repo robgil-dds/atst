@@ -19,10 +19,7 @@
 }
 
 @mixin panel-margin {
-  margin-top: 0;
-  margin-left: 0;
-  margin-right: 0;
-  margin-bottom: $site-margins-mobile * 6;
+  margin: $spacing-large 0;
 
   @include media($medium-screen) {
     margin-bottom: $site-margins * 8;
@@ -56,9 +53,10 @@
   @include panel-theme-default;
   @include panel-margin;
   @include shadow-panel;
+  max-width: $max-panel-width;
 
   &__content {
-    padding: $gap * 2;
+    padding: 3.2rem 2.4rem;
   }
 
   &__body {
@@ -66,7 +64,7 @@
   }
 
   &__heading {
-    padding: $gap * 2;
+    padding: 3.2rem 2.4rem;
 
     @include media($medium-screen) {
       padding: $gap * 4;
