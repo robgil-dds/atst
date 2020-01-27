@@ -5,6 +5,10 @@
   }
 }
 
+.portfolio-header-new .portfolio-header__name {
+    padding: 1.6rem 0;
+}
+
 .portfolio-header {
   flex-direction: column;
   margin: $gap * 2 0;
