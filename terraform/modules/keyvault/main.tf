@@ -13,6 +13,13 @@ resource "azurerm_key_vault" "keyvault" {
 
   sku_name = "premium"
 
+  network_acls {
+    default_action             = var.policy
+    bypass                     = "AzureServices"
+    virtual_network_subnet_ids = var.subnet_ids
+    ip_rules                   = values(var.whitelist)
+  }
+
   tags = {
     environment = var.environment
     owner       = var.owner
