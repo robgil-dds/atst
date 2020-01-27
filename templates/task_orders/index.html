@@ -85,11 +85,8 @@
     {% endcall %}
   {% else %}
     {{ EmptyState(
-      header="task_orders.empty_state.header"|translate,
-      message="task_orders.empty_state.message"|translate,
+      resource="task_orders",
       button_link=url_for('task_orders.form_step_one_add_pdf', portfolio_id=portfolio.id),
-      button_text="task_orders.empty_state.button_text"|translate,
-      view_only_text="task_orders.empty_state.view_only_text"|translate,
       user_can_create=user_can(permissions.CREATE_TASK_ORDER),
     ) }}
   {% endif %}

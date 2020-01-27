@@ -6,17 +6,10 @@
   {% if not portfolio.applications %}
 
     {% set can_create_applications = user_can(permissions.CREATE_APPLICATION) %}
-    {% set message = ('portfolios.reports.empty_state.sub_message.can_create_applications' | translate)
-      if can_create_applications
-      else ('portfolios.reports.empty_state.sub_message.cannot_create_applications' | translate)
-    %}
 
     {{ EmptyState(
-      header='portfolios.reports.empty_state.message' | translate,
-      message=message,
-      button_text="portfolios.applications.empty_state.button_text"|translate,
+      resource='applications_reporting',
       button_link=url_for("applications.view_new_application_step_1", portfolio_id=portfolio.id),
-      view_only_text="portfolios.applications.empty_state.view_only_text"|translate,
       user_can_create=can_create_applications,
     ) }}
 
