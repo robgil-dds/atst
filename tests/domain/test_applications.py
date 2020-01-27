@@ -206,7 +206,7 @@ def test_get_applications_pending_creation():
     portfolio1 = PortfolioFactory.create(state="COMPLETED")
     app_ready = ApplicationFactory.create(portfolio=portfolio1)
 
-    app_claimed = ApplicationFactory.create(portfolio=portfolio1, claimed_until=later)
+    app_done = ApplicationFactory.create(portfolio=portfolio1, cloud_id="123456")
 
     portfolio2 = PortfolioFactory.create(state="UNSTARTED")
     app_not_ready = ApplicationFactory.create(portfolio=portfolio2)

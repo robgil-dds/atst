@@ -134,11 +134,11 @@ class Applications(BaseDomainClass):
             .join(PortfolioStateMachine)
             .filter(PortfolioStateMachine.state == FSMStates.COMPLETED)
             .filter(Application.deleted == False)
-            .filter(Application.cloud_id == None)
+            .filter(Application.cloud_id.is_(None))
             .filter(
                 or_(
-                    Application.claimed_until == None,
-                    Application.claimed_until >= func.now(),
+                    Application.claimed_until.is_(None),
+                    Application.claimed_until <= func.now(),
                 )
             )
         ).all()
