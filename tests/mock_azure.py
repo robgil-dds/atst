@@ -8,6 +8,7 @@ AZURE_CONFIG = {
     "AZURE_SECRET_KEY": "MOCK",
     "AZURE_TENANT_ID": "MOCK",
     "AZURE_POLICY_LOCATION": "policies",
+    "AZURE_VAULT_URL": "http://vault",
 }
 
 AUTH_CREDENTIALS = {
@@ -53,16 +54,38 @@ def mock_policy():
     return Mock(spec=policy)
 
 
+def mock_adal():
+    import adal
+
+    return Mock(spec=adal)
+
+
+def mock_requests():
+    import requests
+
+    return Mock(spec=requests)
+
+
+def mock_secrets():
+    from azure.keyvault import secrets
+
+    return Mock(spec=secrets)
+
+
 class MockAzureSDK(object):
     def __init__(self):
         from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
 
         self.subscription = mock_subscription()
         self.authorization = mock_authorization()
+        self.policy = mock_policy()
+        self.adal = mock_adal()
         self.managementgroups = mock_managementgroups()
         self.graphrbac = mock_graphrbac()
         self.credentials = mock_credentials()
         self.policy = mock_policy()
+        self.secrets = mock_secrets()
+        self.requests = mock_requests()
         # may change to a JEDI cloud
         self.cloud = AZURE_PUBLIC_CLOUD
 

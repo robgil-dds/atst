@@ -1,4 +1,13 @@
-from flask import g, redirect, url_for, session, request, current_app as app
+from flask import (
+    g,
+    redirect,
+    url_for,
+    session,
+    request,
+    current_app as app,
+    _request_ctx_stack as request_ctx_stack,
+)
+from werkzeug.datastructures import ImmutableTypeConversionDict
 
 from atst.domain.users import Users
 
@@ -56,12 +65,26 @@ def get_last_login():
     return session.get("user_id") and session.get("last_login")
 
 
+def _nullify_session(session):
+    session_key = f"{app.config.get('SESSION_KEY_PREFIX')}{session.sid}"
+    app.redis.delete(session_key)
+    request.cookies = ImmutableTypeConversionDict()
+    request_ctx_stack.top.session = app.session_interface.open_session(app, request)
+
+
+def _current_dod_id():
+    return g.current_user.dod_id if session.get("user_id") else None
+
+
 def logout():
-    if session.get("user_id"):  # pragma: no branch
-        dod_id = g.current_user.dod_id
-        del session["user_id"]
-        del session["last_login"]
+    dod_id = _current_dod_id()
+
+    _nullify_session(session)
+
+    if dod_id:
         app.logger.info(f"user with EDIPI {dod_id} has logged out")
+    else:
+        app.logger.info("unauthenticated user has logged out")
 
 
 def _unprotected_route(request):

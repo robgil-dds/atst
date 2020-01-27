@@ -12,7 +12,7 @@ from atst.domain.application_roles import ApplicationRoles
 from atst.domain.environment_roles import EnvironmentRoles
 from atst.domain.invitations import ApplicationInvitations
 from atst.domain.common import Paginator
-from atst.domain.csp.cloud import GeneralCSPException
+from atst.domain.csp.cloud.exceptions import GeneralCSPException
 from atst.domain.permission_sets import PermissionSets
 from atst.models.application_role import Status as ApplicationRoleStatus
 from atst.models.environment_role import CSPRole, EnvironmentRole
@@ -777,3 +777,40 @@ def test_handle_update_member_with_error(set_g, monkeypatch, mock_logger):
     handle_update_member(application.id, app_role.id, form_data)
 
     assert mock_logger.messages[-1] == exception
+
+
+def test_create_subscription_success(client, user_session):
+    environment = EnvironmentFactory.create()
+
+    user_session(environment.portfolio.owner)
+    response = client.post(
+        url_for("applications.create_subscription", environment_id=environment.id),
+    )
+
+    assert response.status_code == 302
+    assert response.location == url_for(
+        "applications.settings",
+        application_id=environment.application.id,
+        _external=True,
+        fragment="application-environments",
+        _anchor="application-environments",
+    )
+
+
+def test_create_subscription_failure(client, user_session, monkeypatch):
+    environment = EnvironmentFactory.create()
+
+    def _raise_csp_exception(*args, **kwargs):
+        raise GeneralCSPException("An error occurred.")
+
+    monkeypatch.setattr(
+        "atst.domain.csp.cloud.MockCloudProvider.create_subscription",
+        _raise_csp_exception,
+    )
+
+    user_session(environment.portfolio.owner)
+    response = client.post(
+        url_for("applications.create_subscription", environment_id=environment.id),
+    )
+
+    assert response.status_code == 400

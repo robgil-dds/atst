@@ -9,10 +9,10 @@ from atst.models import (
     EnvironmentRole,
     PortfolioJobFailure,
 )
-from atst.domain.csp.cloud import CloudProviderInterface, GeneralCSPException
+from atst.domain.csp.cloud.exceptions import GeneralCSPException
+from atst.domain.csp.cloud import CloudProviderInterface
 from atst.domain.environments import Environments
 from atst.domain.portfolios import Portfolios
-
 from atst.domain.environment_roles import EnvironmentRoles
 from atst.models.utils import claim_for_update
 from atst.utils.localization import translate

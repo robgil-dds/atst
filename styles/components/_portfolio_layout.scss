@@ -242,12 +242,19 @@
 
     span.accordion-table__item__toggler {
       font-weight: $font-normal;
+      text-decoration: underline;
+      font-size: $small-font-size;
 
       &.environment-list__item__members {
         float: unset;
-        font-size: $small-font-size;
+        margin-left: -$gap;
       }
     }
+  }
+
+  li.environment-list__edit {
+    border: 1px solid $color-gray-lighter;
+    padding: 0 $gap * 3 $gap * 2;
   }
 
   .activity-log {

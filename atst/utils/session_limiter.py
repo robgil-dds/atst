@@ -4,6 +4,7 @@ from atst.domain.users import Users
 class SessionLimiter(object):
     def __init__(self, config, session, redis):
         self.limit_logins = config["LIMIT_CONCURRENT_SESSIONS"]
+        self.session_prefix = config.get("SESSION_KEY_PREFIX", "session:")
         self.session = session
         self.redis = redis
 
@@ -16,4 +17,4 @@ class SessionLimiter(object):
         Users.update_last_session_id(user, session_id)
 
     def _delete_session(self, session_id):
-        self.redis.delete("session:{}".format(session_id))
+        self.redis.delete(f"{self.session_prefix}{session_id}")
