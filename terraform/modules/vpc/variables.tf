@@ -46,3 +46,15 @@ variable "gateway_subnet" {
   type        = string
   description = "The Subnet CIDR that we'll use for the virtual_network_gateway 'GatewaySubnet'"
 }
+
+variable "service_endpoints" {
+  type        = map
+  description = "A map of the service endpoints and its mapping to subnets"
+
+}
+
+variable "vpn_client_cidr" {
+  type        = list
+  description = "The CIDR range used for clients on the VPN"
+  default     = ["172.16.0.0/16"]
+}

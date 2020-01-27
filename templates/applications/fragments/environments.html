@@ -1,3 +1,4 @@
+{% from "components/alert.html" import Alert %}
 {% from "components/icon.html" import Icon %}
 {% from "components/label.html" import Label %}
 {% from 'components/save_button.html' import SaveButton %}
@@ -10,10 +11,13 @@
   new_env_form) %}
 
   <h3>{{ "portfolios.applications.settings.environments" | translate }}</h3>
+  {% if portfolio.num_task_orders == 0 -%}
+    {{ Alert(message="portfolios.applications.environments.funding_alert"|translate({'name': portfolio.name})) }}
+  {%- endif %}
+  {% if g.matchesPath("application-environments") -%}
+    {% include "fragments/flash.html" %}
+  {%- endif %}
   <section class="panel" id="application-environments">
-    {% if g.matchesPath("application-environments") -%}
-      {% include "fragments/flash.html" %}
-    {%- endif %}
     {% if 0 == environments_obj | length -%}
       <div class="empty-state panel__content">
         <p class="empty-state__message">
@@ -30,14 +34,21 @@
                 <li class="accordion-table__item">
                   <div class="accordion-table__item-content">
                     <div class="environment-list__item">
-                      <span>
-                        <a
-                          href='{{ url_for("applications.access_environment", environment_id=env.id)}}'
-                          target='_blank'
-                          rel='noopener noreferrer'>
-                          {{ env['name'] }} {{ Icon('link', classes='icon--medium icon--primary') }}
-                        </a>
-                      </span>
+                      {% if not env["pending"] -%}
+                        <span>
+                          <a
+                            href='{{ url_for("applications.access_environment", environment_id=env.id)}}'
+                            target='_blank'
+                            rel='noopener noreferrer'>
+                            {{ env['name'] }} {{ Icon('link', classes='icon--medium icon--primary') }}
+                          </a>
+                        </span>
+                      {% else -%}
+                        <span>
+                          {{ env['name'] }}
+                        </span>
+                        {{ Label(type="pending_creation", classes='label--below')}}
+                      {%- endif %}
                       {% if user_can(permissions.EDIT_ENVIRONMENT) -%}
                         {{
                         ToggleButton(
@@ -57,10 +68,6 @@
                           classes="environment-list__item__members"
                         )
                       }}
-                      <br>
-                      {% if env['pending'] -%}
-                        {{ Label(type="changes_pending", classes='label--below')}}
-                      {%- endif %}
                     </div>
                   </div>
 

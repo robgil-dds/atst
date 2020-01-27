@@ -437,6 +437,7 @@ portfolios:
       add_subscription: Add new subscription
       blank_slate: This Application has no environments
       disabled: ": Access Suspended"
+      funding_alert: "Application environments will not be created until the {name} portfolio is funded."
     environments_heading: Application Environments
     existing_application_title: "{application_name} Application Settings"
     member_count: "{count} Members"
