@@ -175,7 +175,7 @@ class PortfolioStateMachine(
                 tenant_id = new_creds.get("tenant_id")
                 secret = self.csp.get_secret(tenant_id, new_creds)
                 secret.update(new_creds)
-                self.csp.set_secret(tenant_id, secret)
+                self.csp.update_tenant_creds(tenant_id, secret)
         except PydanticValidationError as exc:
             app.logger.error(
                 f"Failed to cast response to valid result class {self.__repr__()}:",

@@ -59,15 +59,14 @@ def do_create_application(csp: CloudProviderInterface, application_id=None):
 
     with claim_for_update(application) as application:
 
-        if application.cloud_id is not None:
+        if application.cloud_id:
             return
 
         csp_details = application.portfolio.csp_data
         parent_id = csp_details.get("root_management_group_id")
         tenant_id = csp_details.get("tenant_id")
-        creds = csp.get_credentials(tenant_id)
         payload = ApplicationCSPPayload(
-            creds=creds, display_name=application.name, parent_id=parent_id
+            tenant_id=tenant_id, display_name=application.name, parent_id=parent_id
         )
 
         app_result = csp.create_application(payload)

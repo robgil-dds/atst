@@ -2,7 +2,7 @@ from typing import Dict, List, Optional
 import re
 from uuid import uuid4
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, root_validator
 
 from atst.utils import snake_to_camel
 
@@ -241,7 +241,7 @@ AZURE_MGMNT_PATH = "/providers/Microsoft.Management/managementGroups/"
 MANAGEMENT_GROUP_NAME_REGEX = "^[a-zA-Z0-9\-_\(\)\.]+$"
 
 
-class ManagementGroupCSPPayload(BaseCSPPayload):
+class ManagementGroupCSPPayload(AliasModel):
     """
     :param: management_group_name: Just pass a UUID for this.
     :param: display_name: This can contain any character and
@@ -250,6 +250,7 @@ class ManagementGroupCSPPayload(BaseCSPPayload):
         i.e. /providers/Microsoft.Management/managementGroups/[management group ID]
     """
 
+    tenant_id: str
     management_group_name: Optional[str]
     display_name: str
     parent_id: str
@@ -288,3 +289,55 @@ class ApplicationCSPPayload(ManagementGroupCSPPayload):
 
 class ApplicationCSPResult(ManagementGroupCSPResponse):
     pass
+
+
+class KeyVaultCredentials(BaseModel):
+    root_sp_client_id: Optional[str]
+    root_sp_key: Optional[str]
+    root_tenant_id: Optional[str]
+
+    tenant_id: Optional[str]
+
+    tenant_admin_username: Optional[str]
+    tenant_admin_password: Optional[str]
+
+    tenant_sp_client_id: Optional[str]
+    tenant_sp_key: Optional[str]
+
+    @root_validator(pre=True)
+    def enforce_admin_creds(cls, values):
+        tenant_id = values.get("tenant_id")
+        username = values.get("tenant_admin_username")
+        password = values.get("tenant_admin_password")
+        if any([username, password]) and not all([tenant_id, username, password]):
+            raise ValueError(
+                "tenant_id, tenant_admin_username, and tenant_admin_password must all be set if any one is"
+            )
+
+        return values
+
+    @root_validator(pre=True)
+    def enforce_sp_creds(cls, values):
+        tenant_id = values.get("tenant_id")
+        client_id = values.get("tenant_sp_client_id")
+        key = values.get("tenant_sp_key")
+        if any([client_id, key]) and not all([tenant_id, client_id, key]):
+            raise ValueError(
+                "tenant_id, tenant_sp_client_id, and tenant_sp_key must all be set if any one is"
+            )
+
+        return values
+
+    @root_validator(pre=True)
+    def enforce_root_creds(cls, values):
+        sp_creds = [
+            values.get("root_tenant_id"),
+            values.get("root_sp_client_id"),
+            values.get("root_sp_key"),
+        ]
+        if any(sp_creds) and not all(sp_creds):
+            raise ValueError(
+                "root_tenant_id, root_sp_client_id, and root_sp_key must all be set if any one is"
+            )
+
+        return values
