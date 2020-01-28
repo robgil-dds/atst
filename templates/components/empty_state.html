@@ -1,14 +1,22 @@
-{% macro EmptyState(header, message, button_text, button_link, view_only_text, user_can_create=True) %}
+{% macro EmptyState(resource, button_link, user_can_create=False) %}
+  {% if user_can_create %}
+    {% set perms = 'edit' %}
+  {% else %}
+    {% set perms = 'view' %}
+  {% endif %}
+
+  {% set header = "empty_state.{}.header.{}".format(resource, perms) | translate | safe %}
+  {% set message = "empty_state.{}.message.{}".format(resource, perms) | translate | safe %}
+  {% set button_text = "empty_state.{}.button_text".format(resource) | translate | safe %}
+
   <div class="empty-state">
     <h3>{{ header }}</h3>
     <p>{{ message }}</p>
-    <hr>
-    <div class="empty-state__footer">
-      {% if user_can_create %}
+    {% if user_can_create -%}
+      <hr>
+      <div class="empty-state__footer">
         <a href="{{ button_link }}" class="usa-button usa-button-primary">{{ button_text }}</a>
-      {% else %}
-        <p>{{ view_only_text }}</p>
-      {% endif %}
-    </div>
+      </div>
+    {%- endif %}
   </div>
 {% endmacro %}

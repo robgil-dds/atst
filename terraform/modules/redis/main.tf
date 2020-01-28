@@ -13,6 +13,7 @@ resource "azurerm_redis_cache" "redis" {
   sku_name            = var.sku_name
   enable_non_ssl_port = var.enable_non_ssl_port
   minimum_tls_version = var.minimum_tls_version
+  subnet_id           = var.subnet_id
 
   redis_configuration {
     enable_authentication = var.enable_authentication

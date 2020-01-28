@@ -5,4 +5,7 @@ module "container_registry" {
   environment   = var.environment
   owner         = var.owner
   backup_region = var.backup_region
+  policy        = "Deny"
+  subnet_ids    = []
+  whitelist     = var.admin_user_whitelist
 }
