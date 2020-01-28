@@ -93,4 +93,3 @@ variable "ssl_enforcement" {
   description = "Enforce SSL (Enabled/Disable)"
   default     = "Enabled"
 }
-

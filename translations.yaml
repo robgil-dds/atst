@@ -84,6 +84,31 @@ email:
   application_invite: "{inviter_name} has invited you to a JEDI cloud application"
   portfolio_invite: "{inviter_name} has invited you to a JEDI cloud portfolio"
   environment_ready: JEDI cloud environment ready
+empty_state:
+  applications:
+    header:
+      edit: You don’t have any Applications yet
+      view: This portfolio has no Applications
+    message:
+      edit: You can manage multiple Applications within a single Portfolio as long as the funding sources are the same.
+      view: A Portfolio member with <b>Edit Application</b> permissions can add Applications to this Portfolio.
+    button_text: Create Your First Application
+  applications_reporting:
+    header:
+      edit: Nothing to report.
+      view: Nothing to report.
+    message:
+      edit: This portfolio has no cloud environments set up, so there is no spending data to report. Create an application with some cloud environments to get started.
+      view: This portfolio has no cloud environments set up, so there is no spending data to report. Contact the portfolio owner to set up some cloud environments.
+    button_text: Add a new application
+  task_orders:
+    header:
+      edit: Add approved task orders
+      view: This Portfolio has no Task Orders
+    message:
+      edit: Upload your approved Task Order here. You are required to confirm you have the appropriate signature. You will have the ability to add additional approved Task Orders with more funding to this Portfolio in the future.
+      view: A Portfolio member with <b>Edit Funding</b> permissions can fund this Portfolio with approved Task Orders.
+    button_text: Add Task Order
 flash:
   application:
     created:
@@ -370,11 +395,6 @@ portfolios:
     add_member: Add Team Member
     add_another_environment: Add another environment
     create_button: Create Application
-    empty_state:
-      header: You don't have any Applications yet
-      message: You can manage multiple Applications within a single Portfolio as long as the funding sources are the same.
-      button_text: Create Your First Application
-      view_only_text: Contact your portfolio administrator to add an application.
     new:
       step_1_header: Name and Describe New Application
       step_1_button_text: "Next: Add Environments"
@@ -417,6 +437,7 @@ portfolios:
       add_subscription: Add new subscription
       blank_slate: This Application has no environments
       disabled: ": Access Suspended"
+      funding_alert: "Application environments will not be created until the {name} portfolio is funded."
     environments_heading: Application Environments
     existing_application_title: "{application_name} Application Settings"
     member_count: "{count} Members"
@@ -482,12 +503,6 @@ portfolios:
       header: Funding Duration
       tooltip: Funding duration is the period of time that there is a valid task order funding the portfolio.
     estimate_warning: Reports displayed in JEDI are estimates and not a system of record.
-    empty_state:
-      message: Nothing to report.
-      sub_message:
-        can_create_applications: This portfolio has no cloud environments set up, so there is no spending data to report. Create an application with some cloud environments to get started.
-        cannot_create_applications: This portfolio has no cloud environments set up, so there is no spending data to report. Contact the portfolio owner to set up some cloud environments.
-      action_label: "Add a new application"
     total_value:
       header: Total Portfolio Value
       tooltip: Total portfolio value is all obligated and projected funds for all task orders in this portfolio.
@@ -549,11 +564,6 @@ task_orders:
     sticky_header_text: "Add a Task Order"
     sticky_header_review_text: Review Changes
     sticky_header_context: "Step {step} of 5"
-  empty_state:
-    header: Add approved task orders
-    message: Upload your approved Task Order here. You are required to confirm you have the appropriate signature. You will have the ability to add additional approved Task Orders with more funding to this Portfolio in the future.
-    button_text: Add Task Order
-    view_only_text: Contact your portfolio administrator to add a Task Order.
   sign:
     digital_signature_description: I confirm the uploaded Task Order is signed by the appropriate, duly warranted Agency Contracting Officer who authorized me to upload the Task Order.
     confirmation_description: I confirm that the information entered here in matches that of the submitted Task Order.

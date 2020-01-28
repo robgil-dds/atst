@@ -37,9 +37,9 @@ resource "azurerm_postgresql_virtual_network_rule" "sql" {
 }
 
 resource "azurerm_postgresql_database" "db" {
-  name                = "${var.environment}-atat"
+  name                = "${var.name}-${var.environment}-atat"
   resource_group_name = azurerm_resource_group.sql.name
   server_name         = azurerm_postgresql_server.sql.name
   charset             = "UTF8"
-  collation           = "en_US.utf8"
+  collation           = "en-US"
 }

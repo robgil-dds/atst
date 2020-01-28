@@ -32,7 +32,17 @@ variable "networks" {
     #format
     #name         = "CIDR, route table, Security Group Name"
     public  = "10.1.1.0/24,public"  # LBs
-    private = "10.1.2.0/24,private" # k8s, postgres, redis, dns, ad
+    private = "10.1.2.0/24,private" # k8s, postgres, keyvault
+    redis   = "10.1.3.0/24,private" # Redis
+  }
+}
+
+variable "service_endpoints" {
+  type = map
+  default = {
+    public  = "Microsoft.ContainerRegistry" # Not necessary but added to avoid infinite state loop
+    private = "Microsoft.Storage,Microsoft.KeyVault,Microsoft.ContainerRegistry,Microsoft.Sql"
+    redis   = "Microsoft.Storage,Microsoft.Sql" # FIXME: There is no Microsoft.Redis
   }
 }
 
@@ -48,6 +58,7 @@ variable "route_tables" {
   default = {
     public  = "Internet"
     private = "Internet"
+    redis   = "VnetLocal"
     #private = "VnetLocal"
   }
 }
@@ -78,4 +89,27 @@ variable "admin_users" {
     "Rob Gil"      = "cef37d01-1acf-4085-96c8-da9d34d0237e"
     "Dan Corrigan" = "7e852ceb-eb0d-49b1-b71e-e9dcd1082ffc"
   }
+}
+
+variable "admin_user_whitelist" {
+  type = map
+  default = {
+    "Rob Gil"           = "66.220.238.246/32"
+    "Dan Corrigan Work" = "108.16.207.173/32"
+    "Dan Corrigan Home" = "71.162.221.27/32"
+  }
+}
+
+variable "storage_admin_whitelist" {
+  type = map
+  default = {
+    "Rob Gil"           = "66.220.238.246"
+    "Dan Corrigan Work" = "108.16.207.173"
+    "Dan Corrigan Home" = "71.162.221.27"
+  }
+}
+
+variable "vpn_client_cidr" {
+  type    = list
+  default = ["172.16.255.0/24"]
 }
