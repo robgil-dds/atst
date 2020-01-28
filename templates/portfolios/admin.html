@@ -22,7 +22,7 @@
             {{ TextInput(portfolio_form.name, validation="portfolioName", optional=False) }}
             {{ TextInput(portfolio_form.description, validation="defaultTextAreaField", paragraph=True) }}
             <div class='edit-portfolio-name action-group'>
-              {{ SaveButton(text='Save Changes', additional_classes='usa-button-big') }}
+              {{ SaveButton(text='Save Changes') }}
             </div>
           </form>
         </base-form>

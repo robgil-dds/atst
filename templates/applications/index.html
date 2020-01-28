@@ -24,11 +24,8 @@
   {% if not portfolio.applications %}
 
     {{ EmptyState(
-      header="portfolios.applications.empty_state.header"|translate,
-      message="portfolios.applications.empty_state.message"|translate,
-      button_text="portfolios.applications.empty_state.button_text"|translate,
+      resource='applications',
       button_link=url_for("applications.view_new_application_step_1", portfolio_id=portfolio.id),
-      view_only_text="portfolios.applications.empty_state.view_only_text"|translate,
       user_can_create=can_create_applications,
     ) }}
 
