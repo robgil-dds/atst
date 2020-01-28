@@ -22,11 +22,6 @@ from atst.domain.csp.cloud.models import (
     TenantCSPResult,
 )
 
-creds = {
-    "home_tenant_id": "tenant_id",
-    "client_id": "client_id",
-    "secret_key": "secret_key",
-}
 BILLING_ACCOUNT_NAME = "52865e4c-52e8-5a6c-da6b-c58f0814f06f:7ea5de9d-b8ce-4901-b1c5-d864320c7b03_2019-05-31"
 
 
@@ -146,7 +141,7 @@ def test_create_tenant(mock_azure: AzureCloudProvider):
     mock_azure.sdk.requests.post.return_value = mock_result
     payload = TenantCSPPayload(
         **dict(
-            creds=creds,
+            tenant_id="60ff9d34-82bf-4f21-b565-308ef0533435",
             user_id="admin",
             password="JediJan13$coot",  # pragma: allowlist secret
             domain_name="jediccpospawnedtenant2",
@@ -183,7 +178,6 @@ def test_create_billing_profile_creation(mock_azure: AzureCloudProvider):
                 country="US",
                 postal_code="19109",
             ),
-            creds=creds,
             tenant_id="60ff9d34-82bf-4f21-b565-308ef0533435",
             billing_profile_display_name="Test Billing Profile",
             billing_account_name=BILLING_ACCOUNT_NAME,
@@ -234,7 +228,7 @@ def test_validate_billing_profile_creation(mock_azure: AzureCloudProvider):
 
     payload = BillingProfileVerificationCSPPayload(
         **dict(
-            creds=creds,
+            tenant_id="60ff9d34-82bf-4f21-b565-308ef0533435",
             billing_profile_verify_url="https://management.azure.com/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/operationResults/createBillingProfile_478d5706-71f9-4a8b-8d4e-2cbaca27a668?api-version=2019-10-01-preview",
         )
     )
@@ -273,7 +267,6 @@ def test_create_billing_profile_tenant_access(mock_azure: AzureCloudProvider):
 
     payload = BillingProfileTenantAccessCSPPayload(
         **dict(
-            creds=creds,
             tenant_id="60ff9d34-82bf-4f21-b565-308ef0533435",
             user_object_id="0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
             billing_account_name="7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31",
@@ -305,7 +298,7 @@ def test_create_task_order_billing_creation(mock_azure: AzureCloudProvider):
 
     payload = TaskOrderBillingCreationCSPPayload(
         **dict(
-            creds=creds,
+            tenant_id="60ff9d34-82bf-4f21-b565-308ef0533435",
             billing_account_name="7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31",
             billing_profile_name="KQWI-W2SU-BG7-TGB",
         )
@@ -365,7 +358,7 @@ def test_create_task_order_billing_verification(mock_azure):
 
     payload = TaskOrderBillingVerificationCSPPayload(
         **dict(
-            creds=creds,
+            tenant_id="60ff9d34-82bf-4f21-b565-308ef0533435",
             task_order_billing_verify_url="https://management.azure.com/providers/Microsoft.Billing/billingAccounts/7c89b735-b22b-55c0-ab5a-c624843e8bf6:de4416ce-acc6-44b1-8122-c87c4e903c91_2019-05-31/operationResults/createBillingProfile_478d5706-71f9-4a8b-8d4e-2cbaca27a668?api-version=2019-10-01-preview",
         )
     )
@@ -400,7 +393,7 @@ def test_create_billing_instruction(mock_azure: AzureCloudProvider):
 
     payload = BillingInstructionCSPPayload(
         **dict(
-            creds=creds,
+            tenant_id="60ff9d34-82bf-4f21-b565-308ef0533435",
             initial_clin_amount=1000.00,
             initial_clin_start_date="2020/1/1",
             initial_clin_end_date="2020/3/1",
@@ -413,3 +406,4 @@ def test_create_billing_instruction(mock_azure: AzureCloudProvider):
     result = mock_azure.create_billing_instruction(payload)
     body: BillingInstructionCSPResult = result.get("body")
     assert body.reported_clin_name == "TO1:CLIN001"
+

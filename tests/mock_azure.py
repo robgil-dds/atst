@@ -48,6 +48,12 @@ def mock_credentials():
     return Mock(spec=credentials)
 
 
+def mock_identity():
+    import azure.identity as identity
+
+    return Mock(spec=identity)
+
+
 def mock_policy():
     from azure.mgmt.resource import policy
 
@@ -88,6 +94,7 @@ class MockAzureSDK(object):
         self.managementgroups = mock_managementgroups()
         self.graphrbac = mock_graphrbac()
         self.credentials = mock_credentials()
+        self.identity = mock_identity()
         self.policy = mock_policy()
         self.secrets = mock_secrets()
         self.requests = mock_requests()

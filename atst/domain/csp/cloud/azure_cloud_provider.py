@@ -86,7 +86,7 @@ class AzureCloudProvider(CloudProviderInterface):
 
     def set_secret(self, secret_key, secret_value):
         credential = self._get_client_secret_credential_obj({})
-        secret_client = self.secrets.SecretClient(
+        secret_client = self.sdk.secrets.SecretClient(
             vault_url=self.vault_url, credential=credential,
         )
         try:
@@ -99,7 +99,7 @@ class AzureCloudProvider(CloudProviderInterface):
 
     def get_secret(self, secret_key):
         credential = self._get_client_secret_credential_obj({})
-        secret_client = self.secrets.SecretClient(
+        secret_client = self.sdk.secrets.SecretClient(
             vault_url=self.vault_url, credential=credential,
         )
         try:
@@ -288,7 +288,7 @@ class AzureCloudProvider(CloudProviderInterface):
         )
 
     def create_tenant(self, payload: TenantCSPPayload):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self.get_root_provisioning_token()
         if sp_token is None:
             raise AuthenticationException("Could not resolve token for tenant creation")
         payload.password = token_urlsafe(16)
@@ -318,7 +318,7 @@ class AzureCloudProvider(CloudProviderInterface):
     def create_billing_profile_creation(
         self, payload: BillingProfileCreationCSPPayload
     ):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self.get_root_provisioning_token()
         if sp_token is None:
             raise AuthenticationException(
                 "Could not resolve token for billing profile creation"
@@ -350,7 +350,7 @@ class AzureCloudProvider(CloudProviderInterface):
     def create_billing_profile_verification(
         self, payload: BillingProfileVerificationCSPPayload
     ):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self.get_root_provisioning_token()
         if sp_token is None:
             raise AuthenticationException(
                 "Could not resolve token for billing profile validation"
@@ -375,7 +375,7 @@ class AzureCloudProvider(CloudProviderInterface):
     def create_billing_profile_tenant_access(
         self, payload: BillingProfileTenantAccessCSPPayload
     ):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self.get_root_provisioning_token()
         request_body = {
             "properties": {
                 "principalTenantId": payload.tenant_id,  # from tenant creation
@@ -399,7 +399,7 @@ class AzureCloudProvider(CloudProviderInterface):
     def create_task_order_billing_creation(
         self, payload: TaskOrderBillingCreationCSPPayload
     ):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self.get_root_provisioning_token()
         request_body = [
             {
                 "op": "replace",
@@ -429,7 +429,7 @@ class AzureCloudProvider(CloudProviderInterface):
     def create_task_order_billing_verification(
         self, payload: TaskOrderBillingVerificationCSPPayload
     ):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self.get_root_provisioning_token()
         if sp_token is None:
             raise AuthenticationException(
                 "Could not resolve token for task order billing validation"
@@ -452,7 +452,7 @@ class AzureCloudProvider(CloudProviderInterface):
             return self._error(result.json())
 
     def create_billing_instruction(self, payload: BillingInstructionCSPPayload):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self.get_root_provisioning_token()
         if sp_token is None:
             raise AuthenticationException(
                 "Could not resolve token for task order billing validation"
@@ -563,13 +563,20 @@ class AzureCloudProvider(CloudProviderInterface):
         if sub_id_match:
             return sub_id_match.group(1)
 
+    def get_tenant_principal_token(self, tenant_id):
+        creds = self.get_secret(tenant_id)
+        return self._get_sp_token(creds)
+
+    def get_root_provisioning_token(self):
+        return self._get_sp_token(self._root_creds)
+
     def _get_sp_token(self, creds):
-        home_tenant_id = creds.get("home_tenant_id")
+        tenant_id = creds.get("tenant_id")
         client_id = creds.get("client_id")
         secret_key = creds.get("secret_key")
 
         context = self.sdk.adal.AuthenticationContext(
-            f"{self.sdk.cloud.endpoints.active_directory}/{home_tenant_id}"
+            f"{self.sdk.cloud.endpoints.active_directory}/{tenant_id}"
         )
 
         # TODO: handle failure states here

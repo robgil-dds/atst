@@ -20,20 +20,10 @@ class AliasModel(BaseModel):
 
 
 class BaseCSPPayload(AliasModel):
-    # {"username": "mock-cloud", "pass": "shh"}
-    creds: Dict
-
-    def dict(self, *args, **kwargs):
-        exclude = {"creds"}
-        if "exclude" not in kwargs:
-            kwargs["exclude"] = exclude
-        else:
-            kwargs["exclude"].update(exclude)
-
-        return super().dict(*args, **kwargs)
+    tenant_id: str
 
 
-class TenantCSPPayload(BaseCSPPayload):
+class TenantCSPPayload(AliasModel):
     user_id: str
     password: Optional[str]
     domain_name: str
@@ -232,3 +222,4 @@ class BillingInstructionCSPResult(AliasModel):
         fields = {
             "reported_clin_name": "name",
         }
+
