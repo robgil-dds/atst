@@ -1,6 +1,8 @@
+import json
 from unittest.mock import Mock, patch
 from uuid import uuid4
 
+import pytest
 from tests.factories import ApplicationFactory, EnvironmentFactory
 from tests.mock_azure import AUTH_CREDENTIALS, mock_azure
 
@@ -8,6 +10,8 @@ from atst.domain.csp.cloud import AzureCloudProvider
 from atst.domain.csp.cloud.models import (
     AdminRoleDefinitionCSPPayload,
     AdminRoleDefinitionCSPResult,
+    ApplicationCSPPayload,
+    ApplicationCSPResult,
     BaseCSPPayload,
     BillingInstructionCSPPayload,
     BillingInstructionCSPResult,
@@ -73,8 +77,8 @@ def test_create_subscription_succeeds(mock_azure: AzureCloudProvider):
 
 
 def mock_management_group_create(mock_azure, spec_dict):
-    mock_azure.sdk.managementgroups.ManagementGroupsAPI.return_value.management_groups.create_or_update.return_value.result.return_value = Mock(
-        **spec_dict
+    mock_azure.sdk.managementgroups.ManagementGroupsAPI.return_value.management_groups.create_or_update.return_value.result.return_value = (
+        spec_dict
     )
 
 
@@ -90,12 +94,30 @@ def test_create_environment_succeeds(mock_azure: AzureCloudProvider):
     assert result.id == "Test Id"
 
 
+# mock the get_secret so it returns a JSON string
+MOCK_CREDS = {
+    "tenant_id": str(uuid4()),
+    "tenant_sp_client_id": str(uuid4()),
+    "tenant_sp_key": "1234",
+}
+
+
+def mock_get_secret(azure, func):
+    azure.get_secret = func
+
+    return azure
+
+
 def test_create_application_succeeds(mock_azure: AzureCloudProvider):
     application = ApplicationFactory.create()
-
     mock_management_group_create(mock_azure, {"id": "Test Id"})
 
-    result = mock_azure._create_application(AUTH_CREDENTIALS, application)
+    mock_azure = mock_get_secret(mock_azure, lambda *a, **k: json.dumps(MOCK_CREDS))
+
+    payload = ApplicationCSPPayload(
+        tenant_id="1234", display_name=application.name, parent_id=str(uuid4())
+    )
+    result = mock_azure.create_application(payload)
 
     assert result.id == "Test Id"
 

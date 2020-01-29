@@ -1,6 +1,5 @@
 from uuid import uuid4
 
-
 from .cloud_provider_interface import CloudProviderInterface
 from .exceptions import (
     AuthenticationException,
@@ -14,10 +13,11 @@ from .exceptions import (
     UserRemovalException,
 )
 from .models import (
-    PrincipalAdminRoleCSPResult,
+    AZURE_MGMNT_PATH,
+    AdminRoleDefinitionCSPPayload,
     AdminRoleDefinitionCSPResult,
-    TenantAdminOwnershipCSPResult,
-    TenantPrincipalCSPResult,
+    ApplicationCSPPayload,
+    ApplicationCSPResult,
     BillingInstructionCSPPayload,
     BillingInstructionCSPResult,
     BillingProfileCreationCSPPayload,
@@ -26,12 +26,13 @@ from .models import (
     BillingProfileVerificationCSPPayload,
     BillingProfileVerificationCSPResult,
     PrincipalAdminRoleCSPPayload,
-    AdminRoleDefinitionCSPPayload,
+    PrincipalAdminRoleCSPResult,
     TaskOrderBillingCreationCSPPayload,
     TaskOrderBillingCreationCSPResult,
     TaskOrderBillingVerificationCSPPayload,
     TaskOrderBillingVerificationCSPResult,
     TenantAdminOwnershipCSPPayload,
+    TenantAdminOwnershipCSPResult,
     TenantCSPPayload,
     TenantCSPResult,
     TenantPrincipalAppCSPPayload,
@@ -39,6 +40,7 @@ from .models import (
     TenantPrincipalCredentialCSPPayload,
     TenantPrincipalCredentialCSPResult,
     TenantPrincipalCSPPayload,
+    TenantPrincipalCSPResult,
     TenantPrincipalOwnershipCSPPayload,
     TenantPrincipalOwnershipCSPResult,
 )
@@ -416,3 +418,16 @@ class MockCloudProvider(CloudProviderInterface):
         self._delay(1, 5)
         if self._with_authorization and credentials != self._auth_credentials:
             raise self.AUTHENTICATION_EXCEPTION
+
+    def create_application(self, payload: ApplicationCSPPayload):
+        self._maybe_raise(self.UNAUTHORIZED_RATE, GeneralCSPException)
+
+        return ApplicationCSPResult(
+            id=f"{AZURE_MGMNT_PATH}{payload.management_group_name}"
+        )
+
+    def get_credentials(self, scope="portfolio", tenant_id=None):
+        return self.root_creds()
+
+    def update_tenant_creds(self, tenant_id, secret):
+        return secret

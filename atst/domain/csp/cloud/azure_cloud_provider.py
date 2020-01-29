@@ -1,17 +1,18 @@
+import json
 import re
 from secrets import token_urlsafe
 from typing import Dict
 from uuid import uuid4
 
-from atst.models.application import Application
-from atst.models.environment import Environment
-from atst.models.user import User
+from atst.utils import sha256_hex
 
 from .cloud_provider_interface import CloudProviderInterface
 from .exceptions import AuthenticationException
 from .models import (
     AdminRoleDefinitionCSPPayload,
     AdminRoleDefinitionCSPResult,
+    ApplicationCSPPayload,
+    ApplicationCSPResult,
     BillingInstructionCSPPayload,
     BillingInstructionCSPResult,
     BillingProfileCreationCSPPayload,
@@ -20,6 +21,8 @@ from .models import (
     BillingProfileTenantAccessCSPResult,
     BillingProfileVerificationCSPPayload,
     BillingProfileVerificationCSPResult,
+    KeyVaultCredentials,
+    ManagementGroupCSPResponse,
     PrincipalAdminRoleCSPPayload,
     PrincipalAdminRoleCSPResult,
     TaskOrderBillingCreationCSPPayload,
@@ -60,6 +63,10 @@ class AzureSDKProvider(object):
         import azure.common.credentials as credentials
         import azure.identity as identity
         from azure.keyvault import secrets
+        from azure.core import exceptions
+        from msrestazure.azure_cloud import (
+            AZURE_PUBLIC_CLOUD,
+        )  # TODO: choose cloud type from config
         import adal
         import requests
 
@@ -74,10 +81,6 @@ class AzureSDKProvider(object):
         self.exceptions = exceptions
         self.secrets = secrets
         self.requests = requests
-
-        # TODO: choose cloud type from config
-        from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
-
         self.cloud = AZURE_PUBLIC_CLOUD
 
 
@@ -126,9 +129,7 @@ class AzureCloudProvider(CloudProviderInterface):
                 exc_info=1,
             )
 
-    def create_environment(
-        self, auth_credentials: Dict, user: User, environment: Environment
-    ):
+    def create_environment(self, auth_credentials: Dict, user, environment):
         # since this operation would only occur within a tenant, should we source the tenant
         # via lookup from environment once we've created the portfolio csp data schema
         # something like this:
@@ -145,7 +146,7 @@ class AzureCloudProvider(CloudProviderInterface):
             credentials, management_group_id, display_name, parent_id,
         )
 
-        return management_group
+        return ManagementGroupCSPResponse(**management_group)
 
     def create_atat_admin_user(
         self, auth_credentials: Dict, csp_environment_id: str
@@ -184,15 +185,25 @@ class AzureCloudProvider(CloudProviderInterface):
             "role_name": role_assignment_id,
         }
 
-    def _create_application(self, auth_credentials: Dict, application: Application):
-        management_group_name = str(uuid4())  # can be anything, not just uuid
-        display_name = application.name  # Does this need to be unique?
-        credentials = self._get_credential_obj(auth_credentials)
-        parent_id = "?"  # application.portfolio.csp_details.management_group_id
-
-        return self._create_management_group(
-            credentials, management_group_name, display_name, parent_id,
+    def create_application(self, payload: ApplicationCSPPayload):
+        creds = self._source_creds(payload.tenant_id)
+        credentials = self._get_credential_obj(
+            {
+                "client_id": creds.root_sp_client_id,
+                "secret_key": creds.root_sp_key,
+                "tenant_id": creds.root_tenant_id,
+            },
+            resource=self.sdk.cloud.endpoints.resource_manager,
         )
+
+        response = self._create_management_group(
+            credentials,
+            payload.management_group_name,
+            payload.display_name,
+            payload.parent_id,
+        )
+
+        return ApplicationCSPResult(**response)
 
     def _create_management_group(
         self, credentials, management_group_id, display_name, parent_id=None,
@@ -215,6 +226,9 @@ class AzureCloudProvider(CloudProviderInterface):
 
         # result is a synchronous wait, might need to do a poll instead to handle first mgmt group create
         # since we were told it could take 10+ minutes to complete, unless this handles that polling internally
+        # TODO: what to do is status is not 'Succeeded' on the
+        # response object? Will it always raise its own error
+        # instead?
         return create_request.result()
 
     def _create_subscription(
@@ -307,6 +321,7 @@ class AzureCloudProvider(CloudProviderInterface):
         sp_token = self.get_root_provisioning_token()
         if sp_token is None:
             raise AuthenticationException("Could not resolve token for tenant creation")
+
         payload.password = token_urlsafe(16)
         create_tenant_body = payload.dict(by_alias=True)
 
@@ -862,3 +877,24 @@ class AzureCloudProvider(CloudProviderInterface):
             "secret_key": self.secret_key,
             "tenant_id": self.tenant_id,
         }
+
+    def _source_creds(self, tenant_id=None) -> KeyVaultCredentials:
+        if tenant_id:
+            return self._source_tenant_creds(tenant_id)
+        else:
+            return KeyVaultCredentials(
+                root_tenant_id=self._root_creds.get("tenant_id"),
+                root_sp_client_id=self._root_creds.get("client_id"),
+                root_sp_key=self._root_creds.get("secret_key"),
+            )
+
+    def update_tenant_creds(self, tenant_id, secret):
+        hashed = sha256_hex(tenant_id)
+        self.set_secret(hashed, json.dumps(secret))
+
+        return secret
+
+    def _source_tenant_creds(self, tenant_id):
+        hashed = sha256_hex(tenant_id)
+        raw_creds = self.get_secret(hashed)
+        return KeyVaultCredentials(**json.loads(raw_creds))

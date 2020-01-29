@@ -102,6 +102,7 @@ class MockAzureSDK(object):
         self.secrets = mock_secrets()
         self.requests = mock_requests()
         self.cloud = mock_cloud_details()
+        self.identity = mock_identity()
 
 
 @pytest.fixture(scope="function")
