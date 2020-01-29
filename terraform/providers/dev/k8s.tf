@@ -22,6 +22,7 @@ module "k8s" {
   min_count           = 3
   client_id           = data.azurerm_key_vault_secret.k8s_client_id.value
   client_secret       = data.azurerm_key_vault_secret.k8s_client_secret.value
+  workspace_id        = module.logs.workspace_id
 }
 
 #module "main_lb" {

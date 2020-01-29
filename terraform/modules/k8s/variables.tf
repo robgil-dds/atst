@@ -62,3 +62,8 @@ variable "client_secret" {
   type        = string
   description = "The client secret for the Service Principal associated with the AKS cluster."
 }
+
+variable "workspace_id" {
+  description = "Log Analytics workspace for this resource to log to"
+  type        = string
+}
