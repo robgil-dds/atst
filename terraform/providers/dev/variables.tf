@@ -34,6 +34,7 @@ variable "networks" {
     public  = "10.1.1.0/24,public"  # LBs
     private = "10.1.2.0/24,private" # k8s, postgres, keyvault
     redis   = "10.1.3.0/24,private" # Redis
+    apps    = "10.1.4.0/24,private" # Redis
   }
 }
 
@@ -43,23 +44,18 @@ variable "service_endpoints" {
     public  = "Microsoft.ContainerRegistry" # Not necessary but added to avoid infinite state loop
     private = "Microsoft.Storage,Microsoft.KeyVault,Microsoft.ContainerRegistry,Microsoft.Sql"
     redis   = "Microsoft.Storage,Microsoft.Sql" # FIXME: There is no Microsoft.Redis
+    apps    = "Microsoft.Storage,Microsoft.KeyVault,Microsoft.ContainerRegistry,Microsoft.Sql"
   }
 }
-
-variable "gateway_subnet" {
-  type    = string
-  default = "10.1.20.0/24"
-}
-
 
 variable "route_tables" {
   description = "Route tables and their default routes"
   type        = map
   default = {
     public  = "Internet"
-    private = "Internet"
+    private = "Internet" # TODO: Switch to FW
     redis   = "VnetLocal"
-    #private = "VnetLocal"
+    apps    = "Internet" # TODO: Switch to FW
   }
 }
 
