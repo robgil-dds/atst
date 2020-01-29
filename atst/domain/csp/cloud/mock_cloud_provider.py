@@ -17,6 +17,9 @@ from .exceptions import (
     UnknownServerException,
 )
 from .models import (
+    AZURE_MGMNT_PATH,
+    ApplicationCSPPayload,
+    ApplicationCSPResult,
     BillingInstructionCSPPayload,
     BillingInstructionCSPResult,
     BillingProfileCreationCSPPayload,
@@ -340,3 +343,16 @@ class MockCloudProvider(CloudProviderInterface):
         self._delay(1, 5)
         if self._with_authorization and credentials != self._auth_credentials:
             raise self.AUTHENTICATION_EXCEPTION
+
+    def create_application(self, payload: ApplicationCSPPayload):
+        self._maybe_raise(self.UNAUTHORIZED_RATE, GeneralCSPException)
+
+        return ApplicationCSPResult(
+            id=f"{AZURE_MGMNT_PATH}{payload.management_group_name}"
+        )
+
+    def get_credentials(self, scope="portfolio", tenant_id=None):
+        return self.root_creds()
+
+    def update_tenant_creds(self, tenant_id, secret):
+        return secret
