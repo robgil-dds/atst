@@ -3,26 +3,34 @@
     @include grid-row;
     min-height: 500px;
   }
+}
 
-  margin-left: 2 * $gap;
+.portfolio-header-new .portfolio-header__name {
+  padding: 1.6rem 0;
 }
 
 .portfolio-header {
   flex-direction: column;
+  margin: $gap * 2 0;
+  max-width: $max-panel-width;
+
   @include media($small-screen) {
     flex-direction: row;
   }
 
-  margin-bottom: $gap * 1;
-
   .col--grow {
     overflow: inherit;
+    display: table;
+    min-height: 10rem;
   }
 
   &__name {
     @include h1;
+    display: table-cell;
+    vertical-align: middle;
+
     h1 {
-      margin: 0 $gap ($gap * 2) 0;
+      margin: 0;
       font-size: 3.5rem;
     }
 
@@ -30,6 +38,7 @@
       font-size: $small-font-size;
       margin: 0 0 (-$gap * 0.5);
       color: $color-gray-medium;
+      max-width: 100%;
     }
   }
 
@@ -38,9 +47,15 @@
     font-size: $small-font-size;
 
     .icon-link {
-      padding: $gap;
+      padding: 0;
       border-radius: 0;
       color: $color-blue-darkest;
+      min-width: 10rem;
+      min-height: 10rem;
+
+      .col {
+        margin: 0 auto;
+      }
 
       &:hover {
         background-color: $color-aqua-lightest;
@@ -53,6 +68,7 @@
       &.active {
         color: $color-blue;
         background-color: $color-gray-lightest;
+        text-decoration: none;
 
         &:hover {
           background-color: $color-aqua-lightest;
@@ -82,11 +98,19 @@
   margin-bottom: 3 * $gap;
 }
 
-.portfolio-content {
-  margin: (4 * $gap) $gap 0 $gap;
+.portfolio-admin {
+  margin: $large-spacing 0;
+  max-width: $max-panel-width;
+}
 
+.portfolio-content {
   .panel {
     padding-bottom: 2rem;
+    max-width: $max-panel-width;
+  }
+
+  hr {
+    max-width: $max-panel-width;
   }
 
   a.add-new-button {
@@ -251,6 +275,7 @@
 
 .portfolio-applications {
   margin-top: $gap * 5;
+  max-width: $max-panel-width;
 
   &__header {
     &--title {
@@ -296,8 +321,8 @@
 }
 
 .portfolio-funding {
-  padding: 2 * $gap;
-  padding-top: 0;
+  max-width: $max-panel-width;
+  margin: $large-spacing 0;
 
   .panel {
     @include shadow-panel;
@@ -366,6 +391,8 @@
 }
 
 .portfolio-reports {
+  max-width: $max-panel-width;
+
   &__header {
     margin-bottom: 4 * $gap;
 

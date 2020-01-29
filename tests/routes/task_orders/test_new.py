@@ -158,7 +158,7 @@ def test_task_orders_form_step_two_add_number(client, user_session, task_order):
 
 def test_task_orders_submit_form_step_two_add_number(client, user_session, task_order):
     user_session(task_order.portfolio.owner)
-    form_data = {"number": "1234567890"}
+    form_data = {"number": "abc-1234567890"}
     response = client.post(
         url_for(
             "task_orders.submit_form_step_two_add_number", task_order_id=task_order.id
@@ -167,7 +167,7 @@ def test_task_orders_submit_form_step_two_add_number(client, user_session, task_
     )
 
     assert response.status_code == 302
-    assert task_order.number == "1234567890"
+    assert task_order.number == "ABC1234567890"  # pragma: allowlist secret
 
 
 def test_task_orders_submit_form_step_two_enforces_unique_number(
@@ -194,7 +194,7 @@ def test_task_orders_submit_form_step_two_add_number_existing_to(
     client, user_session, task_order
 ):
     user_session(task_order.portfolio.owner)
-    form_data = {"number": "0000000000"}
+    form_data = {"number": "0000000000000"}
     original_number = task_order.number
     response = client.post(
         url_for(
@@ -203,7 +203,7 @@ def test_task_orders_submit_form_step_two_add_number_existing_to(
         data=form_data,
     )
     assert response.status_code == 302
-    assert task_order.number == "0000000000"
+    assert task_order.number == "0000000000000"
     assert task_order.number != original_number
 
 

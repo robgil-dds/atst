@@ -1,6 +1,8 @@
 from typing import Dict, List, Optional
+import re
+from uuid import uuid4
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, root_validator
 
 from atst.utils import snake_to_camel
 
@@ -232,3 +234,110 @@ class BillingInstructionCSPResult(AliasModel):
         fields = {
             "reported_clin_name": "name",
         }
+
+
+AZURE_MGMNT_PATH = "/providers/Microsoft.Management/managementGroups/"
+
+MANAGEMENT_GROUP_NAME_REGEX = "^[a-zA-Z0-9\-_\(\)\.]+$"
+
+
+class ManagementGroupCSPPayload(AliasModel):
+    """
+    :param: management_group_name: Just pass a UUID for this.
+    :param: display_name: This can contain any character and
+        spaces, but should be 90 characters or fewer long.
+    :param: parent_id: This should be the fully qualified Azure ID,
+        i.e. /providers/Microsoft.Management/managementGroups/[management group ID]
+    """
+
+    tenant_id: str
+    management_group_name: Optional[str]
+    display_name: str
+    parent_id: str
+
+    @validator("management_group_name", pre=True, always=True)
+    def supply_management_group_name_default(cls, name):
+        if name:
+            if re.match(MANAGEMENT_GROUP_NAME_REGEX, name) is None:
+                raise ValueError(
+                    f"Management group name must match {MANAGEMENT_GROUP_NAME_REGEX}"
+                )
+
+            return name[0:90]
+        else:
+            return str(uuid4())
+
+    @validator("display_name", pre=True, always=True)
+    def enforce_display_name_length(cls, name):
+        return name[0:90]
+
+    @validator("parent_id", pre=True, always=True)
+    def enforce_parent_id_pattern(cls, id_):
+        if AZURE_MGMNT_PATH not in id_:
+            return f"{AZURE_MGMNT_PATH}{id_}"
+        else:
+            return id_
+
+
+class ManagementGroupCSPResponse(AliasModel):
+    id: str
+
+
+class ApplicationCSPPayload(ManagementGroupCSPPayload):
+    pass
+
+
+class ApplicationCSPResult(ManagementGroupCSPResponse):
+    pass
+
+
+class KeyVaultCredentials(BaseModel):
+    root_sp_client_id: Optional[str]
+    root_sp_key: Optional[str]
+    root_tenant_id: Optional[str]
+
+    tenant_id: Optional[str]
+
+    tenant_admin_username: Optional[str]
+    tenant_admin_password: Optional[str]
+
+    tenant_sp_client_id: Optional[str]
+    tenant_sp_key: Optional[str]
+
+    @root_validator(pre=True)
+    def enforce_admin_creds(cls, values):
+        tenant_id = values.get("tenant_id")
+        username = values.get("tenant_admin_username")
+        password = values.get("tenant_admin_password")
+        if any([username, password]) and not all([tenant_id, username, password]):
+            raise ValueError(
+                "tenant_id, tenant_admin_username, and tenant_admin_password must all be set if any one is"
+            )
+
+        return values
+
+    @root_validator(pre=True)
+    def enforce_sp_creds(cls, values):
+        tenant_id = values.get("tenant_id")
+        client_id = values.get("tenant_sp_client_id")
+        key = values.get("tenant_sp_key")
+        if any([client_id, key]) and not all([tenant_id, client_id, key]):
+            raise ValueError(
+                "tenant_id, tenant_sp_client_id, and tenant_sp_key must all be set if any one is"
+            )
+
+        return values
+
+    @root_validator(pre=True)
+    def enforce_root_creds(cls, values):
+        sp_creds = [
+            values.get("root_tenant_id"),
+            values.get("root_sp_client_id"),
+            values.get("root_sp_key"),
+        ]
+        if any(sp_creds) and not all(sp_creds):
+            raise ValueError(
+                "root_tenant_id, root_sp_client_id, and root_sp_key must all be set if any one is"
+            )
+
+        return values
