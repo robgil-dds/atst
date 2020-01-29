@@ -9,6 +9,9 @@ AZURE_CONFIG = {
     "AZURE_TENANT_ID": "MOCK",
     "AZURE_POLICY_LOCATION": "policies",
     "AZURE_VAULT_URL": "http://vault",
+    "POWERSHELL_CLIENT_ID": "MOCK",
+    "AZURE_OWNER_ROLE_DEF_ID": "MOCK",
+    "AZURE_GRAPH_RESOURCE": "MOCK",
 }
 
 AUTH_CREDENTIALS = {
@@ -63,15 +66,13 @@ def mock_policy():
 def mock_adal():
     import adal
 
-    return adal
-    # return Mock(spec=adal)
+    return Mock(spec=adal)
 
 
 def mock_requests():
     import requests
 
-    # return Mock(spec=requests)
-    return requests
+    return Mock(spec=requests)
 
 
 def mock_secrets():

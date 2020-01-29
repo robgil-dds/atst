@@ -223,3 +223,80 @@ class BillingInstructionCSPResult(AliasModel):
             "reported_clin_name": "name",
         }
 
+
+class TenantAdminOwnershipCSPPayload(BaseCSPPayload):
+    user_object_id: str
+
+
+class TenantAdminOwnershipCSPResult(AliasModel):
+    admin_owner_assignment_id: str
+
+    class Config:
+        fields = {"admin_owner_assignment_id": "id"}
+
+
+class TenantPrincipalOwnershipCSPPayload(BaseCSPPayload):
+    principal_id: str
+
+
+class TenantPrincipalOwnershipCSPResult(AliasModel):
+    principal_owner_assignment_id: str
+
+    class Config:
+        fields = {"principal_owner_assignment_id": "id"}
+
+
+class TenantPrincipalAppCSPPayload(BaseCSPPayload):
+    pass
+
+
+class TenantPrincipalAppCSPResult(AliasModel):
+    principal_app_id: str
+    principal_app_object_id: str
+
+    class Config:
+        fields = {"principal_app_id": "appId", "principal_app_object_id": "id"}
+
+
+class TenantPrincipalCSPPayload(BaseCSPPayload):
+    principal_app_id: str
+
+
+class TenantPrincipalCSPResult(AliasModel):
+    principal_id: str
+
+    class Config:
+        fields = {"principal_id": "id"}
+
+
+class TenantPrincipalCredentialCSPPayload(BaseCSPPayload):
+    principal_app_id: str
+    principal_app_object_id: str
+
+
+class TenantPrincipalCredentialCSPResult(AliasModel):
+    principal_client_id: str
+    principal_secret_key: str
+
+    class Config:
+        fields = {"principal_secret_key": "secretText"}
+
+
+class AdminRoleDefinitionCSPPayload(BaseCSPPayload):
+    pass
+
+
+class AdminRoleDefinitionCSPResult(AliasModel):
+    admin_role_def_id: str
+
+
+class PrincipalAdminRoleCSPPayload(BaseCSPPayload):
+    principal_id: str
+    admin_role_def_id: str
+
+
+class PrincipalAdminRoleCSPResult(AliasModel):
+    principal_assignment_id: str
+
+    class Config:
+        fields = {"principal_assignment_id": "id"}

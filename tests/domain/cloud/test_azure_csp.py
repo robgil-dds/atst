@@ -6,6 +6,8 @@ from tests.mock_azure import AUTH_CREDENTIALS, mock_azure
 
 from atst.domain.csp.cloud import AzureCloudProvider
 from atst.domain.csp.cloud.models import (
+    AdminRoleDefinitionCSPPayload,
+    AdminRoleDefinitionCSPResult,
     BaseCSPPayload,
     BillingInstructionCSPPayload,
     BillingInstructionCSPResult,
@@ -19,8 +21,18 @@ from atst.domain.csp.cloud.models import (
     TaskOrderBillingCreationCSPResult,
     TaskOrderBillingVerificationCSPPayload,
     TaskOrderBillingVerificationCSPResult,
+    TenantAdminOwnershipCSPPayload,
+    TenantAdminOwnershipCSPResult,
     TenantCSPPayload,
     TenantCSPResult,
+    TenantPrincipalAppCSPPayload,
+    TenantPrincipalAppCSPResult,
+    TenantPrincipalCredentialCSPPayload,
+    TenantPrincipalCredentialCSPResult,
+    TenantPrincipalCSPPayload,
+    TenantPrincipalCSPResult,
+    TenantPrincipalOwnershipCSPPayload,
+    TenantPrincipalOwnershipCSPResult,
 )
 
 BILLING_ACCOUNT_NAME = "52865e4c-52e8-5a6c-da6b-c58f0814f06f:7ea5de9d-b8ce-4901-b1c5-d864320c7b03_2019-05-31"
@@ -409,46 +421,167 @@ def test_create_billing_instruction(mock_azure: AzureCloudProvider):
     assert body.reported_clin_name == "TO1:CLIN001"
 
 
-def test_admin_principal_creation(mock_azure: AzureCloudProvider):
-    # Auth As Tenant Admin
-    # Create App Registration
-    # Create Service Principal
-    # Create App Registration Password Credential
-    # Lookup global admin role
-    # Assign global admin role to Service Principal
+def test_create_tenant_principal_app(mock_azure: AzureCloudProvider):
     with patch.object(
-        AzureCloudProvider, "get_secret", wraps=mock_azure.get_secret
-    ) as mock_get_secret:
-        mock_get_secret.return_value = {
-            "admin_username": "",
-            "admin_password": "",
-        }
-        payload = BaseCSPPayload(
+        AzureCloudProvider,
+        "get_elevated_management_token",
+        wraps=mock_azure.get_elevated_management_token,
+    ) as get_elevated_management_token:
+        get_elevated_management_token.return_value = "my fake token"
+
+        mock_result = Mock()
+        mock_result.ok = True
+        mock_result.json.return_value = {"appId": "appId", "id": "id"}
+
+        mock_azure.sdk.requests.post.return_value = mock_result
+
+        payload = TenantPrincipalAppCSPPayload(
             **{"tenant_id": "6d2d2d6c-a6d6-41e1-8bb1-73d11475f8f4"}
         )
 
-        result = mock_azure.create_remote_admin(payload)
+        result: TenantPrincipalAppCSPResult = mock_azure.create_tenant_principal_app(
+            payload
+        )
 
-        print(result)
+        assert result.principal_app_id == "appId"
 
 
-def test_admin_mg_ownership(mock_azure: AzureCloudProvider):
+def test_create_tenant_principal(mock_azure: AzureCloudProvider):
     with patch.object(
-        AzureCloudProvider, "get_secret", wraps=mock_azure.get_secret
-    ) as mock_get_secret:
-        mock_get_secret.return_value = {
-            "admin_username": "",
-            "admin_password": "",
-        }
-        payload = TenantCSPResult(
+        AzureCloudProvider,
+        "get_elevated_management_token",
+        wraps=mock_azure.get_elevated_management_token,
+    ) as get_elevated_management_token:
+        get_elevated_management_token.return_value = "my fake token"
+
+        mock_result = Mock()
+        mock_result.ok = True
+        mock_result.json.return_value = {"id": "principal_id"}
+
+        mock_azure.sdk.requests.post.return_value = mock_result
+
+        payload = TenantPrincipalCSPPayload(
             **{
-                "user_id": "blach",
+                "tenant_id": "6d2d2d6c-a6d6-41e1-8bb1-73d11475f8f4",
+                "principal_app_id": "appId",
+            }
+        )
+
+        result: TenantPrincipalCSPResult = mock_azure.create_tenant_principal(payload)
+
+        assert result.principal_id == "principal_id"
+
+
+def test_create_tenant_principal_credential(mock_azure: AzureCloudProvider):
+    with patch.object(
+        AzureCloudProvider,
+        "get_elevated_management_token",
+        wraps=mock_azure.get_elevated_management_token,
+    ) as get_elevated_management_token:
+        get_elevated_management_token.return_value = "my fake token"
+
+        mock_result = Mock()
+        mock_result.ok = True
+        mock_result.json.return_value = {"secretText": "new secret key"}
+
+        mock_azure.sdk.requests.post.return_value = mock_result
+
+        payload = TenantPrincipalCredentialCSPPayload(
+            **{
+                "tenant_id": "6d2d2d6c-a6d6-41e1-8bb1-73d11475f8f4",
+                "principal_app_id": "appId",
+                "principal_app_object_id": "appObjId",
+            }
+        )
+
+        result: TenantPrincipalCredentialCSPResult = mock_azure.create_tenant_principal_credential(
+            payload
+        )
+
+        assert result.principal_secret_key == "new secret key"
+
+
+def test_create_admin_role_definition(mock_azure: AzureCloudProvider):
+    with patch.object(
+        AzureCloudProvider,
+        "get_elevated_management_token",
+        wraps=mock_azure.get_elevated_management_token,
+    ) as get_elevated_management_token:
+        get_elevated_management_token.return_value = "my fake token"
+
+        mock_result = Mock()
+        mock_result.ok = True
+        mock_result.json.return_value = {
+            "value": [
+                {"id": "wrongid", "displayName": "Wrong Role"},
+                {"id": "id", "displayName": "Company Administrator"},
+            ]
+        }
+
+        mock_azure.sdk.requests.get.return_value = mock_result
+
+        payload = AdminRoleDefinitionCSPPayload(
+            **{"tenant_id": "6d2d2d6c-a6d6-41e1-8bb1-73d11475f8f4"}
+        )
+
+        result: AdminRoleDefinitionCSPResult = mock_azure.create_admin_role_definition(
+            payload
+        )
+
+        assert result.admin_role_def_id == "id"
+
+
+def test_create_tenant_admin_ownership(mock_azure: AzureCloudProvider):
+    with patch.object(
+        AzureCloudProvider,
+        "get_elevated_management_token",
+        wraps=mock_azure.get_elevated_management_token,
+    ) as get_elevated_management_token:
+        get_elevated_management_token.return_value = "my fake token"
+
+        mock_result = Mock()
+        mock_result.ok = True
+        mock_result.json.return_value = {"id": "id"}
+
+        mock_azure.sdk.requests.put.return_value = mock_result
+
+        payload = TenantAdminOwnershipCSPPayload(
+            **{
                 "tenant_id": "6d2d2d6c-a6d6-41e1-8bb1-73d11475f8f4",
                 "user_object_id": "971efe4d-1e80-4e39-b3b9-4e5c63ad446d",
             }
         )
 
-        result = mock_azure.assign_root_mg_ownership(payload)
+        result: TenantAdminOwnershipCSPResult = mock_azure.create_tenant_admin_ownership(
+            payload
+        )
 
-        print(result)
+        assert result.admin_owner_assignment_id == "id"
 
+
+def test_create_tenant_principal_ownership(mock_azure: AzureCloudProvider):
+    with patch.object(
+        AzureCloudProvider,
+        "get_elevated_management_token",
+        wraps=mock_azure.get_elevated_management_token,
+    ) as get_elevated_management_token:
+        get_elevated_management_token.return_value = "my fake token"
+
+        mock_result = Mock()
+        mock_result.ok = True
+        mock_result.json.return_value = {"id": "id"}
+
+        mock_azure.sdk.requests.put.return_value = mock_result
+
+        payload = TenantPrincipalOwnershipCSPPayload(
+            **{
+                "tenant_id": "6d2d2d6c-a6d6-41e1-8bb1-73d11475f8f4",
+                "principal_id": "971efe4d-1e80-4e39-b3b9-4e5c63ad446d",
+            }
+        )
+
+        result: TenantPrincipalOwnershipCSPResult = mock_azure.create_tenant_principal_ownership(
+            payload
+        )
+
+        assert result.principal_owner_assignment_id == "id"
