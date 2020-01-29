@@ -113,8 +113,8 @@
     text-overflow: ellipsis;
 
     &--active {
-      @include h4;
-
+      font-size: $base-font-size;
+      font-weight: $font-bold;
       background-color: $color-aqua-lightest !important;
       color: $color-primary-darker !important;
       box-shadow: inset ($gap / 2) 0 0 0 $color-primary-darker;
