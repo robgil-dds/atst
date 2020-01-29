@@ -102,8 +102,10 @@ MOCK_CREDS = {
 }
 
 
-def mock_get_secret(azure, func):
-    azure.get_secret = func
+def mock_get_secret(azure, val=None):
+    if val is None:
+        val = json.dumps(MOCK_CREDS)
+    azure.get_secret = lambda *a, **k: val
 
     return azure
 
@@ -111,12 +113,12 @@ def mock_get_secret(azure, func):
 def test_create_application_succeeds(mock_azure: AzureCloudProvider):
     application = ApplicationFactory.create()
     mock_management_group_create(mock_azure, {"id": "Test Id"})
-
-    mock_azure = mock_get_secret(mock_azure, lambda *a, **k: json.dumps(MOCK_CREDS))
+    mock_azure = mock_get_secret(mock_azure)
 
     payload = ApplicationCSPPayload(
         tenant_id="1234", display_name=application.name, parent_id=str(uuid4())
     )
+
     result = mock_azure.create_application(payload)
 
     assert result.id == "Test Id"
@@ -162,10 +164,6 @@ def test_create_policy_definition_succeeds(mock_azure: AzureCloudProvider):
 
 
 def test_create_tenant(mock_azure: AzureCloudProvider):
-    mock_azure.sdk.adal.AuthenticationContext.return_value.context.acquire_token_with_client_credentials.return_value = {
-        "accessToken": "TOKEN"
-    }
-
     mock_result = Mock()
     mock_result.json.return_value = {
         "objectId": "0a5f4926-e3ee-4f47-a6e3-8b0a30a40e3d",
@@ -176,7 +174,6 @@ def test_create_tenant(mock_azure: AzureCloudProvider):
     mock_azure.sdk.requests.post.return_value = mock_result
     payload = TenantCSPPayload(
         **dict(
-            tenant_id="60ff9d34-82bf-4f21-b565-308ef0533435",
             user_id="admin",
             password="JediJan13$coot",  # pragma: allowlist secret
             domain_name="jediccpospawnedtenant2",
@@ -186,6 +183,7 @@ def test_create_tenant(mock_azure: AzureCloudProvider):
             password_recovery_email_address="thomas@promptworks.com",
         )
     )
+    mock_azure = mock_get_secret(mock_azure)
     result = mock_azure.create_tenant(payload)
     body: TenantCSPResult = result.get("body")
     assert body.tenant_id == "60ff9d34-82bf-4f21-b565-308ef0533435"
@@ -446,8 +444,8 @@ def test_create_billing_instruction(mock_azure: AzureCloudProvider):
 def test_create_tenant_principal_app(mock_azure: AzureCloudProvider):
     with patch.object(
         AzureCloudProvider,
-        "get_elevated_management_token",
-        wraps=mock_azure.get_elevated_management_token,
+        "_get_elevated_management_token",
+        wraps=mock_azure._get_elevated_management_token,
     ) as get_elevated_management_token:
         get_elevated_management_token.return_value = "my fake token"
 
@@ -456,11 +454,11 @@ def test_create_tenant_principal_app(mock_azure: AzureCloudProvider):
         mock_result.json.return_value = {"appId": "appId", "id": "id"}
 
         mock_azure.sdk.requests.post.return_value = mock_result
+        mock_azure = mock_get_secret(mock_azure)
 
         payload = TenantPrincipalAppCSPPayload(
             **{"tenant_id": "6d2d2d6c-a6d6-41e1-8bb1-73d11475f8f4"}
         )
-
         result: TenantPrincipalAppCSPResult = mock_azure.create_tenant_principal_app(
             payload
         )
@@ -471,8 +469,8 @@ def test_create_tenant_principal_app(mock_azure: AzureCloudProvider):
 def test_create_tenant_principal(mock_azure: AzureCloudProvider):
     with patch.object(
         AzureCloudProvider,
-        "get_elevated_management_token",
-        wraps=mock_azure.get_elevated_management_token,
+        "_get_elevated_management_token",
+        wraps=mock_azure._get_elevated_management_token,
     ) as get_elevated_management_token:
         get_elevated_management_token.return_value = "my fake token"
 
@@ -481,6 +479,7 @@ def test_create_tenant_principal(mock_azure: AzureCloudProvider):
         mock_result.json.return_value = {"id": "principal_id"}
 
         mock_azure.sdk.requests.post.return_value = mock_result
+        mock_azure = mock_get_secret(mock_azure)
 
         payload = TenantPrincipalCSPPayload(
             **{
@@ -497,8 +496,8 @@ def test_create_tenant_principal(mock_azure: AzureCloudProvider):
 def test_create_tenant_principal_credential(mock_azure: AzureCloudProvider):
     with patch.object(
         AzureCloudProvider,
-        "get_elevated_management_token",
-        wraps=mock_azure.get_elevated_management_token,
+        "_get_elevated_management_token",
+        wraps=mock_azure._get_elevated_management_token,
     ) as get_elevated_management_token:
         get_elevated_management_token.return_value = "my fake token"
 
@@ -507,6 +506,8 @@ def test_create_tenant_principal_credential(mock_azure: AzureCloudProvider):
         mock_result.json.return_value = {"secretText": "new secret key"}
 
         mock_azure.sdk.requests.post.return_value = mock_result
+
+        mock_azure = mock_get_secret(mock_azure)
 
         payload = TenantPrincipalCredentialCSPPayload(
             **{
@@ -520,14 +521,14 @@ def test_create_tenant_principal_credential(mock_azure: AzureCloudProvider):
             payload
         )
 
-        assert result.principal_secret_key == "new secret key"
+        assert result.principal_creds_established == True
 
 
 def test_create_admin_role_definition(mock_azure: AzureCloudProvider):
     with patch.object(
         AzureCloudProvider,
-        "get_elevated_management_token",
-        wraps=mock_azure.get_elevated_management_token,
+        "_get_elevated_management_token",
+        wraps=mock_azure._get_elevated_management_token,
     ) as get_elevated_management_token:
         get_elevated_management_token.return_value = "my fake token"
 
@@ -541,6 +542,7 @@ def test_create_admin_role_definition(mock_azure: AzureCloudProvider):
         }
 
         mock_azure.sdk.requests.get.return_value = mock_result
+        mock_azure = mock_get_secret(mock_azure)
 
         payload = AdminRoleDefinitionCSPPayload(
             **{"tenant_id": "6d2d2d6c-a6d6-41e1-8bb1-73d11475f8f4"}
@@ -556,8 +558,8 @@ def test_create_admin_role_definition(mock_azure: AzureCloudProvider):
 def test_create_tenant_admin_ownership(mock_azure: AzureCloudProvider):
     with patch.object(
         AzureCloudProvider,
-        "get_elevated_management_token",
-        wraps=mock_azure.get_elevated_management_token,
+        "_get_elevated_management_token",
+        wraps=mock_azure._get_elevated_management_token,
     ) as get_elevated_management_token:
         get_elevated_management_token.return_value = "my fake token"
 
@@ -584,8 +586,8 @@ def test_create_tenant_admin_ownership(mock_azure: AzureCloudProvider):
 def test_create_tenant_principal_ownership(mock_azure: AzureCloudProvider):
     with patch.object(
         AzureCloudProvider,
-        "get_elevated_management_token",
-        wraps=mock_azure.get_elevated_management_token,
+        "_get_elevated_management_token",
+        wraps=mock_azure._get_elevated_management_token,
     ) as get_elevated_management_token:
         get_elevated_management_token.return_value = "my fake token"
 

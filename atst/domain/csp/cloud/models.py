@@ -278,10 +278,7 @@ class TenantPrincipalCredentialCSPPayload(BaseCSPPayload):
 
 class TenantPrincipalCredentialCSPResult(AliasModel):
     principal_client_id: str
-    principal_secret_key: str
-
-    class Config:
-        fields = {"principal_secret_key": "secretText"}
+    principal_creds_established: bool
 
 
 class AdminRoleDefinitionCSPPayload(BaseCSPPayload):

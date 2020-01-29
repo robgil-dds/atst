@@ -331,8 +331,8 @@ class MockCloudProvider(CloudProviderInterface):
 
         return TenantPrincipalCredentialCSPResult(
             **dict(
-                secretText="principal_secret_key",
                 principal_client_id="principal_client_id",
+                principal_creds_established=True,
             )
         )
 
