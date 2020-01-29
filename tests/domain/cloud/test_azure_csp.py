@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from uuid import uuid4
 
 from tests.factories import ApplicationFactory, EnvironmentFactory
@@ -6,6 +6,7 @@ from tests.mock_azure import AUTH_CREDENTIALS, mock_azure
 
 from atst.domain.csp.cloud import AzureCloudProvider
 from atst.domain.csp.cloud.models import (
+    BaseCSPPayload,
     BillingInstructionCSPPayload,
     BillingInstructionCSPResult,
     BillingProfileCreationCSPPayload,
@@ -406,4 +407,48 @@ def test_create_billing_instruction(mock_azure: AzureCloudProvider):
     result = mock_azure.create_billing_instruction(payload)
     body: BillingInstructionCSPResult = result.get("body")
     assert body.reported_clin_name == "TO1:CLIN001"
+
+
+def test_admin_principal_creation(mock_azure: AzureCloudProvider):
+    # Auth As Tenant Admin
+    # Create App Registration
+    # Create Service Principal
+    # Create App Registration Password Credential
+    # Lookup global admin role
+    # Assign global admin role to Service Principal
+    with patch.object(
+        AzureCloudProvider, "get_secret", wraps=mock_azure.get_secret
+    ) as mock_get_secret:
+        mock_get_secret.return_value = {
+            "admin_username": "",
+            "admin_password": "",
+        }
+        payload = BaseCSPPayload(
+            **{"tenant_id": "6d2d2d6c-a6d6-41e1-8bb1-73d11475f8f4"}
+        )
+
+        result = mock_azure.create_remote_admin(payload)
+
+        print(result)
+
+
+def test_admin_mg_ownership(mock_azure: AzureCloudProvider):
+    with patch.object(
+        AzureCloudProvider, "get_secret", wraps=mock_azure.get_secret
+    ) as mock_get_secret:
+        mock_get_secret.return_value = {
+            "admin_username": "",
+            "admin_password": "",
+        }
+        payload = TenantCSPResult(
+            **{
+                "user_id": "blach",
+                "tenant_id": "6d2d2d6c-a6d6-41e1-8bb1-73d11475f8f4",
+                "user_object_id": "971efe4d-1e80-4e39-b3b9-4e5c63ad446d",
+            }
+        )
+
+        result = mock_azure.assign_root_mg_ownership(payload)
+
+        print(result)
 

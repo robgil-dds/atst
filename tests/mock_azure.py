@@ -63,13 +63,15 @@ def mock_policy():
 def mock_adal():
     import adal
 
-    return Mock(spec=adal)
+    return adal
+    # return Mock(spec=adal)
 
 
 def mock_requests():
     import requests
 
-    return Mock(spec=requests)
+    # return Mock(spec=requests)
+    return requests
 
 
 def mock_secrets():
