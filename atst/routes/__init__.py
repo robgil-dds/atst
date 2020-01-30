@@ -130,13 +130,3 @@ def logout():
 @bp.route("/about")
 def about():
     return render_template("about.html")
-
-
-@bp.route("/csp-environment-access")
-def csp_environment_access():
-    return render_template("mock_csp.html", text="console for this environment")
-
-
-@bp.route("/jedi-csp-calculator")
-def jedi_csp_calculator():
-    return redirect(app.csp.cloud.get_calculator_url())

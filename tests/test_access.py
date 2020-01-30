@@ -19,9 +19,7 @@ from atst.app import make_config, make_app
 _NO_ACCESS_CHECK_REQUIRED = _NO_LOGIN_REQUIRED + [
     "applications.accept_invitation",  # available to all users; access control is built into invitation logic
     "atst.catch_all",  # available to all users
-    "atst.csp_environment_access",  # internal redirect
     "atst.home",  # available to all users
-    "atst.jedi_csp_calculator",  # internal redirect
     "dev.messages",  # dev tool
     "dev.test_email",  # dev tool
     "portfolios.accept_invitation",  # available to all users; access control is built into invitation logic
