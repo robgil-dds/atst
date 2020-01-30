@@ -1,12 +1,16 @@
 import json
 import re
 from secrets import token_urlsafe
-from typing import Dict
+from typing import Any, Dict
 from uuid import uuid4
+
+from atst.utils import sha256_hex
 
 from .cloud_provider_interface import CloudProviderInterface
 from .exceptions import AuthenticationException
 from .models import (
+    AdminRoleDefinitionCSPPayload,
+    AdminRoleDefinitionCSPResult,
     ApplicationCSPPayload,
     ApplicationCSPResult,
     BillingInstructionCSPPayload,
@@ -19,26 +23,36 @@ from .models import (
     BillingProfileVerificationCSPResult,
     KeyVaultCredentials,
     ManagementGroupCSPResponse,
+    PrincipalAdminRoleCSPPayload,
+    PrincipalAdminRoleCSPResult,
     TaskOrderBillingCreationCSPPayload,
     TaskOrderBillingCreationCSPResult,
     TaskOrderBillingVerificationCSPPayload,
     TaskOrderBillingVerificationCSPResult,
+    TenantAdminOwnershipCSPPayload,
+    TenantAdminOwnershipCSPResult,
     TenantCSPPayload,
     TenantCSPResult,
+    TenantPrincipalAppCSPPayload,
+    TenantPrincipalAppCSPResult,
+    TenantPrincipalCredentialCSPPayload,
+    TenantPrincipalCredentialCSPResult,
+    TenantPrincipalCSPPayload,
+    TenantPrincipalCSPResult,
+    TenantPrincipalOwnershipCSPPayload,
+    TenantPrincipalOwnershipCSPResult,
 )
 from .policy import AzurePolicyManager
-from atst.utils import sha256_hex
 
-AZURE_ENVIRONMENT = "AZURE_PUBLIC_CLOUD"  # TBD
-AZURE_SKU_ID = "?"  # probably a static sku specific to ATAT/JEDI
 SUBSCRIPTION_ID_REGEX = re.compile(
     "subscriptions\/([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})",
     re.I,
 )
 
 # This needs to be a fully pathed role definition identifier, not just a UUID
+# TODO: Extract these from sdk msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
+AZURE_SKU_ID = "0001"  # probably a static sku specific to ATAT/JEDI
 REMOTE_ROOT_ROLE_DEF_ID = "/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-4000-8000-000000000000"
-AZURE_MANAGEMENT_API = "https://management.azure.com"
 
 
 class AzureSDKProvider(object):
@@ -50,8 +64,9 @@ class AzureSDKProvider(object):
         import azure.identity as identity
         from azure.keyvault import secrets
         from azure.core import exceptions
-
-        from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
+        from msrestazure.azure_cloud import (
+            AZURE_PUBLIC_CLOUD,
+        )  # TODO: choose cloud type from config
         import adal
         import requests
 
@@ -66,7 +81,6 @@ class AzureSDKProvider(object):
         self.exceptions = exceptions
         self.secrets = secrets
         self.requests = requests
-        # may change to a JEDI cloud
         self.cloud = AZURE_PUBLIC_CLOUD
 
 
@@ -78,6 +92,9 @@ class AzureCloudProvider(CloudProviderInterface):
         self.secret_key = config["AZURE_SECRET_KEY"]
         self.tenant_id = config["AZURE_TENANT_ID"]
         self.vault_url = config["AZURE_VAULT_URL"]
+        self.ps_client_id = config["POWERSHELL_CLIENT_ID"]
+        self.owner_role_def_id = config["AZURE_OWNER_ROLE_DEF_ID"]
+        self.graph_resource = config["AZURE_GRAPH_RESOURCE"]
 
         if azure_sdk_provider is None:
             self.sdk = AzureSDKProvider()
@@ -87,7 +104,7 @@ class AzureCloudProvider(CloudProviderInterface):
         self.policy_manager = AzurePolicyManager(config["AZURE_POLICY_LOCATION"])
 
     def set_secret(self, secret_key, secret_value):
-        credential = self._get_client_secret_credential_obj({})
+        credential = self._get_client_secret_credential_obj()
         secret_client = self.sdk.secrets.SecretClient(
             vault_url=self.vault_url, credential=credential,
         )
@@ -100,7 +117,7 @@ class AzureCloudProvider(CloudProviderInterface):
             )
 
     def get_secret(self, secret_key):
-        credential = self._get_client_secret_credential_obj({})
+        credential = self._get_client_secret_credential_obj()
         secret_client = self.sdk.secrets.SecretClient(
             vault_url=self.vault_url, credential=credential,
         )
@@ -176,7 +193,7 @@ class AzureCloudProvider(CloudProviderInterface):
                 "secret_key": creds.root_sp_key,
                 "tenant_id": creds.root_tenant_id,
             },
-            resource=AZURE_MANAGEMENT_API,
+            resource=self.sdk.cloud.endpoints.resource_manager,
         )
 
         response = self._create_management_group(
@@ -301,7 +318,7 @@ class AzureCloudProvider(CloudProviderInterface):
         )
 
     def create_tenant(self, payload: TenantCSPPayload):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self._get_root_provisioning_token()
         if sp_token is None:
             raise AuthenticationException("Could not resolve token for tenant creation")
 
@@ -313,26 +330,33 @@ class AzureCloudProvider(CloudProviderInterface):
         }
 
         result = self.sdk.requests.post(
-            "https://management.azure.com/providers/Microsoft.SignUp/createTenant?api-version=2020-01-01-preview",
+            f"{self.sdk.cloud.endpoints.resource_manager}/providers/Microsoft.SignUp/createTenant?api-version=2020-01-01-preview",
             json=create_tenant_body,
             headers=create_tenant_headers,
         )
 
         if result.status_code == 200:
-            return self._ok(
-                TenantCSPResult(
-                    **result.json(),
-                    tenant_admin_password=payload.password,
-                    tenant_admin_username=payload.user_id,
-                )
+            result_dict = result.json()
+            tenant_id = result_dict.get("tenantId")
+            tenant_admin_username = (
+                f"{payload.user_id}@{payload.domain_name}.onmicrosoft.com"
             )
+            self.update_tenant_creds(
+                tenant_id,
+                KeyVaultCredentials(
+                    tenant_id=tenant_id,
+                    tenant_admin_username=tenant_admin_username,
+                    tenant_admin_password=payload.password,
+                ),
+            )
+            return self._ok(TenantCSPResult(**result_dict))
         else:
             return self._error(result.json())
 
     def create_billing_profile_creation(
         self, payload: BillingProfileCreationCSPPayload
     ):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self._get_root_provisioning_token()
         if sp_token is None:
             raise AuthenticationException(
                 "Could not resolve token for billing profile creation"
@@ -344,7 +368,7 @@ class AzureCloudProvider(CloudProviderInterface):
             "Authorization": f"Bearer {sp_token}",
         }
 
-        billing_account_create_url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles?api-version=2019-10-01-preview"
+        billing_account_create_url = f"{self.sdk.cloud.endpoints.resource_manager}/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles?api-version=2019-10-01-preview"
 
         result = self.sdk.requests.post(
             billing_account_create_url,
@@ -364,7 +388,7 @@ class AzureCloudProvider(CloudProviderInterface):
     def create_billing_profile_verification(
         self, payload: BillingProfileVerificationCSPPayload
     ):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self._get_root_provisioning_token()
         if sp_token is None:
             raise AuthenticationException(
                 "Could not resolve token for billing profile validation"
@@ -389,7 +413,7 @@ class AzureCloudProvider(CloudProviderInterface):
     def create_billing_profile_tenant_access(
         self, payload: BillingProfileTenantAccessCSPPayload
     ):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self._get_root_provisioning_token()
         request_body = {
             "properties": {
                 "principalTenantId": payload.tenant_id,  # from tenant creation
@@ -402,7 +426,7 @@ class AzureCloudProvider(CloudProviderInterface):
             "Authorization": f"Bearer {sp_token}",
         }
 
-        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/createBillingRoleAssignment?api-version=2019-10-01-preview"
+        url = f"{self.sdk.cloud.endpoints.resource_manager}/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/createBillingRoleAssignment?api-version=2019-10-01-preview"
 
         result = self.sdk.requests.post(url, headers=headers, json=request_body)
         if result.status_code == 201:
@@ -413,12 +437,12 @@ class AzureCloudProvider(CloudProviderInterface):
     def create_task_order_billing_creation(
         self, payload: TaskOrderBillingCreationCSPPayload
     ):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self._get_root_provisioning_token()
         request_body = [
             {
                 "op": "replace",
                 "path": "/enabledAzurePlans",
-                "value": [{"skuId": "0001"}],
+                "value": [{"skuId": AZURE_SKU_ID}],
             }
         ]
 
@@ -426,7 +450,7 @@ class AzureCloudProvider(CloudProviderInterface):
             "Authorization": f"Bearer {sp_token}",
         }
 
-        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}?api-version=2019-10-01-preview"
+        url = f"{self.sdk.cloud.endpoints.resource_manager}/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}?api-version=2019-10-01-preview"
 
         result = self.sdk.requests.patch(
             url, headers=request_headers, json=request_body
@@ -443,7 +467,7 @@ class AzureCloudProvider(CloudProviderInterface):
     def create_task_order_billing_verification(
         self, payload: TaskOrderBillingVerificationCSPPayload
     ):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self._get_root_provisioning_token()
         if sp_token is None:
             raise AuthenticationException(
                 "Could not resolve token for task order billing validation"
@@ -466,7 +490,7 @@ class AzureCloudProvider(CloudProviderInterface):
             return self._error(result.json())
 
     def create_billing_instruction(self, payload: BillingInstructionCSPPayload):
-        sp_token = self._get_sp_token(payload.creds)
+        sp_token = self._get_root_provisioning_token()
         if sp_token is None:
             raise AuthenticationException(
                 "Could not resolve token for task order billing validation"
@@ -480,7 +504,7 @@ class AzureCloudProvider(CloudProviderInterface):
             }
         }
 
-        url = f"https://management.azure.com/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/instructions/{payload.initial_task_order_id}:CLIN00{payload.initial_clin_type}?api-version=2019-10-01-preview"
+        url = f"{self.sdk.cloud.endpoints.resource_manager}/providers/Microsoft.Billing/billingAccounts/{payload.billing_account_name}/billingProfiles/{payload.billing_profile_name}/instructions/{payload.initial_task_order_id}:CLIN00{payload.initial_clin_type}?api-version=2019-10-01-preview"
 
         auth_header = {
             "Authorization": f"Bearer {sp_token}",
@@ -493,21 +517,198 @@ class AzureCloudProvider(CloudProviderInterface):
         else:
             return self._error(result.json())
 
-    def create_remote_admin(self, creds, tenant_details):
-        # create app/service principal within tenant, with name constructed from tenant details
-        # assign principal global admin
+    def create_tenant_admin_ownership(self, payload: TenantAdminOwnershipCSPPayload):
+        mgmt_token = self._get_elevated_management_token(payload.tenant_id)
 
-        # needs to call out to CLI with tenant owner username/password, prototyping for that underway
+        role_definition_id = f"/providers/Microsoft.Management/managementGroups/{payload.tenant_id}/providers/Microsoft.Authorization/roleDefinitions/{self.owner_role_def_id}"
 
-        # return identifier and creds to consumer for storage
-        response = {"clientId": "string", "secretKey": "string", "tenantId": "string"}
-        return self._ok(
-            {
-                "client_id": response["clientId"],
-                "secret_key": response["secret_key"],
-                "tenant_id": response["tenantId"],
+        request_body = {
+            "properties": {
+                "roleDefinitionId": role_definition_id,
+                "principalId": payload.user_object_id,
             }
+        }
+
+        auth_header = {
+            "Authorization": f"Bearer {mgmt_token}",
+        }
+
+        assignment_guid = str(uuid4())
+
+        url = f"{self.sdk.cloud.endpoints.resource_manager}/providers/Microsoft.Management/managementGroups/{payload.tenant_id}/providers/Microsoft.Authorization/roleAssignments/{assignment_guid}?api-version=2015-07-01"
+
+        response = self.sdk.requests.put(url, headers=auth_header, json=request_body)
+
+        if response.ok:
+            return TenantAdminOwnershipCSPResult(**response.json())
+
+    def create_tenant_principal_ownership(
+        self, payload: TenantPrincipalOwnershipCSPPayload
+    ):
+        mgmt_token = self._get_elevated_management_token(payload.tenant_id)
+
+        # NOTE: the tenant_id is also the id of the root management group, once it is created
+        role_definition_id = f"/providers/Microsoft.Management/managementGroups/{payload.tenant_id}/providers/Microsoft.Authorization/roleDefinitions/{self.owner_role_def_id}"
+
+        request_body = {
+            "properties": {
+                "roleDefinitionId": role_definition_id,
+                "principalId": payload.principal_id,
+            }
+        }
+
+        auth_header = {
+            "Authorization": f"Bearer {mgmt_token}",
+        }
+
+        assignment_guid = str(uuid4())
+
+        url = f"{self.sdk.cloud.endpoints.resource_manager}/providers/Microsoft.Management/managementGroups/{payload.tenant_id}/providers/Microsoft.Authorization/roleAssignments/{assignment_guid}?api-version=2015-07-01"
+
+        response = self.sdk.requests.put(url, headers=auth_header, json=request_body)
+
+        if response.ok:
+            return TenantPrincipalOwnershipCSPResult(**response.json())
+
+    def create_tenant_principal_app(self, payload: TenantPrincipalAppCSPPayload):
+        graph_token = self._get_tenant_admin_token(
+            payload.tenant_id, self.graph_resource
         )
+        if graph_token is None:
+            raise AuthenticationException(
+                "Could not resolve graph token for tenant admin"
+            )
+
+        request_body = {"displayName": "ATAT Remote Admin"}
+
+        auth_header = {
+            "Authorization": f"Bearer {graph_token}",
+        }
+
+        url = f"{self.graph_resource}/v1.0/applications"
+
+        response = self.sdk.requests.post(url, json=request_body, headers=auth_header)
+
+        if response.ok:
+            return TenantPrincipalAppCSPResult(**response.json())
+
+    def create_tenant_principal(self, payload: TenantPrincipalCSPPayload):
+        graph_token = self._get_tenant_admin_token(
+            payload.tenant_id, self.graph_resource
+        )
+        if graph_token is None:
+            raise AuthenticationException(
+                "Could not resolve graph token for tenant admin"
+            )
+
+        request_body = {"appId": payload.principal_app_id}
+
+        auth_header = {
+            "Authorization": f"Bearer {graph_token}",
+        }
+
+        url = f"{self.graph_resource}/beta/servicePrincipals"
+
+        response = self.sdk.requests.post(url, json=request_body, headers=auth_header)
+
+        if response.ok:
+            return TenantPrincipalCSPResult(**response.json())
+
+    def create_tenant_principal_credential(
+        self, payload: TenantPrincipalCredentialCSPPayload
+    ):
+        graph_token = self._get_tenant_admin_token(
+            payload.tenant_id, self.graph_resource
+        )
+        if graph_token is None:
+            raise AuthenticationException(
+                "Could not resolve graph token for tenant admin"
+            )
+
+        request_body = {
+            "passwordCredentials": [{"displayName": "ATAT Generated Password"}]
+        }
+
+        auth_header = {
+            "Authorization": f"Bearer {graph_token}",
+        }
+
+        url = f"{self.graph_resource}/v1.0/applications/{payload.principal_app_object_id}/addPassword"
+
+        response = self.sdk.requests.post(url, json=request_body, headers=auth_header)
+
+        if response.ok:
+            result = response.json()
+            self.update_tenant_creds(
+                payload.tenant_id,
+                KeyVaultCredentials(
+                    tenant_id=payload.tenant_id,
+                    tenant_sp_key=result.get("secretText"),
+                    tenant_sp_client_id=payload.principal_app_id,
+                ),
+            )
+            return TenantPrincipalCredentialCSPResult(
+                principal_client_id=payload.principal_app_id,
+                principal_creds_established=True,
+            )
+
+    def create_admin_role_definition(self, payload: AdminRoleDefinitionCSPPayload):
+        graph_token = self._get_tenant_admin_token(
+            payload.tenant_id, self.graph_resource
+        )
+        if graph_token is None:
+            raise AuthenticationException(
+                "Could not resolve graph token for tenant admin"
+            )
+
+        auth_header = {
+            "Authorization": f"Bearer {graph_token}",
+        }
+
+        url = f"{self.graph_resource}/beta/roleManagement/directory/roleDefinitions"
+
+        response = self.sdk.requests.get(url, headers=auth_header)
+
+        result = response.json()
+        roleList = result.get("value")
+
+        DEFAULT_ADMIN_RD_ID = "794bb258-3e31-42ff-9ee4-731a72f62851"
+        admin_role_def_id = next(
+            (
+                role.get("id")
+                for role in roleList
+                if role.get("displayName") == "Company Administrator"
+            ),
+            DEFAULT_ADMIN_RD_ID,
+        )
+
+        return AdminRoleDefinitionCSPResult(admin_role_def_id=admin_role_def_id)
+
+    def create_principal_admin_role(self, payload: PrincipalAdminRoleCSPPayload):
+        graph_token = self._get_tenant_admin_token(
+            payload.tenant_id, self.graph_resource
+        )
+        if graph_token is None:
+            raise AuthenticationException(
+                "Could not resolve graph token for tenant admin"
+            )
+
+        request_body = {
+            "principalId": payload.principal_id,
+            "roleDefinitionId": payload.admin_role_def_id,
+            "resourceScope": "/",
+        }
+
+        auth_header = {
+            "Authorization": f"Bearer {graph_token}",
+        }
+
+        url = f"{self.graph_resource}/beta/roleManagement/directory/roleAssignments"
+
+        response = self.sdk.requests.post(url, headers=auth_header, json=request_body)
+
+        if response.ok:
+            return PrincipalAdminRoleCSPResult(**response.json())
 
     def force_tenant_admin_pw_update(self, creds, tenant_owner_id):
         # use creds to update to force password recovery?
@@ -577,22 +778,42 @@ class AzureCloudProvider(CloudProviderInterface):
         if sub_id_match:
             return sub_id_match.group(1)
 
-    def _get_sp_token(self, creds):
-        home_tenant_id = creds.get("home_tenant_id")
-        client_id = creds.get("client_id")
-        secret_key = creds.get("secret_key")
+    def _get_tenant_admin_token(self, tenant_id, resource):
+        creds = self._source_tenant_creds(tenant_id)
+        return self._get_up_token_for_resource(
+            creds.tenant_admin_username,
+            creds.tenant_admin_password,
+            tenant_id,
+            resource,
+        )
 
-        # TODO: Make endpoints consts or configs
-        authentication_endpoint = "https://login.microsoftonline.com/"
-        resource = "https://management.azure.com/"
+    def _get_root_provisioning_token(self):
+        creds = self._source_creds()
+        return self._get_sp_token(
+            creds.tenant_id, creds.root_sp_client_id, creds.root_sp_key
+        )
 
+    def _get_sp_token(self, tenant_id, client_id, secret_key):
         context = self.sdk.adal.AuthenticationContext(
-            authentication_endpoint + home_tenant_id
+            f"{self.sdk.cloud.endpoints.active_directory}/{tenant_id}"
         )
 
         # TODO: handle failure states here
         token_response = context.acquire_token_with_client_credentials(
-            resource, client_id, secret_key
+            self.sdk.cloud.endpoints.resource_manager, client_id, secret_key
+        )
+
+        return token_response.get("accessToken", None)
+
+    def _get_up_token_for_resource(self, username, password, tenant_id, resource):
+
+        context = self.sdk.adal.AuthenticationContext(
+            f"{self.sdk.cloud.endpoints.active_directory}/{tenant_id}"
+        )
+
+        # TODO: handle failure states here
+        token_response = context.acquire_token_with_username_password(
+            resource, username, password, self.ps_client_id
         )
 
         return token_response.get("accessToken", None)
@@ -606,15 +827,13 @@ class AzureCloudProvider(CloudProviderInterface):
             cloud_environment=self.sdk.cloud,
         )
 
-    def _get_client_secret_credential_obj(self, creds):
+    def _get_client_secret_credential_obj(self):
+        creds = self._source_creds()
         return self.sdk.identity.ClientSecretCredential(
-            tenant_id=creds.get("tenant_id"),
-            client_id=creds.get("client_id"),
-            client_secret=creds.get("secret_key"),
+            tenant_id=creds.tenant_id,
+            client_id=creds.root_sp_client_id,
+            client_secret=creds.root_sp_key,
         )
-
-    def _make_tenant_admin_cred_obj(self, username, password):
-        return self.sdk.credentials.UserPassCredentials(username, password)
 
     def _ok(self, body=None):
         return self._make_response("ok", body)
@@ -642,6 +861,26 @@ class AzureCloudProvider(CloudProviderInterface):
             "tenant_id": self.tenant_id,
         }
 
+    def _get_elevated_management_token(self, tenant_id):
+        mgmt_token = self._get_tenant_admin_token(
+            tenant_id, self.sdk.cloud.endpoints.resource_manager
+        )
+        if mgmt_token is None:
+            raise AuthenticationException(
+                "Failed to resolve management token for tenant admin"
+            )
+
+        auth_header = {
+            "Authorization": f"Bearer {mgmt_token}",
+        }
+        url = f"{self.sdk.cloud.endpoints.resource_manager}/providers/Microsoft.Authorization/elevateAccess?api-version=2016-07-01"
+        result = self.sdk.requests.post(url, headers=auth_header)
+
+        if not result.ok:
+            raise AuthenticationException("Failed to elevate access")
+
+        return mgmt_token
+
     def _source_creds(self, tenant_id=None) -> KeyVaultCredentials:
         if tenant_id:
             return self._source_tenant_creds(tenant_id)
@@ -652,13 +891,16 @@ class AzureCloudProvider(CloudProviderInterface):
                 root_sp_key=self._root_creds.get("secret_key"),
             )
 
-    def update_tenant_creds(self, tenant_id, secret):
+    def update_tenant_creds(self, tenant_id, secret: KeyVaultCredentials):
         hashed = sha256_hex(tenant_id)
-        self.set_secret(hashed, json.dumps(secret))
+        new_secrets = secret.dict()
+        curr_secrets = self._source_tenant_creds(tenant_id)
+        updated_secrets: Dict[str, Any] = {**curr_secrets.dict(), **new_secrets}
+        us = KeyVaultCredentials(**updated_secrets)
+        self.set_secret(hashed, json.dumps(us.dict()))
+        return us
 
-        return secret
-
-    def _source_tenant_creds(self, tenant_id):
+    def _source_tenant_creds(self, tenant_id) -> KeyVaultCredentials:
         hashed = sha256_hex(tenant_id)
         raw_creds = self.get_secret(hashed)
         return KeyVaultCredentials(**json.loads(raw_creds))

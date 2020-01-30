@@ -16,7 +16,7 @@ Ex.
 ```
 {
     'postgres_root_user': 'EzTEzSNLKQPHuJyPdPloIDCAlcibbl',
-    'postgres_root_password': "2+[A@E4:C=ubb/#R#'n<p|wCW-|%q^"
+    'postgres_root_password': "2+[A@E4:C=ubb/#R#'n<p|wCW-|%q^" <!-- pragma: allowlist secret -->
 }
 ```
 
