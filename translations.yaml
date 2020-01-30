@@ -524,11 +524,16 @@ task_orders:
     tooltip:
       obligated_funds: Funds committed to fund your portfolio. This may represent 100% of your total Task Order value, or a portion of it.
       total_value: All obligated and projected funds for the Task Order’s Base and Option CLINs.
-      expended_funds: All funds spend from the Task Order so far.
+      expended_funds: All funds spent from the Task Order so far.
   form:
     add_clin: Add Another CLIN
     add_to_header: Enter the Task Order number
     add_to_description: Please input your 13-digit Task Order number. This number may be listed under "Order Number" if your Contracting Officer used form 1149, or "Delivery Order/Call No." if form 1155 was used. Moving forward, this portion of funding will be referenced by the recorded Task Order number.
+    builder_base:
+      cancel_modal: Do you want to save this draft?
+      delete_draft: No, delete it
+      save_draft: Yes, save for later
+      to_number: "<strong>Task Order Number:</strong> {number}"
     clin_title: Enter Contract Line Items
     clin_description: "Refer to your task order to locate your Contract Line Item Numbers (CLINs)."
     clin_details: CLIN Details
@@ -551,12 +556,16 @@ task_orders:
     step_1:
       title: Upload your approved Task Order (TO)
       description: Upload your approved Task Order here. You are required to confirm you have the appropriate signature. You will have the ability to add additional approved Task Orders with more funding to this Portfolio in the future.
+      next_button: "Next: Add TO Number"
+    step_2:
+      next_button: "Next: Add Base CLIN"
     step_3:
       next_button: "Next: Review Task Order"
       percent_obligated: "% of Funds Obligated"
     step_4:
       documents: Documents
       clins: CLIN Summary
+      next_button: "Next: Confirm"
     step_5:
       cta_text: Verify Your Information
       description: Prior to submitting the Task Order, you must acknowledge, by marking the appropriate box below, that the uploaded Task Order is signed by an appropriate, duly warranted Contracting Officer who has the authority to execute the uploaded Task Order on your Agency’s behalf and has authorized you to upload the Task Order in accordance with Agency policy and procedures. You must further acknowledge, by marking the appropriate box below, that all information entered herein matches that of the submitted Task Order.
